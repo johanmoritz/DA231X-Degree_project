@@ -48,6 +48,7 @@ latex.out/
 # algorithms
 *.alg
 *.loa
+*.ist
 
 # achemso
 acs-*.bib
