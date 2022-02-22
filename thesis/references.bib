@@ -175,20 +175,65 @@
 }
 
 @inproceedings{androulaki_hyperledger_2018,
-	location = {Porto Portugal},
-	title = {Hyperledger fabric: a distributed operating system for permissioned blockchains},
-	isbn = {978-1-4503-5584-1},
-	url = {https://dl.acm.org/doi/10.1145/3190508.3190538},
-	doi = {10.1145/3190508.3190538},
-	shorttitle = {Hyperledger fabric},
-	abstract = {Fabric is a modular and extensible open-source system for deploying and operating permissioned blockchains and one of the Hyperledger projects hosted by the Linux Foundation (www.hyperledger.org).},
-	eventtitle = {{EuroSys} '18: Thirteenth {EuroSys} Conference 2018},
-	pages = {1--15},
-	booktitle = {Proceedings of the Thirteenth {EuroSys} Conference},
-	publisher = {{ACM}},
-	author = {Androulaki, Elli and Barger, Artem and Bortnikov, Vita and Cachin, Christian and Christidis, Konstantinos and De Caro, Angelo and Enyeart, David and Ferris, Christopher and Laventman, Gennady and Manevich, Yacov and Muralidharan, Srinivasan and Murthy, Chet and Nguyen, Binh and Sethi, Manish and Singh, Gari and Smith, Keith and Sorniotti, Alessandro and Stathakopoulou, Chrysoula and Vukolić, Marko and Cocco, Sharon Weed and Yellick, Jason},
-	urldate = {2022-02-21},
-	date = {2018-04-23},
-	langid = {english},
-	file = {Androulaki et al. - 2018 - Hyperledger fabric a distributed operating system.pdf:C\:\\Users\\johan.moritz\\Zotero\\storage\\24LDSJJD\\Androulaki et al. - 2018 - Hyperledger fabric a distributed operating system.pdf:application/pdf},
+  location   = {Porto Portugal},
+  title      = {Hyperledger fabric: a distributed operating system for permissioned blockchains},
+  isbn       = {978-1-4503-5584-1},
+  url        = {https://dl.acm.org/doi/10.1145/3190508.3190538},
+  doi        = {10.1145/3190508.3190538},
+  shorttitle = {Hyperledger fabric},
+  abstract   = {Fabric is a modular and extensible open-source system for deploying and operating permissioned blockchains and one of the Hyperledger projects hosted by the Linux Foundation (www.hyperledger.org).},
+  eventtitle = {{EuroSys} '18: Thirteenth {EuroSys} Conference 2018},
+  pages      = {1--15},
+  booktitle  = {Proceedings of the Thirteenth {EuroSys} Conference},
+  publisher  = {{ACM}},
+  author     = {Androulaki, Elli and Barger, Artem and Bortnikov, Vita and Cachin, Christian and Christidis, Konstantinos and De Caro, Angelo and Enyeart, David and Ferris, Christopher and Laventman, Gennady and Manevich, Yacov and Muralidharan, Srinivasan and Murthy, Chet and Nguyen, Binh and Sethi, Manish and Singh, Gari and Smith, Keith and Sorniotti, Alessandro and Stathakopoulou, Chrysoula and Vukolić, Marko and Cocco, Sharon Weed and Yellick, Jason},
+  urldate    = {2022-02-21},
+  date       = {2018-04-23},
+  langid     = {english},
+  file       = {Androulaki et al. - 2018 - Hyperledger fabric a distributed operating system.pdf:C\:\\Users\\johan.moritz\\Zotero\\storage\\24LDSJJD\\Androulaki et al. - 2018 - Hyperledger fabric a distributed operating system.pdf:application/pdf}
+}
+
+@inproceedings{barger_byzantine_2021,
+  title      = {A Byzantine Fault-Tolerant Consensus Library for Hyperledger Fabric},
+  doi        = {10.1109/ICBC51069.2021.9461099},
+  abstract   = {Hyperledger Fabric is an enterprise grade permissioned distributed ledger platform that offers modularity for a broad set of industry use cases. One modular component is a pluggable ordering service that establishes consensus on the order of transactions and batches them into blocks. However, as of the time of this writing, there is no production grade Byzantine Fault-Tolerant ({BFT}) ordering service for Fabric, with the latest version (v2.3) supporting only Crash Fault-Tolerance ({CFT}).In this work we describe the design and implementation of a {BFT} ordering service for Fabric, employing a new {BFT} consensus library. The new library, based on the {BFT}-{SMART} protocol and written in Go, is tailored to the blockchain use-case, yet is general enough to cater to a wide variety of other uses. The {BFT} library's design and integration into Fabric address crucial aspects that were left unsolved in all prior work, making them unfit for production use. We evaluate the new {BFT} ordering service by comparing it with the currently supported Raft-based {CFT} ordering service in Hyperledger Fabric.},
+  eventtitle = {2021 {IEEE} International Conference on Blockchain and Cryptocurrency ({ICBC})},
+  pages      = {1--9},
+  booktitle  = {2021 {IEEE} International Conference on Blockchain and Cryptocurrency ({ICBC})},
+  author     = {Barger, Artem and Manevich, Yacov and Meir, Hagar and Tock, Yoav},
+  date       = {2021-05},
+  keywords   = {Blockchain, Distributed ledger, Distributed Ledger, Fault tolerance, Fault tolerant systems, Production, Protocols, Writing},
+  file       = {IEEE Xplore Full Text PDF:C\:\\Users\\johan.moritz\\Zotero\\storage\\RWS2TJY3\\Barger et al. - 2021 - A Byzantine Fault-Tolerant Consensus Library for H.pdf:application/pdf}
+}
+
+@article{di_pierro_what_2017,
+  title        = {What Is the Blockchain?},
+  volume       = {19},
+  issn         = {1558-366X},
+  doi          = {10.1109/MCSE.2017.3421554},
+  abstract     = {Blockchain is a new technology, based on hashing, which is at the foundation of the platforms for trading cryptocurrencies and executing smart contracts. This article reviews the basic ideas of this technology and provides a sample minimalist implementation in Python.},
+  pages        = {92--95},
+  number       = {5},
+  journaltitle = {Computing in Science Engineering},
+  author       = {Di Pierro, Massimo},
+  date         = {2017},
+  note         = {Conference Name: Computing in Science Engineering},
+  keywords     = {Authentication, Bitcoin, blockchain, Contracts, cryptography, Digital signatures, finance, Peer-to-peer computing, scientific computing},
+  file         = {IEEE Xplore Full Text PDF:C\:\\Users\\johan.moritz\\Zotero\\storage\\PNKB8LX5\\Di Pierro - 2017 - What Is the Blockchain.pdf:application/pdf;IEEE Xplore Abstract Record:C\:\\Users\\johan.moritz\\Zotero\\storage\\52IIHWDA\\8024092.html:text/html}
+}
+
+@article{nakamoto_bitcoin_nodate,
+  title    = {Bitcoin: A Peer-to-Peer Electronic Cash System},
+  abstract = {A purely peer-to-peer version of electronic cash would allow online payments to be sent directly from one party to another without going through a financial institution. Digital signatures provide part of the solution, but the main benefits are lost if a trusted third party is still required to prevent double-spending. We propose a solution to the double-spending problem using a peer-to-peer network. The network timestamps transactions by hashing them into an ongoing chain of hash-based proof-of-work, forming a record that cannot be changed without redoing the proof-of-work. The longest chain not only serves as proof of the sequence of events witnessed, but proof that it came from the largest pool of {CPU} power. As long as a majority of {CPU} power is controlled by nodes that are not cooperating to attack the network, they'll generate the longest chain and outpace attackers. The network itself requires minimal structure. Messages are broadcast on a best effort basis, and nodes can leave and rejoin the network at will, accepting the longest proof-of-work chain as proof of what happened while they were gone.},
+  pages    = {9},
+  author   = {Nakamoto, Satoshi},
+  langid   = {english},
+  file     = {Nakamoto - Bitcoin A Peer-to-Peer Electronic Cash System.pdf:C\:\\Users\\johan.moritz\\Zotero\\storage\\AL2SD348\\Nakamoto - Bitcoin A Peer-to-Peer Electronic Cash System.pdf:application/pdf}
+}
+
+@online{fabric_gateway_2022,
+  title   = {Fabric Gateway — hyperledger-fabricdocs main documentation},
+  url     = {https://hyperledger-fabric.readthedocs.io/en/release-2.4/gateway.html},
+  urldate = {2022-02-22},
+  file    = {Fabric Gateway — hyperledger-fabricdocs main documentation:C\:\\Users\\johan.moritz\\Zotero\\storage\\8ZTJYHC9\\gateway.html:text/html}
 }

@@ -569,7 +569,7 @@ Within information security, the terms confidentiality, integrity and availabili
 
 In a response to supply chain attacks on package archives for open source software, several projects have started within the linux community in order to raise build reproducibility \cite{reproducible_builds_project}. Traditionally, linux distributions come with package managers (such as apt \textbf{cite} (apt) or pacman \textbf{cite} (pacman)) that help users installing and managing programs. While many packages have their source code available online and can be built directly from it by each user, package managers commonly have the functionality to download pre-built programs from an archive. This is convenient for the user but comes with security risks. Using pre-built packages relies on trusting the builder to use the correct source code and that any dependencies needed to build the package are themselves correct.
 
-Building a package reproducibly means it is bit-by-bit identical every time it is built, no matter the build-environment \cite{lamb_reproducible_2021}. Verifying its correctness can therefore rely on multiple parties, each building it separately, instead of trusting a single builder. Each builder can supply a hash of the built software which, if everything has been done correctly, should all be the same. Reproducible builds allows a separation between distributing the software artifact and its verification. Different efforts to make builds reproducible have used various strategies, but a core similarity \textbf{is this true??} between them is the use of some kind of specification for the build-environment.
+Building a package reproducibly means it is bit-by-bit identical every time it is built \cite{lamb_reproducible_2021}. Verifying its correctness can therefore rely on multiple parties, each building it separately, instead of trusting a single builder. Each builder can supply a hash of the built software which, if everything has been done correctly, should all be the same. Reproducible builds allows a separation between distributing the software artifact and its verification. Different efforts to make builds reproducible have used various strategies, but a core similarity \textbf{is this true??} between them is the use of some kind of specification for the build-environment.
 
 \subsection{Nix}
 
@@ -580,6 +580,8 @@ Building a package reproducibly means it is bit-by-bit identical every time it i
 \subsection{.buildinfo}
 
 In order for builds to be reproducible in different computing environments, the Debian project uses .buildinfo files to describe the necessary parts of the environment in which a package was first built. By recreating this environment on a different machine, build artifacts become identical (if the package is reproducible). .buildinfo files include, among other, name and version of the source package, architecture it was built on, checksums for the build artifacts and other packages available on the system \cite{lamb_reproducible_2021}. The .buildinfo files origin and authenticity is given by the builder signing it with their private \glsentryshort{PGP} key. A user can verify that a package has been built from source by comparing its checksum from \textbf{hash example} with the one in a corresponding .buildinfo file from a trusted source.
+
+Currently, .buildinfo files are distributed in a centralized archive \textbf{cite}. As this is a single-point-of-failure, if a malicious actor takes control of this archive, it could be very hard for users to know whether or not a package should be trusted.
 
 \subsection{Rebuilding Debian packages}
 
@@ -605,7 +607,9 @@ A number of consensus algorithms exists, serving various applications. One way t
 
 \subsection{Blockchain}
 
+Originally described for Bitcoin \cite{nakamoto_bitcoin_nodate, di_pierro_what_2017}, blockchain is a technology based on \glsentrylong{DLT} for storing transactions without needing a centralized organization. Transactions are represented as simple strings of characters which allows them to model essentially anything. This is why blockchains can be used for a broad spectrum of applications; \eg currencies, ownership contracts etc. \textbf{cite}. The name stems from the setup of a blockchain ledger where groups of, closely related in time, transactions are appended together as a block to the current chain by including a hash of the previous block in the latest one. By grouping transactions together, the throuput of the network improves. A consensus algorithm is used to create a total ordering of the blocks so that every node on the network eventually holds the same ledger.
 
+\todoinline{Add figure for how one block connects to the next.}
 
 \subsection{Peer-to-peer}
 
@@ -616,11 +620,21 @@ A number of consensus algorithms exists, serving various applications. One way t
 
 Run under the umbrella of the Linux Foundation \textbf{cite}, the Hyperledger Fabric, or Fabric, is a permissioned blockchain framework with a novel and flexible approach to \gls{DLT}. A Fabric network can for example choose a consensus algorithm suitable for that particular use case, and define specific requirements for when a particular change to the ledger may be allowed \cite{androulaki_hyperledger_2018}. This section will describe and discuss the main components of a Hyperledger Fabric network and how they work together.
 
-\subsection{Ledger}
+\subsection{Overview}
 
-The Hyperledger Fabric ledger is permissioned which, compared to a public one (such as Bitcoin \textbf{cite}), means that it is only available to certain participants. This is regulated by \glsentryfullpl{MSP} on the network, verifying the identities of nodes through \glsentryfullpl{CA} \textbf{cite}. Besides \glsentryshortpl{MSP}, the nodes on the network can take on one of the roles of \textit{peer} or \textit{orderer}. Every node on network belongs to a some organization whos' \glsentryshort{MSP} determines its role. In this sense, a fabric network is really a network of organizations rather than one of nodes.
+The Hyperledger Fabric ledger is permissioned which, compared to a public one (such as Bitcoin \textbf{cite}), means that it is only available to certain participants. This is regulated by \glsentryfullpl{MSP} on the network, verifying the identities of nodes through \glsentryfullpl{CA} \textbf{cite}. Besides \glsentryshortpl{MSP}, the nodes on the network can take on one of the roles of \textit{peer} or \textit{orderer}. Every node on network belongs to a some organization whos' \glsentryshort{MSP} determines its role. In this sense, a Fabric network is really a network of organizations rather than one of nodes.
 
-Every peer stores' the networks entire blockchain ledger and validates transactions and changes to the ledger. Orderers, on the other hand, clump together transactions into blocks and delivers them to the peers. This separation of concern is one of the unique features of Hyperledger Fabric, and makes consensus algorithm selection possible. Changes onto the ledger are made by invoking smart contracts, called chaincodes within Fabric. Chaincodes are authorized programs that are run by peers on the network. If multple peers (according to its endorcement policy) get the same results by running the a chaincode, any updates the chaincode has created is written to the ledger.
+Every peer stores' the networks entire blockchain ledger and validates transactions and changes to the ledger. Orderers, on the other hand, clump together transactions into blocks and delivers them to the peers. This separation of concern is one of the unique features of Hyperledger Fabric, and makes consensus algorithm selection possible. Changes onto the ledger are made by invoking smart contracts, called chaincodes within Fabric. Chaincodes are authorized programs that are run by peers on the network. If multple peers (according to its endorcement policy) get the same result from running the chaincode, any updates are written to the ledger. For performance reasons, a key-value store representing the current "world-state" is continuously derrived from the ledger and stored on the peers. This allows both reading and writing to happen without going through the entire ledger itself.
+
+\todoinline{No Byzantine fault tolerance in Fabric Ordering service. WIP for example \cite{barger_byzantine_2021}}
+
+\todoinline{Bootstraping ordering service with a genesis block containing a configuration transaction \cite{androulaki_hyperledger_2018}}
+
+\todoinline{Descibe how Endorcement Policies work}
+
+\subsection{Transactions}
+
+A transaction in Hyperledger Fabric goes through a number of steps before a change to the ledger happens. First, a client application invokes a particular chaincode by (as of version 2.4) sending a transaction proposal to the Fabric gateway on the network. The gateway is a service running on a peer which takes care of the transaction details, allowing the client to focus on application logic \cite{fabric_gateway_2022}. After recieving the proposal from the client, the gateway finds the peer within their own organization with the longest ledger, the \textit{endorsing} peer, and forwards it to them. The endorsing peer runs the transaction (\ie chaincode) and notes what parts of the world-state it had to read from. This information together with the chaincode's Endorcement Policy informs which organizations that has to accept, or endorse, the transaction. It is the gateway that forwards the endorcement requests to peers' of each needed organization, and gather their responses. Each peer will sign their endorsment with their private key. The client application will then recieve the result of the transaction, which they can sign and commit to the ledger via the gateway. The gateway sends the signed transaction to the ordering service 
 
 \subsection{Peers}
 
