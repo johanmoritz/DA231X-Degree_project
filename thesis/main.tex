@@ -82,8 +82,8 @@
 \include{lib/acronyms}  %load the acronyms file
 
 %% Information for inside title page
-\title{This is the title in the language of the thesis}
-\subtitle{An subtitle in the language of the thesis}
+\title{Trust in your friends, on the ledger}
+\subtitle{Safer reproducible builds through decentralized distribution of .buildinfo files}
 
 % give the alternative title - i.e., if the thesis is in English, then give a Swedish title
 \alttitle{Detta är den svenska översättningen av titeln}
@@ -551,7 +551,7 @@ This chapter provides basic background information about xxx. Additionally, this
 
 \section{Trust}
 
-While subjective in an absolute sense, trust can be both described and reasoned about. In cite (the trust paper) the authors modell trust as two directed graphs. Each node can choose to trust another node, represented by an edge between them in one of the graphs. They can also choose to trust another node as a recommender, thus adding an edge between them in the second graph. Every node that the recommender trusts is also counted as trusted by the original node. This is the foundation for a web-of-trust \textbf{glossary entry}, such as used by the \glsentryshort{PGP} protocol for cryptographic signing \textbf{verify and cite}.
+While subjective in an absolute sense, trust can be both described and reasoned about. In \cite{abdui-rahman_distributed_nodate} the authors modell trust as two directed graphs. Each node can choose to trust another node, represented by an edge between them in one of the graphs. They can also choose to trust another node as a recommender, thus adding an edge between them in the second graph. Every node that the recommender trusts is also counted as trusted by the original node. This is the foundation for a web-of-trust \textbf{glossary entry}, such as used by the \glsentryshort{PGP} protocol for cryptographic signing \textbf{verify and cite}.
 
 \subsection{\glsentryfull{PKI}}
 
@@ -626,15 +626,23 @@ The Hyperledger Fabric ledger is permissioned which, compared to a public one (s
 
 Every peer stores' the networks entire blockchain ledger and validates transactions and changes to the ledger. Orderers, on the other hand, clump together transactions into blocks and delivers them to the peers. This separation of concern is one of the unique features of Hyperledger Fabric, and makes consensus algorithm selection possible. Changes onto the ledger are made by invoking smart contracts, called chaincodes within Fabric. Chaincodes are authorized programs that are run by peers on the network. If multple peers (according to its endorcement policy) get the same result from running the chaincode, any updates are written to the ledger. For performance reasons, a key-value store representing the current "world-state" is continuously derrived from the ledger and stored on the peers. This allows both reading and writing to happen without going through the entire ledger itself.
 
-\todoinline{No Byzantine fault tolerance in Fabric Ordering service. WIP for example \cite{barger_byzantine_2021}}
-
 \todoinline{Bootstraping ordering service with a genesis block containing a configuration transaction \cite{androulaki_hyperledger_2018}}
 
 \todoinline{Descibe how Endorcement Policies work}
 
 \subsection{Transactions}
 
-A transaction in Hyperledger Fabric goes through a number of steps before a change to the ledger happens. First, a client application invokes a particular chaincode by (as of version 2.4) sending a transaction proposal to the Fabric gateway on the network. The gateway is a service running on a peer which takes care of the transaction details, allowing the client to focus on application logic \cite{fabric_gateway_2022}. After recieving the proposal from the client, the gateway finds the peer within their own organization with the longest ledger, the \textit{endorsing} peer, and forwards it to them. The endorsing peer runs the transaction (\ie chaincode) and notes what parts of the world-state it had to read from. This information together with the chaincode's Endorcement Policy informs which organizations that has to accept, or endorse, the transaction. It is the gateway that forwards the endorcement requests to peers' of each needed organization, and gather their responses. Each peer will sign their endorsment with their private key. The client application will then recieve the result of the transaction, which they can sign and commit to the ledger via the gateway. The gateway sends the signed transaction to the ordering service 
+A transaction in Hyperledger Fabric goes through a number of steps before a change to the ledger happens. First, a client application invokes a particular chaincode by (as of version 2.4) sending a transaction proposal to the Fabric gateway on the network. The gateway is a service running on a peer which takes care of the transaction details, allowing the client to focus on application logic \cite{fabric_gateway_2022}. After recieving the proposal from the client, the gateway finds the peer within their own organization with the longest ledger, the \textit{endorsing} peer, and forwards it to them. The endorsing peer runs the transaction (\ie chaincode) and notes what parts of the world-state it had to read from and which it will write to (the \textit{read-write set}). This information together with the chaincode's Endorcement Policy informs which organizations has to accept, or endorse, the transaction for it to be valid. Only at the time when every necessary organization has endorsed the transaction can any change be made to the ledger.
+
+The Fabric gateway is responsible for forwarding endorcement requests with the transaction proposal to peer's of each necessary organization, and gather their responses. Each of these peers will then run the transaction proposal and sign their endorsment for it with their private key, if they deem it correct. The  gateway recieves the read-write sets and endorcements, validates them, and sends a final version of the transaction to the ordering service. The actual transaction contains the read-write set as well as the endorcements from the different organizations.
+
+As the ordering service is run on other, orderer, nodes on the network, how the ordering service is implemented is completety separated from the functionality of the peers. Its purpose is to group transactions into blocks, order and distribute them to all the peers on the network. By default, Fabrics' ordering service uses Raft, which is voting based crash fault tolerant consensus algorithm \cite{ongaro_raft_2014}. Attempts have been made to add a Byzantine-fault tolerant ordering service to Fabric \cite{barger_byzantine_2021} but so far none has been added to the project.
+
+When a peer recieves a block from the ordering service they add it to their locally stored ledger, validates each transaction and, if valid, updates its local world-state according to the transaction write set. They also notify the client application the status of the transaction. Validation has two parts. First, the transaction must fulfill its endorcement policy and, secondly, the subset of the world-state contained in the read set must not have changed. All transactions, valid and invalid, are added to the ledger, but they are marked to know which ones are which.
+
+
+
+\todoinline{Add figure of transaction flow.}
 
 \subsection{Peers}
 
