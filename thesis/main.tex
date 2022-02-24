@@ -649,7 +649,7 @@ When a peer recieves a block from the ordering service they add it to their loca
 
 An update to the Fabric ledger is only possible if the endorsement policy relevant to a transaction has been fulfilled. Endorsement policies describe which and how many organizations or peers that need to run and endorse a transaction proposal. They are defined as logical formulas referencing relevant organization and role for the peers that have to endorse it. Figure \ref{fig:endorsement-policy-example} shows an example endorsement policy with three organizations called Org1, Org2 and Org3 where all endorsing peers must have the \textit{member} role.
 
-An endorsement policy can be defined on three different granularity levels; chaincode-, collection- and key-level. Chaincode- and collection-level policies are decided on when a chaincode is commited to the network. The former is a general policy which always has to be fulfilled everytime the chaincode submitted as a transaction. Collection-level policies on the other hand are rules for when a chaincode reads or writes from a private collection. A chaincode can have multiple private collections, each with its own collection-level policy.
+An endorsement policy can be defined on three different granularity levels; chaincode-, collection- and key-level. Chaincode- and collection-level policies are decided on when a chaincode is commited to the network. The former is a general policy which always has to be fulfilled everytime the chaincode submitted as a transaction. Collection-level policies on the other hand are rules for when a chaincode reads or writes from a private collection. A chaincode can have multiple private collections, each with its own collection-level policy. When a chaincode accesses such a collection, the additional policies have to be satisfied as well. Key-level policies are similar to collection-level ones in that they only become relevant when a chaincode touches a subset of the world-state. A difference being that key-level policies are declared in the execution of a chaincode. A usecase for this is when adding a new asset to the ledger with a specific owner. By setting a key-level endorsement policy to the key of the asset, any transaction that tries to change the asset will have to be endorsed by, for example, its owner before it is commited to the ledger.
 
 \begin{figure}
 	\begin{verbatim}
@@ -658,14 +658,6 @@ An endorsement policy can be defined on three different granularity levels; chai
 	\caption{Endorsement policy syntax example}
 	\label{fig:endorsement-policy-example}
 \end{figure}
-
-\todoinline{Describe what an endorsement policy is and its purpose}
-
-\todoinline{Chaincode-level endorsement}
-
-\todoinline{Collection-level endorsement}
-
-\todoinline{Key-level endorsement}
 
 \subsection{Chaincode}
 
