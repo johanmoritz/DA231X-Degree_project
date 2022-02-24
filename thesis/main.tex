@@ -630,7 +630,8 @@ Every peer stores' the networks entire blockchain ledger and validates transacti
 
 \todoinline{Descibe how Endorcement Policies work}
 
-\subsection{Transactions}
+\subsection{Transaction flow}
+\label{subsec:transaction-flow}
 
 A transaction in Hyperledger Fabric goes through a number of steps before a change to the ledger happens. First, a client application invokes a particular chaincode by (as of version 2.4) sending a transaction proposal to the Fabric gateway on the network. The gateway is a service running on a peer which takes care of the transaction details, allowing the client to focus on application logic \cite{fabric_gateway_2022}. After recieving the proposal from the client, the gateway finds the peer within their own organization with the longest ledger, the \textit{endorsing} peer, and forwards it to them. The endorsing peer runs the transaction (\ie chaincode) and notes what parts of the world-state it had to read from and which it will write to (the \textit{read-write set}). This information together with the chaincode's Endorcement Policy informs which organizations has to accept, or endorse, the transaction for it to be valid. Only at the time when every necessary organization has endorsed the transaction can any change be made to the ledger.
 
@@ -644,13 +645,20 @@ When a peer recieves a block from the ordering service they add it to their loca
 
 \todoinline{Add figure of transaction flow.}
 
-\subsection{Peers}
-
-\subsection{Policies}
-
-\subsection{Transactions}
+\subsection{Endorcement Policies}
 
 \subsection{Chaincode}
+
+Many current blockchains have some notion of a smart contract \cite{di_pierro_what_2017}, \ie methods to programatically change the ledger only when certain properties, or contracts, have been fulfilled. Smart contracts makes a blockchain more general purpose as they can be used to model many different protocols and applications. \textbf{examples plz}
+
+In Hyperledger Fabric, smart contracts are called chaincode. As there is no inherent asset on the Fabric ledger over which peers can make transactions, chaincodes are the only way the ledger can be changed. They are in other words the only way to create, update and remove assets. Chaincodes has to follow the \textit{fabric-contract} \gls{API} to be run by peers on the network, but what language they can be written in is flexible. The official language options are Java, Javascript and Go, but other languages can be supported in theory. A chaincode smart contract interacts, through the fabric-contract \glsentryshort{API}, with the world-state key-value representation of the ledger and can query, update and set values in it.
+
+Running a chaincode on the network does not update the ledger directly (see \ref{subsec:transaction-flow} for how ledger modifications are implemented). Instead a read-write set of the keys that have been queried from and the changes to the ones that have been set during the execution of the chaincode are generated. The result of the chaincode is this read-write set, which is then further used to update the ledger itself.
+
+\todoinline{Add chaincode example}
+
+\todoinline{Find some good references for chaincode besides the official documentation.}
+
 
 
 \section{Formal verification}
