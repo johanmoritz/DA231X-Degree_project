@@ -469,8 +469,6 @@ goals of this thesis project, and outlines the structure of the thesis.\\
 
 Discussions on how to verify the lack of malicious code in binaries go at least as far back as to Ken Thompson's Turing award lecture \cite{thompson_reflections_1984} where he discusses the issues of trusting code created by others. In recent years, several attacks on popular packages within the \glsentryfull{FOSS} have been executed \cite{lamb_reproducible_2021} where trusted repositories have injected malicious code in their released binaries. These attacks question how much trust in such dependencies is appropriate. In an attempt to raise the level of trust and security in \glsentryfull{FOSS}, the reproducible builds projects \cite{reproducible_builds_project} was started within the Debian community. Its goal was to mitigate the risk that a package is tampered with by ensuring that its builds are deterministic and therefore should be bit-by-bit identical over multiple rebuilds. Any user of a reproducible package can verify that it has indeed been built from its source code and was not manipulated after the fact simply by rebuilding it from the package's .buildinfo file. These metadata files for reproducible builds include hashes of the produced build artifacts and a description of the build environment to enable user-side verification. .buildinfo files are by this notion the crucial link to ensure reproducibility, which also means that a great deal of trust is assumed when using them. Current measures for validating .buildinfo files and their corresponding packages involve package repository managers and volunteers running rebuilderd \cite{rebuilderd_public_nodate} instances that test the reproducibility of every .buildinfo file added to the relevant package archive. This setup allows users to audit the separate build logs, thus confirming the validity of a particular package. However, because this would be a manual process and the different instances do not coordinate their work, it relies on the user judging on a case-by-case basis whether to trust a package or not. This project seeks to reduce some of that burden from the user while increasing their trust in the software they use by investigating possible decentralized solutions for distributing and proving the correctness of .buildinfo files.
 
-% As one can find in RFC 1235\,\cite{ioannidis_coherent_1991} multicast is useful for xxxx. A number of different \glspl{OS} have been used in this work, such as the following \glspl{OS}: UNIX, Linux, Windows, etc. The main focus will be on one \gls{OS}, namely Linux.
-
 \section{Problem}
 \label{sec:problem}
 \todo[inline, backgroundcolor=kth-lightblue]{svensk: Problemdefinition elle Frågeställning\\
@@ -478,8 +476,12 @@ Discussions on how to verify the lack of malicious code in binaries go at least 
 	den ingenjörsmässiga erfarenheten eller/och vetenskapen som kan komma ur
 	projektet. }
 
-Longer problem statement\\
-If possible, end this section with a question as a problem statement.
+% Longer problem statement\\
+% If possible, end this section with a question as a problem statement.
+
+Equivalences between human readable source code and binaries are hard to prove \textbf{cite}. Likewise is it if the comparison is between source and a hash of a binary. A more easily proved variation of this problem is whether multiple binaries have been built from the same, potentially unknown, source. If the binaries are identical and we trust that the builder is not forging their results, we can be confident in that the binaries were all built the same way. The proof, though, is only as strong as our trust in the builder; an actor which could be compromised without us knowing. With multiple builders, we reduce this risk and our trust can increase likewise.
+
+Distributing the workload creates the need for a system where the build results can be aggregated. Because users have different needs, they should be able to choose their own trust models and use the packages they trust based on the build results from the different builders. With this as background, we ask how such a system can be designed and implemented in order to maximize user trust in that the packages they use have been derrived from the correct source code.
 
 % Research Question
 \subsection{Original problem and definition}
