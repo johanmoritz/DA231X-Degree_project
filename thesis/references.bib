@@ -239,19 +239,74 @@
 }
 
 @article{abdui-rahman_distributed_nodate,
-	title = {A Distributed Trust Model},
-	abstract = {The widespread use of the Internet signals theneed for a better understanding of trust as a basis for secure on-line interaction. In the face of increasing uncertainty and risk, users must be allowed to reason flectively about the trustworthiness of on-line entities. In this paper, we outline the shortcomings of current security approaches for managing trust and propose a model for trust, based on distributed recommendations.},
-	pages = {13},
-	author = {Abdui-Rahman, Aifarez and Hailes, Stephen and Hailes, S},
-	langid = {english},
-	file = {Abdui-Rahman et al. - A Distributed Trust Model.pdf:C\:\\Users\\johan.moritz\\Zotero\\storage\\UHHNZVPM\\Abdui-Rahman et al. - A Distributed Trust Model.pdf:application/pdf},
+  title    = {A Distributed Trust Model},
+  abstract = {The widespread use of the Internet signals theneed for a better understanding of trust as a basis for secure on-line interaction. In the face of increasing uncertainty and risk, users must be allowed to reason flectively about the trustworthiness of on-line entities. In this paper, we outline the shortcomings of current security approaches for managing trust and propose a model for trust, based on distributed recommendations.},
+  pages    = {13},
+  author   = {Abdui-Rahman, Aifarez and Hailes, Stephen and Hailes, S},
+  langid   = {english},
+  file     = {Abdui-Rahman et al. - A Distributed Trust Model.pdf:C\:\\Users\\johan.moritz\\Zotero\\storage\\UHHNZVPM\\Abdui-Rahman et al. - A Distributed Trust Model.pdf:application/pdf}
 }
 
 @article{ongaro_raft_2014,
-	title = {In Search of an Understandable Consensus Algorithm},
-	abstract = {Raft is a consensus algorithm for managing a replicated log. It produces a result equivalent to (multi-)Paxos, and it is as efﬁcient as Paxos, but its structure is different from Paxos; this makes Raft more understandable than Paxos and also provides a better foundation for building practical systems. In order to enhance understandability, Raft separates the key elements of consensus, such as leader election, log replication, and safety, and it enforces a stronger degree of coherency to reduce the number of states that must be considered. Results from a user study demonstrate that Raft is easier for students to learn than Paxos. Raft also includes a new mechanism for changing the cluster membership, which uses overlapping majorities to guarantee safety.},
-	pages = {16},
-	author = {Ongaro, Diego and Ousterhout, John},
-	langid = {english},
-	file = {Ongaro and Ousterhout - In Search of an Understandable Consensus Algorithm.pdf:C\:\\Users\\johan.moritz\\Zotero\\storage\\TEAD9BZI\\Ongaro and Ousterhout - In Search of an Understandable Consensus Algorithm.pdf:application/pdf},
+  title    = {In Search of an Understandable Consensus Algorithm},
+  abstract = {Raft is a consensus algorithm for managing a replicated log. It produces a result equivalent to (multi-)Paxos, and it is as efﬁcient as Paxos, but its structure is different from Paxos; this makes Raft more understandable than Paxos and also provides a better foundation for building practical systems. In order to enhance understandability, Raft separates the key elements of consensus, such as leader election, log replication, and safety, and it enforces a stronger degree of coherency to reduce the number of states that must be considered. Results from a user study demonstrate that Raft is easier for students to learn than Paxos. Raft also includes a new mechanism for changing the cluster membership, which uses overlapping majorities to guarantee safety.},
+  pages    = {16},
+  author   = {Ongaro, Diego and Ousterhout, John},
+  langid   = {english},
+  file     = {Ongaro and Ousterhout - In Search of an Understandable Consensus Algorithm.pdf:C\:\\Users\\johan.moritz\\Zotero\\storage\\TEAD9BZI\\Ongaro and Ousterhout - In Search of an Understandable Consensus Algorithm.pdf:application/pdf}
+}
+
+
+@inproceedings{ince_blockchain_2020,
+  title      = {Blockchain Based Distributed Package Management Architecture},
+  doi        = {10.1109/UBMK50275.2020.9219374},
+  abstract   = {Application management in Linux based operating systems is managed by package managers. The package repositories of most Linux distributions provide software through central servers. While having a central server provides a unique verified and maintained version, servers often separate official and community packages, and users frequently use community packages. However, some highly demanded community packages may not be stored in official repositories. While central servers are open to a single point of failure, using community packages without any security check may be insecure. In this paper, we introduce the idea of a distributed package management architecture for Linux systems based on blockchain technology. In the proposed system, package providers are considered as miners, building a package is mining, and proof-of-work is reproducible packaging by the miners. The blockchain keeps the hash of the package contents. Creating and testing a package will return to the packager as reliability scores. This system will have the following advantages. Packages will be verified through consensus, single points of failure will be eliminated ensuring availability, packages are stored in a distributed network. The goal is to keep the operating system alive with a decentralized, reliable, and transparent blockchain-based package management system.},
+  eventtitle = {2020 5th International Conference on Computer Science and Engineering ({UBMK})},
+  pages      = {238--242},
+  booktitle  = {2020 5th International Conference on Computer Science and Engineering ({UBMK})},
+  author     = {Ince, M. Numan and Ak, Murat and Gunay, Melih},
+  date       = {2020-09},
+  keywords   = {Blockchain, Global Positioning System, Hafnium compounds, Linux, {MILIS} Linux, Operating systems, Optical fibers, P2P Network, Package Management, Servers},
+  file       = {IEEE Xplore Full Text PDF:C\:\\Users\\johan.moritz\\Zotero\\storage\\WFIK4AA8\\Ince et al. - 2020 - Blockchain Based Distributed Package Management Ar.pdf:application/pdf;IEEE Xplore Abstract Record:C\:\\Users\\johan.moritz\\Zotero\\storage\\XFEJMB64\\9219374.html:text/html}
+}
+
+@inproceedings{blahser_thine_2021,
+  title      = {Thine — Approach for a fault tolerant distributed packet manager based on hypercore protocol},
+  doi        = {10.1109/COMPSAC51774.2021.00266},
+  abstract   = {There are a range of package managers out there which are used in almost every software development project to integrate third party packages to a project. These packages are usually stored in central repositories in the cloud. This central cloud approach brings some downsides especially with regard to fault tolerance which we want to tackle with our approach inspired by thoughts of dew computing. In this paper we present a fully distributed package manager which can be used on cloud as well as on the edge or in a hybrid environment. The approach is based on a peer-to-peer network, implemented with hypercore protocol.},
+  eventtitle = {2021 {IEEE} 45th Annual Computers, Software, and Applications Conference ({COMPSAC})},
+  pages      = {1778--1782},
+  booktitle  = {2021 {IEEE} 45th Annual Computers, Software, and Applications Conference ({COMPSAC})},
+  author     = {Blähser, Jannik and Göller, Tim and Böhmer, Matthias},
+  date       = {2021-07},
+  note       = {{ISSN}: 0730-3157},
+  keywords   = {Conferences, Fault tolerance, Fault tolerant systems, Java, Protocols, Prototypes, Software},
+  file       = {IEEE Xplore Full Text PDF:C\:\\Users\\johan.moritz\\Zotero\\storage\\NBNIEPJP\\Blähser et al. - 2021 - Thine — Approach for a fault tolerant distributed .pdf:application/pdf;IEEE Xplore Abstract Record:C\:\\Users\\johan.moritz\\Zotero\\storage\\ZMDEDTY5\\9529611.html:text/html}
+}
+
+@inproceedings{zichichi_efficiency_2020,
+	title = {On the Efficiency of Decentralized File Storage for Personal Information Management Systems},
+	doi = {10.1109/ISCC50000.2020.9219623},
+	abstract = {This paper presents an architecture, based on Distributed Ledger Technologies ({DLTs}) and Decentralized File Storage ({DFS}) systems, to support the use of Personal Information Management Systems ({PIMS}). {DLT} and {DFS} are used to manage data sensed by mobile users equipped with devices with sensing capability. {DLTs} guarantee the immutability, traceability and verifiability of references to personal data, that are stored in {DFS}. In fact, the inclusion of data digests in the {DLT} makes it possible to obtain an unalterable reference and a tamper-proof log, while remaining compliant with the regulations on personal data, i.e. {GDPR}. We provide an experimental evaluation on the feasibility of the use of {DFS}. Three different scenarios have been studied: i) a proprietary {IPFS} approach with a dedicated node interfacing with the data producers, ii) a public {IPFS} service and iii) Sia Skynet. Results show that through proper configuration of the system infrastructure, it is viable to build a decentralized Personal Data Storage ({PDS}).},
+	eventtitle = {2020 {IEEE} Symposium on Computers and Communications ({ISCC})},
+	pages = {1--6},
+	booktitle = {2020 {IEEE} Symposium on Computers and Communications ({ISCC})},
+	author = {Zichichi, Mirko and Ferretti, Stefano and D’Angelo, Gabriele},
+	date = {2020-07},
+	note = {{ISSN}: 2642-7389},
+	keywords = {Memory, Computers, Decentralized File Storage, Distributed ledger, Distributed Ledger Technologies, Information management, Performance evaluation, Personal Information Management System, Regulation, Reliability engineering, Sensing as a Service},
+	file = {IEEE Xplore Full Text PDF:C\:\\Users\\johan.moritz\\Zotero\\storage\\B88J2R29\\Zichichi et al. - 2020 - On the Efficiency of Decentralized File Storage fo.pdf:application/pdf;IEEE Xplore Abstract Record:C\:\\Users\\johan.moritz\\Zotero\\storage\\C3PQ3VXX\\9219623.html:text/html},
+}
+
+@inproceedings{liu_data_2018,
+	title = {A Data Storage Method Based on Blockchain for Decentralization {DNS}},
+	doi = {10.1109/DSC.2018.00035},
+	abstract = {As a distributed database mapping the domain name and {IP} address, {DNS} makes it easier to access the Internet However, {DNS} relies on the resolution of the root server, which is a hierarchical network topology centered on the root. It is vulnerable to single points of failure and domain name resolution data tampered, affects the normal service of Internet domain name resolution seriously. To solve this problem, we proposed a new blockchain-based decentralization {DNS} data storage method by studying the principle and characteristics of blockchain. And implement a decentralization system {DecDNS} to establish multiple parallel {DNS} nodes, store the key information of the zone file resolution data. In the experiment, we proactively invalidated multiple nodes in the parallel resolution node and tampered the domain name resolution data. The experimental results show that, the {DecDNS} can provide normal resolution services, solve the problem of single point failure and the falsification of domain name resolution data. While compatible with the original domain name system, it is also enhances the stability and security of {DNS} framework, so it is an effective and feasible solution.},
+	eventtitle = {2018 {IEEE} Third International Conference on Data Science in Cyberspace ({DSC})},
+	pages = {189--196},
+	booktitle = {2018 {IEEE} Third International Conference on Data Science in Cyberspace ({DSC})},
+	author = {Liu, Jingqiang and Li, Bin and Chen, Lizhang and Hou, Meng and Xiang, Feiran and Wang, Peijun},
+	date = {2018-06},
+	keywords = {Servers, blockchain, Cloud computing, Contracts, data storage, decentralization, {DNS}, Memory, single point failure},
+	file = {IEEE Xplore Full Text PDF:C\:\\Users\\johan.moritz\\Zotero\\storage\\C4R5KMWR\\Liu et al. - 2018 - A Data Storage Method Based on Blockchain for Dece.pdf:application/pdf;IEEE Xplore Abstract Record:C\:\\Users\\johan.moritz\\Zotero\\storage\\MFFE37I8\\8411856.html:text/html},
 }
