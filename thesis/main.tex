@@ -492,10 +492,18 @@ Distributing the workload creates the need for a system where the build results 
 \label{sec:researchQuestion}
 % \todo[inline, backgroundcolor=kth-lightblue]{Ursprungligt problem och definition}
 
-The Debian Reproducible Builds project uses .buildinfo files to store checksums of derived artifacts. These files can serve as proof that a package has been built from source by a particular builder. Storing the aggregated .buildinfo files from multiple builders in a system could increase user trust in .buildinfo files, and therefore in packages. With this in mind we ask the following questions:
+The Debian Reproducible Builds project uses .buildinfo files to store checksums of derived artifacts. These files can serve as proof that a package has been built from source by a particular builder. Storing the aggregated .buildinfo files from multiple builders in a system could increase user trust in .buildinfo files, and therefore in packages. With this in mind we ask the following question:
 
-\subsection{Scientific and engineering issues}\todo[inline, backgroundcolor=kth-lightblue]{Vetenskaplig och ingenjörsmässig frågeställning}
-some text
+\begin{itemize}
+	\item To what extent can distributed and decentralized storage secure the integrity of .buildinfo files?
+\end{itemize}
+
+\subsection{Scientific and engineering issues}
+% \todo[inline, backgroundcolor=kth-lightblue]{Vetenskaplig och ingenjörsmässig frågeställning}
+\begin{itemize}
+	\item Which distributed data storage solutions are applicable for .buildinfo files?
+	\item How can we model a relevant system for efficient evaluation of integrity preservation?
+\end{itemize}
 
 \section{Purpose}
 % \todo[inline, backgroundcolor=kth-lightblue]{Syfte}
@@ -601,17 +609,17 @@ Currently, .buildinfo files are distributed in a centralized archive \textbf{cit
 
 \section{\glsentryfull{DLT}}
 
-Storing and managing data is commonly done in databases such as \glspl{RDBMS} or key-value stores \textbf{cite}. Because of these solutions' often centralized nature, they come with both integrity and availability risks \textbf{cite}. They can become single-point-of-failures. If that data storage is interrupted or manipulated, a system relying on it is at risk. \glsentrylongpl{DLT} are an alternative solution to data storage, mitigating the shortcomings of traditional, centralized methods. \glsentryshort{DLT} is an umbrella term for several different technologies which rely on decentralized append-only logs \cite{kannengieser_trade-offs_2021} . The data stored in such a network cannot be changed by a central node. Instead there has to be a consensus over the participants on how a change is to be made, followed by that change being propagated to all nodes in the network. Depending on the application, different solutions to how consensus is made and how the ledger itself is represented have been designed, each with its strengths and weaknesses.
+Storing and managing data is commonly done in databases such as \glspl{RDBMS} or key-value stores \textbf{cite}. Because of these solutions' often centralized nature, they come with both integrity and availability risks \textbf{cite}. They can become single-point-of-failures. If that data storage is interrupted or manipulated, a system relying on it is at risk. \glsentrylongpl{DLT} are an alternative solution to data storage, mitigating the shortcomings of traditional, centralized methods. \glsentryshort{DLT} is an umbrella term for several different technologies which rely on decentralized append-only logs \cite{kannengieser_trade-offs_2021} . The data stored in such a network cannot be changed by a central node. Instead, there has to be a consensus over the participants on how a change is to be made, followed by that change being propagated to all nodes in the network. Depending on the application, different solutions to how consensus is made and how the ledger itself is represented have been designed, each with its strengths and weaknesses.
 
-The term \glsentrylong{DSL} is sometimes used interchangably with blockchain, but while the latter uses a specific shape on its ledger, the former is more ambiguous. Other examples of \glsentryshortpl{DLT} are Certificate Transparency logs \textbf{cite} and peer-two-peer networks.
+The term \glsentrylong{DSL} is sometimes used interchangeably with blockchain, but while the latter uses a specific shape on its ledger, the former is more ambiguous. Other examples of \glsentryshortpl{DLT} are Certificate Transparency logs \textbf{cite} and peer-two-peer networks.
 
 \subsection{Merkle trees}
 
-Patent approved in 1982 \cite{merkle_method_1982} as a method for managing digital signatures, Merkle trees have since then been used for applications amongst file sharing and peer-to-peer communication \cite{daniel_ipfs_2022}, auditing certificate authorities \cite{laurie_certificate_2013} and running blockchains \cite{zahed_benisi_blockchain-based_2020}. Merkle trees are directed acyclical graphs where each node's value is a hash based on the values of its child nodes. The leaves of the graph contain the data (or a hash thereof) relevant for a particular application, while the other nodes enable efficient proof mechanisms for validating the integrity of the data. For example given a subgraph (\ie one with less data), verifying that its supergraph contains a certain value relies only on a subset of their differing nodes. This makes Merkle trees applicable to distributed systems where sending entire graphs between clients would be too expensive.
+Patent approved in 1982 \cite{merkle_method_1982} as a method for managing digital signatures, Merkle trees have since then been used for applications amongst file sharing and peer-to-peer communication \cite{daniel_ipfs_2022}, auditing certificate authorities \cite{laurie_certificate_2013} and running blockchains \cite{zahed_benisi_blockchain-based_2020}. Merkle trees are directed acyclical graphs where each nodes' value is a hash based on the values of its child nodes. The leaves of the graph contain the data (or a hash thereof) relevant for a particular application, while the other nodes enable efficient proof mechanisms for validating the integrity of the data. For example: given a subgraph (\ie one with less data), verifying that its supergraph contains a certain value relies only on a subset of their differing nodes. This makes Merkle trees applicable to distributed systems where sending entire graphs between clients would be too expensive.
 
 \subsection{Consensus}
 
-When multiple systems or processes cooperate on a shared state, any change to this state needs to be agreed upon between the different entities. If no agreement, or consensus, can be found, the entities different views of the state can drift away from each other. This can lead to an in-valid system from which no meaningful progress can be made. The problem of creating consensus can be further complicated by assuming that entities can crash and be revived at any time, or even be malicious in the messages they send to the network.
+When multiple systems or processes cooperate on a shared state, any change to this state needs to be agreed upon between the different entities. If no agreement, or consensus, can be found, the entities' different views of the state can drift away from each other. This can lead to an in-valid system from which no meaningful progress can be made. The problem of creating consensus can be further complicated by assuming that entities can crash and be revived at any time, or even be malicious in the messages they send to the network.
 
 A number of consensus algorithms exists, serving various applications. One way to differentiate them is whether they are proof of voting based. In a proof based consensus algorithm, only the party that has provided a certain proof is allowed to change the data. Such algorithms can be found in some public ledger blockchains, such as bitcoin. The proof itself can be, for example, finding a number given certain constraints, which is known as proof-of-work. With proof-of-work, the greater computational investment any one participant makes, the greater is the probability that they will be allowed to change the blockchain. However, the greater the computational power is in the whole network, the more limited is any one participants possibility control it or use it maliciously. Other proof based algorithms exist, but they are all centered on connecting responsibility with some type of resource investment. Voting based consensus algorithms on the other hand relate more to a more intuitive understanding of agreement, \ie democratic voting. Agreement is made only when a certain fraction of the nodes have voted in acknowledgment to a certain decision. This relies on knowing how many nodes there are on the network in total, making voting based consensus less usable in certain scenarios. While simple in idea, a voting based consensus algorithm can become complicated in practice. The algorithm should not only be able to find consensus in perfect conditions, instead a realistic solution should work even if some nodes on the network crashes and, perhaps, even if some nodes are malicious. A consensus algorithm that can handle both of these kinds of issues is called Byzantine resilient \cite{goos_consensus_1983} or that it has Byzantine fault tolerance \cite{nguyen_survey_2018}. If the algorithm only handles crashes but not malicious actors it has Crash fault tolerance.
 
@@ -622,6 +630,9 @@ A number of consensus algorithms exists, serving various applications. One way t
 Originally described for Bitcoin \cite{nakamoto_bitcoin_nodate, di_pierro_what_2017}, blockchain is a technology based on \glsentrylong{DLT} for storing transactions without needing a centralized organization. Transactions are represented as simple strings of characters which allows them to model essentially anything. This is why blockchains can be used for a broad spectrum of applications; \eg currencies, ownership contracts etc. \textbf{cite}. The name stems from the setup of a blockchain ledger where groups of, closely related in time, transactions are appended together as a block to the current chain by including a hash of the previous block in the latest one. By grouping transactions together, the throuput of the network improves. A consensus algorithm is used to create a total ordering of the blocks so that every node on the network eventually holds the same ledger.
 
 \todoinline{Add figure for how one block connects to the next.}
+
+\todoinline{Public vs Private vs Consortium blockchain }
+
 
 \subsection{Peer-to-peer}
 
@@ -687,11 +698,16 @@ Running a chaincode on the network does not update the ledger directly (see \ref
 
 
 
-\section{Formal verification}
+\section{Formal specification}
 
-\subsection{Temporal logic}
+Distributed systems can be complex to design and hard to reason about. This is mainly due to the non-deterministic interleaving of subsystems acting individually \textbf{cite}. To ensure that a design of a distributed system works as intended, formal specification notation and tools can be used. These do not generate actual implementations of a system, but instead a precise description of system properties \cite{lamsweerde_formal_2000}. By modeling a system with a formal specification, its properties can be automatically verified or refuted. It also forces the developer to think in terms of system invariants instead of \textit{how} the system should be constructed. Because formal specifications are models of (and not actual) systems, there is no guarantee that they correspond correctly to a real implementation. However, because they do not include as many concrete details, testing the correspondance between a specification and an implementation can be done on a higher abstraction level compared to the unit-testing common in software verification.
 
-\subsection{TLA+}
+\subsection{TLA\textsuperscript+}
+
+TLA\textsuperscript+ \cite{lamport_specifying_2001} is a language for formal specification where a model describes a systems' behaviour over time. It has been used successfully in industry to verify and finding bugs in distributed systems \cite{joshi_checking_2003,newcombe_how_2015} and can be written in both a mathematical notation style and the more pseudocode-esque PlusCal. The specification can then be verified by the TLC \textbf{acronym} tool which simulates executions of the model in order to find potential faults. 
+
+\subsection{Temporal Logic of Actions}
+
 
 
 % \section{Major background area 1}
@@ -818,7 +834,7 @@ Running a chaincode on the network does not update the ledger directly (see \ref
 
 A number of proposals for distributed and decentralized data management are recorded in the research litterature. \textcite{ince_blockchain_2020} describe a combination of blockchain and the \glsentryshort{P2P} network \gls{IPFS} for package storage. They envision a proof-of-work consensus algorithm based on the act of rebuilding a package where builders gain rewards in terms of a productiviy score with every rebuild they add to the ledger. At a certain score, a builder is promoted to an approver and can validate other builders rebuilds. Because blockchains are limited in storage space, only packages' addresses are stored in the ledger with the actual artifacts being distributed through \glsentryshort{IPFS}. While an interesting concept, no prototype or evaluation is provided by the paper. A similar approach was taken by \textcite{zichichi_efficiency_2020} but with the application of managing personal data. They managed different kinds of personal data by partitioning it through smart contracts, each with its own access list for node authorization.
 
-Instead of using blockchain and \glsentryshort{P2P} technologies together, \textcite{blahser_thine_2021} show a prototype system for distributed package management using only a peer-to-peer technology called Hypercore protocol. They rely on Hypercore protocol to act both as a distributed file system as well as an append only ledger. This approach is convenient but does not have any built-in safeguards against malicious actors or packages. On the other hand, \textcite{liu_data_2018} used blockchain technology single-handledly to construct a distributed \gls{DNS}. Because of the limited amount of data in a zone file, no separate distributed file system was needed for their application. Each request to the service was done through a smart contract and their prototype system were able to serve requests with a 0.006025 average response delay and a failure resolution rate of 2.14\%. 
+Instead of using blockchain and \glsentryshort{P2P} technologies together, \textcite{blahser_thine_2021} show a prototype system for distributed package management using only a peer-to-peer technology called Hypercore protocol. They rely on Hypercore protocol to act both as a distributed file system as well as an append only ledger. This approach is convenient but does not have any built-in safeguards against malicious actors or packages. On the other hand, \textcite{liu_data_2018} used blockchain technology single-handledly to construct a distributed \gls{DNS}. Because of the limited amount of data in a zone file, no separate distributed file system was needed for their application. Each request to the service was done through a smart contract and their prototype system were able to serve requests with a 0.006025 seconds average response delay and a failure resolution rate of 2.14\%.
 
 
 % \subsection{Major related work 1}\todo[inline, backgroundcolor=kth-lightblue]{Relaterande arbeten 1}
