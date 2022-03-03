@@ -469,7 +469,7 @@ goals of this thesis project, and outlines the structure of the thesis.\\
 
 Discussions on how to verify the lack of malicious code in binaries go at least as far back as to Ken Thompson's Turing award lecture \cite{thompson_reflections_1984} where he discusses the issues of trusting code created by others. In recent years, several attacks on popular packages within the \glsentryfull{FOSS} have been executed \cite{lamb_reproducible_2021} where trusted repositories have injected malicious code in their released binaries. These attacks question how much trust in such dependencies is appropriate. In an attempt to raise the level of trust and security in \glsentryfull{FOSS}, the reproducible builds projects \cite{reproducible_builds_project} was started within the Debian community. Its goal was to mitigate the risk that a package is tampered with by ensuring that its builds are deterministic and therefore should be bit-by-bit identical over multiple rebuilds. Any user of a reproducible package can verify that it has indeed been built from its source code and was not manipulated after the fact simply by rebuilding it from the package's .buildinfo file. These metadata files for reproducible builds include hashes of the produced build artifacts and a description of the build environment to enable user-side verification. .buildinfo files are by this notion the crucial link to ensure reproducibility, which also means that a great deal of trust is assumed when using them. Current measures for validating .buildinfo files and their corresponding packages involve package repository managers and volunteers running rebuilderd \cite{rebuilderd_public_nodate} instances that test the reproducibility of every .buildinfo file added to the relevant package archive. This setup allows users to audit the separate build logs, thus confirming the validity of a particular package. However, because this would be a manual process and the different instances do not coordinate their work, it relies on the user judging on a case-by-case basis whether to trust a package or not.
 
-Validating the aggregated results from many pacakge builds could potentially be done through \glspl{DLT}. \glsentryshortpl{DLT} were popularized by Bitcoin \cite{di_pierro_what_2017, nakamoto_bitcoin_nodate} for crypto-currencies but has wide ranging applications in trust related domains. A distributed ledger is a log of transaction held by many different nodes on a network. Transactions are validated, ordered and added to the network by a consensus algorithm to ensure that no single or small group of nodes can act maliciously. The log itself is commonly a tree or graph of hashes which allows proving that a particular transaction has happened to be efficient.
+Validating the aggregated results from many package builds could potentially be done through \glspl{DLT}. \glsentryshortpl{DLT} were popularized by Bitcoin \cite{di_pierro_what_2017, nakamoto_bitcoin_nodate} for crypto-currencies but has wide ranging applications in trust related domains. A distributed ledger is a log of transaction held by many different nodes on a network. Transactions are validated, ordered and added to the network by a consensus algorithm to ensure that no single or small group of nodes can act maliciously. The log itself is commonly a tree or graph of hashes which allows proving that a particular transaction has happened in an efficient manner. Because of their distributed nature, \glsentryshortpl{DLT} are however hard to test and verify. One way to go about this without loosing accuracy \textbf{Precision?} is by modeling the system with formal specification tools that can validate the properties of the system design. Even though such a model is not a true representation of the system itself,
 
 This project seeks to reduce some of the above mentioned burden from the user while increasing their trust in the software they use by investigating possible decentralized solutions for distributing and proving the correctness of .buildinfo files.
 
@@ -696,17 +696,38 @@ Running a chaincode on the network does not update the ledger directly (see \ref
 
 \todoinline{Find some good references for chaincode besides the official documentation.}
 
-
+\todoinline{Describe the core api for chaincode}
 
 \section{Formal specification}
 
 Distributed systems can be complex to design and hard to reason about. This is mainly due to the non-deterministic interleaving of subsystems acting individually \textbf{cite}. To ensure that a design of a distributed system works as intended, formal specification notation and tools can be used. These do not generate actual implementations of a system, but instead a precise description of system properties \cite{lamsweerde_formal_2000}. By modeling a system with a formal specification, its properties can be automatically verified or refuted. It also forces the developer to think in terms of system invariants instead of \textit{how} the system should be constructed. Because formal specifications are models of (and not actual) systems, there is no guarantee that they correspond correctly to a real implementation. However, because they do not include as many concrete details, testing the correspondance between a specification and an implementation can be done on a higher abstraction level compared to the unit-testing common in software verification.
 
-\subsection{TLA\textsuperscript+}
+\section{TLA\textsuperscript+}
 
-TLA\textsuperscript+ \cite{lamport_specifying_2001} is a language for formal specification where a model describes a systems' behaviour over time. It has been used successfully in industry to verify and finding bugs in distributed systems \cite{joshi_checking_2003,newcombe_how_2015} and can be written in both a mathematical notation style and the more pseudocode-esque PlusCal. The specification can then be verified by the TLC \textbf{acronym} tool which simulates executions of the model in order to find potential faults. 
+TLA\textsuperscript+ \cite{lamport_specifying_2001} is a language for formal specification where a model describes a systems' behaviour over time. It has been used successfully in industry to verify and finding bugs in distributed systems \cite{joshi_checking_2003,newcombe_how_2015} and can be written in both a mathematical notation style and the more pseudocode-esque PlusCal. The specification can then be verified by the TLC \textbf{acronym} tool which simulates executions of the model in order to find potential faults. TLA\textsuperscript+ is built on the \gls{TLA} \cite{lamport_temporal_1994}, but adds improvements for writing more modular and larger specifications.
 
-\subsection{Temporal Logic of Actions}
+\subsection{\glsentryfull{TLA}}
+
+The semantics of \glsentryshort{TLA} are based on infinite sequences of states called behaviours. Here, a state $s$ is a mapping from symbolic variable names to values \eg $[x \mapsto 1, y \mapsto "a", z \mapsto 42]$. Behaviours represent the history of states that a program execution enters, one state for each atomic change. A program incrementing a counter could for example have the behaviour $\langle [x \mapsto 0, \dotsc], [x \mapsto 1, \dotsc], [x \mapsto 1, \dotsc], [x \mapsto 2, \dotsc], \dotsc \rangle$. Note that $x$ does not increment at every state in this behaviour. This is an example of \textit{stuttering} \ie $x$ is allowed to remain at a certain value for several states. Stuttering is an important concept because it allows logical formulas, or programs, to be modular. We can imagine a second counter program running concurrently with the first where a variable $y$ happens to increment where $x$ didn't. An example of this is shown in figure \ref{fig:concurrent-behaviour}. 
+
+\begin{figure}
+	$\langle [x \mapsto 0, y \mapsto 0, \dotsc], [x \mapsto 1, y \mapsto 0, \dotsc], [x \mapsto 1, y \mapsto 1, \dotsc], [x \mapsto 2, y \mapsto 2, \dotsc], \dotsc \rangle$
+	\caption{A behaviour where the variables $x$ and $y$ increment concurrently.}
+	\label{fig:concurrent-behaviour}
+\end{figure}
+
+\subsubsection{Propositional logic in \glsentryshort{TLA}}
+
+\subsection{State Functions}
+
+\subsubsection{Actions}
+
+\subsubsection{Formulas}
+
+
+
+
+\subsection{TLA\textsuperscript+ Syntax Summary}
 
 
 
