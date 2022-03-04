@@ -638,6 +638,8 @@ Originally described for Bitcoin \cite{nakamoto_bitcoin_nodate, di_pierro_what_2
 
 \todoinline{Add information about IPFS}
 
+\todoinline{Summaries several different DLT}
+
 
 
 
@@ -702,6 +704,8 @@ Running a chaincode on the network does not update the ledger directly (see \ref
 
 Distributed systems can be complex to design and hard to reason about. This is mainly due to the non-deterministic interleaving of subsystems acting individually \textbf{cite}. To ensure that a design of a distributed system works as intended, formal specification notation and tools can be used. These do not generate actual implementations of a system, but instead a precise description of system properties \cite{lamsweerde_formal_2000}. By modeling a system with a formal specification, its properties can be automatically verified or refuted. It also forces the developer to think in terms of system invariants instead of \textit{how} the system should be constructed. Because formal specifications are models of (and not actual) systems, there is no guarantee that they correspond correctly to a real implementation. However, because they do not include as many concrete details, testing the correspondance between a specification and an implementation can be done on a higher abstraction level compared to the unit-testing common in software verification.
 
+\todoinline{Summaries several different formal specification methods }
+
 \section{TLA\textsuperscript+}
 
 TLA\textsuperscript+ \cite{lamport_specifying_2001} is a language for formal specification where a model describes a systems' behaviour over time. It has been used successfully in industry to verify and finding bugs in distributed systems \cite{joshi_checking_2003,newcombe_how_2015} and can be written in both a mathematical notation style and the more pseudocode-esque PlusCal. The specification can then be verified by the TLC \textbf{acronym} tool which simulates executions of the model in order to find potential faults. TLA\textsuperscript+ is built on the \gls{TLA} \cite{lamport_temporal_1994}, but adds improvements for writing more modular and larger specifications.
@@ -750,6 +754,16 @@ Figure \ref{fig:state-function-example} shows an example of a substitution in a 
 \end{figure}
 
 \subsubsection{Actions}
+
+So far \glsentryshort{TLA} is quite similar to propositional and predicate logic \textbf{which one?} but with the addition of \textit{actions}, it changes quite radically. An action can be seen as the link between two states in the behaviour of a program. It describes change from one state to the next. Syntactically, this is done by separating variables into two groups: \textit{un-primed} variables $x$, $y$, $z, \dotsc$ and \textit{primed} variables $x^\prime$, $y^\prime$, $z^\prime, \dotsc$. Primed variables represent the value of their un-primed counterpart in the next state, and an action is just a boolean expression with both primed and unprimed variables. Incrementing a variable can for example be written as the action $x^\prime = x + 1$. In natural language, this means that the variables value in the next state should be one more than in the previous. Similarly to how we did it for state functions and predicates, we can define the semantic meaning of an action $\mathcal{A}$ as
+
+\begin{math}
+	s \llbracket \mathcal{A} \rrbracket t \triangleq \mathcal{A}\lparen \forall v : s\llbracket v \rrbracket / v, t\llbracket v \rrbracket / v^\prime \rparen
+\end{math}
+
+where $s$ and $t$ are both states and $t$ follows directly after $s$. In other words, actions are relations between states that are following each other in time.
+
+The changes in the increment counter program can, as mentioned, be represented by an action. To support stuttering we can add the second possibility that the variable stays the same. This is written as the disjunction $\lparen x^\prime = x + 1 \rparen \lor \lparen x^\prime = x \rparen$ \ie either $x$ is incremented or it stays the same. As it turns out, this is a commonly used concept when writing specification so \glsentryshort{TLA} provides a shorthand for it written $\lbrack \mathcal{A} \rbrack_f$. We pronounce $\lbrack \mathcal{A} \rbrack_f$ as ``square $\mathcal{A}$ sub $f$''. $f$ here is any state function, but is often a sequence of the variables that are allowed to stutter. For example, with the increment program we can write $\lbrack x^\prime = x + 1 \rbrack_{\langle x \rangle}$.
 
 \subsubsection{Formulas}
 
@@ -886,6 +900,9 @@ A number of proposals for distributed and decentralized data management are reco
 
 Instead of using blockchain and \glsentryshort{P2P} technologies together, \textcite{blahser_thine_2021} show a prototype system for distributed package management using only a peer-to-peer technology called Hypercore protocol. They rely on Hypercore protocol to act both as a distributed file system as well as an append only ledger. This approach is convenient but does not have any built-in safeguards against malicious actors or packages. On the other hand, \textcite{liu_data_2018} used blockchain technology single-handledly to construct a distributed \gls{DNS}. Because of the limited amount of data in a zone file, no separate distributed file system was needed for their application. Each request to the service was done through a smart contract and their prototype system were able to serve requests with a 0.006025 seconds average response delay and a failure resolution rate of 2.14\%.
 
+\todoinline{Add work on specifying systems to analyse security properties}
+
+\todoinline{Add work on infering formal specifications from logs}
 
 % \subsection{Major related work 1}\todo[inline, backgroundcolor=kth-lightblue]{Relaterande arbeten 1}
 % Carrier clouds have been suggested as a way to reduce the delay between the users and the cloud server that is providing them with content. However, there is a question of how to find the available resources in such a carrier cloud. One approach has been to disseminate resource information using an extension to OSPF-TE, see Roozbeh, Sefidcon, and Maguire \cite{roozbeh_resource_2013}.
