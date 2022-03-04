@@ -708,7 +708,7 @@ TLA\textsuperscript+ \cite{lamport_specifying_2001} is a language for formal spe
 
 \subsection{\glsentryfull{TLA}}
 
-The semantics of \glsentryshort{TLA} are based on infinite sequences of states called behaviours. Here, a state $s$ is a mapping from symbolic variable names to values \eg $[x \mapsto 1, y \mapsto "a", z \mapsto 42]$. Behaviours represent the history of states that a program execution enters, one state for each atomic change. A program incrementing a counter could for example have the behaviour $\langle [x \mapsto 0, \dotsc], [x \mapsto 1, \dotsc], [x \mapsto 1, \dotsc], [x \mapsto 2, \dotsc], \dotsc \rangle$. Note that $x$ does not increment at every state in this behaviour. This is an example of \textit{stuttering} \ie $x$ is allowed to remain at a certain value for several states. Stuttering is an important concept because it allows logical formulas, or programs, to be modular. We can imagine a second counter program running concurrently with the first where a variable $y$ happens to increment where $x$ didn't. An example of this is shown in figure \ref{fig:concurrent-behaviour}. 
+The semantics of \glsentryshort{TLA} are based on infinite sequences of states called behaviours. Here, a state $s$ is a mapping from symbolic variable names to values \eg $[x \mapsto 1, y \mapsto "a", z \mapsto 42]$. Behaviours represent the history of states that a program execution enters, one state for each atomic change. A program incrementing a counter could for example have the behaviour $\langle [x \mapsto 0, \dotsc], [x \mapsto 1, \dotsc], [x \mapsto 1, \dotsc], [x \mapsto 2, \dotsc], \dotsc \rangle$. Note that $x$ does not increment at every state in this behaviour. This is an example of \textit{stuttering} \ie $x$ is allowed to remain the same or increment at every step. Stuttering is an important concept because it allows logical formulas, or programs, to be modular. As an example of this, we can imagine a second counter program running concurrently with the first. The two programs are both incrementing variables but not necessarily at the same time, so at certain states we need stuttering to descibe the combined program. An example of this is shown in figure \ref{fig:concurrent-behaviour}.
 
 \begin{figure}
 	$\langle [x \mapsto 0, y \mapsto 0, \dotsc], [x \mapsto 1, y \mapsto 0, \dotsc], [x \mapsto 1, y \mapsto 1, \dotsc], [x \mapsto 2, y \mapsto 2, \dotsc], \dotsc \rangle$
@@ -718,7 +718,36 @@ The semantics of \glsentryshort{TLA} are based on infinite sequences of states c
 
 \subsubsection{Propositional logic in \glsentryshort{TLA}}
 
-\subsection{State Functions}
+The core of \glsentryshort{TLA} is propositional logic \textbf{propositional?} with common connectives \textbf{connectives?} such as $\land$, $\lor$, $\implies$, $\lnot$, $\forall$ and $\exists$.
+
+\subsubsection{State Functions and Predicates}
+
+\glsentryshort{TLA} allows the use of ``regular'' mathematics which can be used to form expressions such as $x^2 + 5*y - 3$. These make up the body of non-boolean state functions and their boolean equivalent predicates. The meaning of such expressions is evaluated relative a state. This is done by substituting the value of a variable in the state for the same variable in the expression. This definition can be written
+
+\begin{math}
+	s \llbracket f \rrbracket \triangleq f \lparen \forall v : s \llbracket v \rrbracket / v \rparen
+\end{math}
+
+where
+
+\begin{itemize}
+	\item $f$ is a state function or a predicate
+	\item $\triangleq$ signifies equality by \textit{definition}
+	\item $s \llbracket v \rrbracket$ is the value of variable $v$ in state $s$
+	\item $s \llbracket v \rrbracket / v$ substitutes  $s \llbracket v \rrbracket$ for $v$
+\end{itemize}
+
+Figure \ref{fig:state-function-example} shows an example of a substitution in a state function.
+
+\begin{figure}
+	\begin{math}
+		g \triangleq x + y - 2 \\
+		s \triangleq \lbrack x \mapsto 0, y \mapsto 2 \rbrack \\
+		s \llbracket g \rrbracket \equiv s \llbracket x \rrbracket + s \llbracket y \rrbracket - 2 \equiv 0
+	\end{math}
+	\caption{Semantic meaning of a state function $g$ given a state $s$.}
+	\label{fig:state-function-example}
+\end{figure}
 
 \subsubsection{Actions}
 
