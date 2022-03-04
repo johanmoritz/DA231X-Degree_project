@@ -765,10 +765,17 @@ where $s$ and $t$ are both states and $t$ follows directly after $s$. In other w
 
 The changes in the increment counter program can, as mentioned, be represented by an action. To support stuttering we can add the second possibility that the variable stays the same. This is written as the disjunction $\lparen x^\prime = x + 1 \rparen \lor \lparen x^\prime = x \rparen$ \ie either $x$ is incremented or it stays the same. As it turns out, this is a commonly used concept when writing specification so \glsentryshort{TLA} provides a shorthand for it written $\lbrack \mathcal{A} \rbrack_f$. We pronounce $\lbrack \mathcal{A} \rbrack_f$ as ``square $\mathcal{A}$ sub $f$''. $f$ here is any state function, but is often a sequence of the variables that are allowed to stutter. For example, with the increment program we can write $\lbrack x^\prime = x + 1 \rbrack_{\langle x \rangle}$.
 
-\subsubsection{Formulas}
+\subsubsection{Temporal operators}
 
+Where actions describe a single step of change between two states, we have already mentioned that program executions are represented in \glsentryshort{TLA} by behaviours \ie sequences of states. To be able to describe whole behaviours we need some way of lifting actions from acting on pairs of states to sequences of states. We can perform this lifting in \glsentryshort{TLA} with the \textit{always} temporal operator, written as $\Box \mathcal{A}$. Informally, this is a formula that is true only if the action is true for all pairs of states in a behaviour. More generally, we can write $\Box F$ where $F$ is a logical formula built from predicates and actions. For a behaviour $\langle s_0, s_1, s_2, \dotsc \rangle$, the operator can be defined as
 
+\begin{math}
+	\langle s_0, s_1, s_2, \dotsc \rangle \llbracket \Box F \rrbracket \triangleq \forall n \in \mathbb{N} : \langle s_n, s_{n+1}, s_{n+2}, \dotsc \rangle \llbracket F \rrbracket
+\end{math}
 
+where $\mathbb{N}$ is the set of natural numbers.
+
+Besides $\Box$, another common temporar operator is called \textit{eventually} and written $\Diamond$. $\Diamond F$ can be described as 
 
 \subsection{TLA\textsuperscript+ Syntax Summary}
 
