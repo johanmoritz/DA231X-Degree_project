@@ -787,7 +787,7 @@ This is equivalent to the definition
 	\langle s_0, s_1, s_2, \dotsc \rangle \llbracket \Diamond F \rrbracket \triangleq \exists n \in \mathbb{N} : \langle s_n, s_{n+1}, s_{n+2}, \dotsc \rangle \llbracket F \rrbracket
 \end{math}
 
-\ie $F$ should be true in \textit{some} state $s_i$. Combinations of $\Diamond$ and $\Box$ can describe some interesting properties such as 
+\ie $F$ should be true in \textit{some} state $s_i$. Combinations of $\Diamond$ and $\Box$ can describe some interesting properties such as
 
 \begin{itemize}
 	\item $\Box\Diamond F$, or \textit{infinietly often}
@@ -796,6 +796,16 @@ This is equivalent to the definition
 \end{itemize}
 
 The last one means that if $F$ is true in some state, $G$ has to be true at the same or a later state. This can also be written with the shorthand $F \leadsto G$.
+
+\subsubsection{\glsentryshort{TLA} formulas}
+
+Not all combinations of the above mentioned logical and temporal operators are allowed \glsentryshort{TLA} formulas. Instead, only formulas built from simple predicates (with no temporal operators or actions) or $\Box \lbrack \mathcal{A}  \rbrack_{f}$ for some action $\mathcal{A}$ and state function $f$ can be used. This is most noticable from a typical \glsentryshort{TLA} specification of a program. With an initial state predicate $init_\Phi \triangleq x = 0$ and an action describing the next state $next_\Phi \triangleq x^\prime = x + 1$, we get the \glsentryshort{TLA} formula
+
+\begin{math}
+	\Phi \triangleq init_\Phi \lor \Box \lbrack next_\Phi \rbrack_x
+\end{math}
+
+\ie either the value of $x$ is equal to 0 or it is one greater or equal to the value of $x$ in the previous state.
 
 \subsection{TLA\textsuperscript+ Syntax Summary}
 
