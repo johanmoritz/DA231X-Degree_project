@@ -807,6 +807,14 @@ Not all combinations of the above mentioned logical and temporal operators are a
 
 \ie either the value of $x$ is equal to 0 or it is one greater or equal to the value of $x$ in the previous state.
 
+\subsection{TLC \textbf{acronym}}
+
+\subsubsection{Termination}
+
+\subsubsection{Deadlock}
+
+\subsubsection{Livelock}
+
 \subsection{TLA\textsuperscript+ Syntax Summary}
 
 
@@ -933,11 +941,15 @@ Not all combinations of the above mentioned logical and temporal operators are a
 
 \section{Related work area}\todo[inline, backgroundcolor=kth-lightblue]{Relaterande arbeten}
 
+\subsection{Decentralized File Distribution}
+
 A number of proposals for distributed and decentralized data management are recorded in the research litterature. \textcite{ince_blockchain_2020} describe a combination of blockchain and the \glsentryshort{P2P} network \gls{IPFS} for package storage. They envision a proof-of-work consensus algorithm based on the act of rebuilding a package where builders gain rewards in terms of a productiviy score with every rebuild they add to the ledger. At a certain score, a builder is promoted to an approver and can validate other builders rebuilds. Because blockchains are limited in storage space, only packages' addresses are stored in the ledger with the actual artifacts being distributed through \glsentryshort{IPFS}. While an interesting concept, no prototype or evaluation is provided by the paper. A similar approach was taken by \textcite{zichichi_efficiency_2020} but with the application of managing personal data. They managed different kinds of personal data by partitioning it through smart contracts, each with its own access list for node authorization.
 
 Instead of using blockchain and \glsentryshort{P2P} technologies together, \textcite{blahser_thine_2021} show a prototype system for distributed package management using only a peer-to-peer technology called Hypercore protocol. They rely on Hypercore protocol to act both as a distributed file system as well as an append only ledger. This approach is convenient but does not have any built-in safeguards against malicious actors or packages. On the other hand, \textcite{liu_data_2018} used blockchain technology single-handledly to construct a distributed \gls{DNS}. Because of the limited amount of data in a zone file, no separate distributed file system was needed for their application. Each request to the service was done through a smart contract and their prototype system were able to serve requests with a 0.006025 seconds average response delay and a failure resolution rate of 2.14\%.
 
-\todoinline{Add work on specifying systems to analyse security properties}
+\subsection{Formal verification of Smart contracts}
+
+Writing smart contracts correctly and with high safety is hard. To aid this, several researchers have looked into using formal methods to verify them. \textcite{bhargavan_formal_2016} translated the Solidity language for writing smart contracts into the general purpose language F$^{\star}$ made for program verification. The authors then used the type system of F$^{\star}$ to enforce certain safety properties in the smart contract. \textcite{beckert_formal_2018} took a similar approach but for the Hyperledger Fabric chaincode. By adding pre- and postconditions in comments to chaincode written in Java and translating these to Java Modeling Language \textbf{acronym} they managed to deduce smart contract safety properties statically. In a slightly different direction, \textcite{latif_blockchain_2019} modelled a blockchain for waste management using TLA\textsuperscript+. Their initial system description was written in UML \textbf{(acronym, cite)} which turned out to be a relatively straithforward to translate into a formal specification language. The systems' safety and liveness properties could then be validated with the TLC \textbf{(acronym)} model checker.
 
 \todoinline{Add work on infering formal specifications from logs}
 
