@@ -499,6 +499,7 @@ The Debian Reproducible Builds project uses .buildinfo files to store checksums 
 \end{itemize}
 
 \subsection{Scientific and engineering issues}
+\label{subsec:scientific-issues}
 % \todo[inline, backgroundcolor=kth-lightblue]{Vetenskaplig och ingenjörsmässig frågeställning}
 \begin{itemize}
 	\item Which distributed data storage solutions are applicable for .buildinfo files?
@@ -534,14 +535,20 @@ One current way of managing software safely is to first downloade its source cod
 
 % \todo[inline]{In addition to presenting the goal(s), you might also state what the deliverables and results of the project are.}
 
-\section{Research Methodology}\todo[inline, backgroundcolor=kth-lightblue]{Undersökningsmetod}
+\section{Research Methodology}
+% \todo[inline, backgroundcolor=kth-lightblue]{Undersökningsmetod}
 % \todo[inline, backgroundcolor=kth-lightblue]{Här anger du vilken vilken övergripande undersökningsstrategi eller metod du skall använda för att försöka besvara den akademiska frågeställning och samtidigt lösa det e v ursprungliga problemet. Ofta kan man använda "lösandet av ursprungsproblemet" som en fallstudie kring en akademisk frågeställning. Du undersöker någon intressant fråga i "skarpt" läge och samlar resultat och erfarenhet ur detta.\\
 % 	Tänk på att företaget ibland måste stå tillbaka i sin önskan och förväntan på projektets resultat till förmån för ny eller kompletterande ingenjörserfarenhet och vetenskap (ditt examensarbete). Det är du som student som bestämmer och löser fördelningen mellan dessa två intressen men se till att alla är informerade. }
 % \todo[inline]{Introduce your choice of methodology/methodologies and method/methods – and the reason why you chose them. Contrast them with and explain why you did not choose other methodologies or methods. (The details of the actual methodology and method you have chosen will be given in Chapter~\ref{ch:methods}. Note that in Chapter~\ref{ch:methods}, the focus could be research strategies, data collection, data analysis, and quality assurance.)\\
 % 	In this section you should present your philosophical assumption(s), research method(s), and research approach(es).}
 
-\section{Delimitations}\todo[inline, backgroundcolor=kth-lightblue]{Avgränsningar}
+The project will take three different phases. Initially, a pre-study focusing on reproducible builds, \glsentrylongpl{DLT} and formal specifcation will take place. Its purpose will be finding possible technologies, solutions and evaluation methods for solving the issues mentioned under section \ref{subsec:scientific-issues}. With this initial phases finished, an appropriate storage strategy for ensuring the integrity of .buildinfo files and a methodology for modeling such a storage system is decided. The last phase involves producing and evaluating the model of said system to produce an answer to the original research question stated in \ref{sec:researchQuestion}.
+
+\section{Delimitations}
+% \todo[inline, backgroundcolor=kth-lightblue]{Avgränsningar}
 % \todo[inline]{Describe the boundary/limits of your thesis project and what you are explicitly not going to do. This will help you bound your efforts – as you have clearly defined what is out of the scope of this thesis project. Explain the delimitations. These are all the things that could affect the study if they were examined and included in the degree project.}
+
+While this project utilizes .buildinfo files and reproducible builds as its core problem domain, no builds or .buildinfo files are necessarily going to be produced during it. More specifically, the interessting part of .builfinfo files in terms of the project are their meta information and context in the software ecosystem. Their actual content and semantics are mainly irrelevant for the project, and will most likely be represented in an abstract manner in any implementations and artifacts. 
 
 \section{Structure of the thesis}\todo[inline, backgroundcolor=kth-lightblue]{ Rapportens disposition}
 \label{sec:structure}
@@ -832,7 +839,7 @@ Two additional examples of liveness properties are the weak and strong fairness 
 	SF_f\lparen \mathcal{A} \rparen \triangleq \lparen \Box \Diamond \langle \mathcal{A} \rangle_f \rparen \lor  \lparen \Diamond \Box \neg Enabled \langle \mathcal{A} \rangle_f \rparen
 \end{math}
 
-where 
+where
 
 \begin{itemize}
 	\item $\langle \mathcal{A} \rangle_f \triangleq \mathcal{A} \land \lparen f^\prime \neq f \rparen $ \ie the action $A$ is executed and changes variables in $f$
