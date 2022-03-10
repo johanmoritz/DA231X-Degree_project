@@ -809,9 +809,35 @@ Not all combinations of the above mentioned logical and temporal operators are a
 
 \subsection{TLC \textbf{(acronym)} Model Checker}
 
-TLA\textsuperscript+ is part of a toolbox made for supporting the creation and testing of formal specifications. Instead of validating a TLA model by hand, the TLC \textbf{(acronym)} model checker allows mechanic verification by simulating its possible executions while looking for invalid states and other errors. If TLC \textbf{(acronym)} finds a problem, it terminates the simulation and notifies the user with a timeline of the behaviour that lead up to the particular error. The user can then improve their model, and gain a better understanding of their specification and system. Because verifying a specifcation means TLC \textbf{(acronym)} has to simulate every possible behaviour, this can take a long time to do. A practical way to resolve this is to limit the state space in the model, but that also limits the type of properties TLC \textbf{(acronym)} can test. For example, ensuring the absence of integer overflow from the sum of two 32-bit integers would imply testing all possible pairs, but this would take far too long to test. If we instead limit the possible integer values to, for example, $0 \dotsc 5$ the simulation might terminate without error but we have clearly not managed to validate the absence of overflows. 
+TLA\textsuperscript+ is part of a toolbox made for supporting the creation and testing of formal specifications. Instead of validating a TLA model by hand, the TLC \textbf{(acronym)} model checker allows mechanic verification by simulating its possible executions while looking for invalid states and other errors. If TLC \textbf{(acronym)} finds a problem, it terminates the simulation and notifies the user with a timeline of the behaviour that lead up to the particular error. The user can then improve their model, and gain a better understanding of their specification and system. Because verifying a specifcation means TLC \textbf{(acronym)} has to simulate every possible behaviour, this can take a long time to do. A practical way to resolve this is to limit the state space in the model, but that also limits the type of properties TLC \textbf{(acronym)} can test. For example, ensuring the absence of integer overflow from the sum of two 32-bit integers would imply testing all possible pairs, but this would take far too long to test. If we instead limit the possible integer values to, for example, $0 \dotsc 5$ the simulation might terminate without error but we have clearly not managed to validate the absence of overflows.
 
-Instead, the TLC \textbf{(acronym)} model checker is instead more appropriate for validating time-related and concurrency problems. Here follows a short description of some of the properties that TLC \textbf{(acronym)} can test. 
+Instead, the TLC \textbf{(acronym)} model checker is instead more appropriate for validating time-related and concurrency problems. Here follows a short description of some of the properties that TLC \textbf{(acronym)} can test.
+
+\subsubsection{Safety}
+
+A specification that can never do anything ``bad'' is said to follow its \textit{safety} property. Variations of this is common to test in software engineering practices such as unit-testing. Safety checking in TLC \textbf{(acronym)} is straightforward as it is done by simply testing every new state during simulation for the relevant property. To examplify this, we can consider type invariants as safety properties. An variable might for example only be allowed to be an integer and nothing else.
+
+\subsubsection{Liveness}
+
+While a safe program is guaranteed to never do anything bad, whether or not it will actually do anything at all is not certain. Liveness properties describe what ``good'' things a specifcation necessarily will do. Some examples can be that an execution is guaranteed to terminate, that no deadlock between processes can happen, or that all processes will progress.
+
+In TLA\textsuperscript+, liveness properties are written with temporal operators such as $\Box$ or $\Diamond$. Reaching a certain value can for example be written as $\Diamond \Box F$ \ie eventually a state is reached from which $F$ is always true.
+
+\subsubsection{Fairness}
+
+Two additional examples of liveness properties are the weak and strong fairness properties. A \textit{fair} specification is guaranteed to execute an action as long as it is possible. If the action is weakly fair then it will be performed as long as it is repeatedly possible to do so. If it is strongly fair, then it will be executed unless it is no longer possible to do so. More formally they are defined, for action $\mathcal{A}$ and state function $f$, as
+
+\begin{math}
+	WF_f\lparen \mathcal{A} \rparen \triangleq \lparen \Box \Diamond \langle \mathcal{A} \rangle_f \rparen \lor  \lparen \Box \Diamond \neg Enabled \langle \mathcal{A} \rangle_f \rparen \\
+	SF_f\lparen \mathcal{A} \rparen \triangleq \lparen \Box \Diamond \langle \mathcal{A} \rangle_f \rparen \lor  \lparen \Diamond \Box \neg Enabled \langle \mathcal{A} \rangle_f \rparen
+\end{math}
+
+where 
+
+\begin{itemize}
+	\item $\langle \mathcal{A} \rangle_f \triangleq \mathcal{A} \land \lparen f^\prime \neq f \rparen $ \ie the action $A$ is executed and changes variables in $f$
+	\item $\neg Enabled \langle \mathcal{A} \rangle_f$ means that $\mathcal{A}$ is impossible to execute.
+\end{itemize}
 
 \subsubsection{Termination}
 
