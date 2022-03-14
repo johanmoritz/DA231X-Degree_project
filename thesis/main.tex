@@ -522,7 +522,7 @@ One current way of managing software safely is to first downloade its source cod
 
 \section{Goals}
 
-The main goal of this project is to formulate a plan for how to store .buildinfo files in such a way that their integrity is maintained. This involves understanding the purpose of and context within .buildinfo files exist. The storage plan should be formulated based on this context and written as a formal specification. 
+The main goal of this project is to formulate a plan for how to store .buildinfo files in such a way that their integrity is maintained. This involves understanding the purpose of and context within .buildinfo files exist. The storage plan should be formulated based on this context and written as a formal specification.
 
 % \todo[inline, backgroundcolor=kth-lightblue]{Mål}
 % \todo[inline, backgroundcolor=kth-lightblue]{Skilj på syfte och mål. Syftet är att åstakomma en förändring i något. Målen är vad som konkret skall göras för att om möjligt uppnå den önskade förändringen (syfte). }
@@ -551,11 +551,11 @@ The project will take three different phases. Initially, a pre-study focusing on
 % \todo[inline, backgroundcolor=kth-lightblue]{Avgränsningar}
 % \todo[inline]{Describe the boundary/limits of your thesis project and what you are explicitly not going to do. This will help you bound your efforts – as you have clearly defined what is out of the scope of this thesis project. Explain the delimitations. These are all the things that could affect the study if they were examined and included in the degree project.}
 
-While this project utilizes .buildinfo files and reproducible builds as its core problem domain, no builds or .buildinfo files are necessarily going to be produced during it. More specifically, the interessting part of .builfinfo files in terms of the project are their meta information and context in the software ecosystem. Their actual content and semantics are mainly irrelevant for the project, and will most likely be represented in an abstract manner in any implementations and artifacts. 
+While this project utilizes .buildinfo files and reproducible builds as its core problem domain, no builds or .buildinfo files are necessarily going to be produced during it. More specifically, the interessting part of .builfinfo files in terms of the project are their meta information and context in the software ecosystem. Their actual content and semantics are mainly irrelevant for the project, and will most likely be represented in an abstract manner in any implementations and artifacts.
 
-\section{Structure of the thesis}\todo[inline, backgroundcolor=kth-lightblue]{ Rapportens disposition}
-\label{sec:structure}
-Chapter~\ref{ch:background} presents relevant background information about xxx.  Chapter~\ref{ch:methods} presents the methodology and method used to solve the problem. …
+% \section{Structure of the thesis}\todo[inline, backgroundcolor=kth-lightblue]{ Rapportens disposition}
+% \label{sec:structure}
+% Chapter~\ref{ch:background} presents relevant background information about xxx.  Chapter~\ref{ch:methods} presents the methodology and method used to solve the problem. …
 
 \cleardoublepage
 \chapter{Background}
@@ -572,26 +572,26 @@ Chapter~\ref{ch:background} presents relevant background information about xxx. 
 % 	project /work (described in this thesis). Explain why and what is not used in
 % 	the degree project and give valid reasons for rejecting the work/research.}
 
-This chapter provides basic background information about xxx. Additionally, this chapter describes xxx. The chapter also describes related work xxxx.
+To bring the reader up to speed, this chapter covers an introduction on reproducible builds as seen within the Debian project. It also describes the core ideas in \glsentrylongpl{DLT}, examplified most notably with the blockchain Hyperledger Fabric, and temporal logic and formal specifications written TLA\textsuperscript+. Important terminology such as \glsentrylong{CIA} is also presented. The chapter ends with a review of previous work related to this project.
 
 
 
 % \todo[inline, backgroundcolor=kth-lightblue]{Vilken viktig litteratur och
 % 	(forsknings-)artiklar har du studerat inom området (litteraturstudie)? }
 
-\section{Trust}
+% \section{Trust}
 
-While subjective in an absolute sense, trust can be both described and reasoned about. In \cite{abdui-rahman_distributed_nodate} the authors modell trust as two directed graphs. Each node can choose to trust another node, represented by an edge between them in one of the graphs. They can also choose to trust another node as a recommender, thus adding an edge between them in the second graph. Every node that the recommender trusts is also counted as trusted by the original node. This is the foundation for a web-of-trust \textbf{glossary entry}, such as used by the \glsentryshort{PGP} protocol for cryptographic signing \textbf{verify and cite}.
+% While subjective in an absolute sense, trust can be both described and reasoned about. In \cite{abdui-rahman_distributed_nodate} the authors modell trust as two directed graphs. Each node can choose to trust another node, represented by an edge between them in one of the graphs. They can also choose to trust another node as a recommender, thus adding an edge between them in the second graph. Every node that the recommender trusts is also counted as trusted by the original node. This is the foundation for a web-of-trust \textbf{glossary entry}, such as used by the \glsentryshort{PGP} protocol for cryptographic signing \textbf{verify and cite}.
 
-\subsection{Hashes}
+% \subsection{Hashes}
 
-\subsection{\glsentryfull{PKI}}
+% \subsection{\glsentryfull{PKI}}
 
-\subsection{Web of trust}
+% \subsection{Web of trust}
 
-\subsection{\glsentryfull{PGP}}
+% \subsection{\glsentryfull{PGP}}
 
-\subsection{\glsentryfull{CA}}
+% \subsection{\glsentryfull{CA}}
 
 \section{\glsentryfull{CIA}}
 
@@ -666,8 +666,6 @@ The Hyperledger Fabric ledger is permissioned which, compared to a public one (s
 Every peer stores' the networks entire blockchain ledger and validates transactions and changes to the ledger. Orderers, on the other hand, clump together transactions into blocks and delivers them to the peers. This separation of concern is one of the unique features of Hyperledger Fabric, and makes consensus algorithm selection possible. Changes onto the ledger are made by invoking smart contracts, called chaincodes within Fabric. Chaincodes are authorized programs that are run by peers on the network. If multple peers (according to its endorcement policy) get the same result from running the chaincode, any updates are written to the ledger. For performance reasons, a key-value store representing the current "world-state" is continuously derrived from the ledger and stored on the peers. This allows both reading and writing to happen without going through the entire ledger itself.
 
 \todoinline{Bootstraping ordering service with a genesis block containing a configuration transaction \cite{androulaki_hyperledger_2018}}
-
-\todoinline{Descibe how Endorcement Policies work}
 
 \subsection{Transaction flow}
 \label{subsec:transaction-flow}
@@ -851,13 +849,13 @@ where
 	\item $\neg Enabled \langle \mathcal{A} \rangle_f$ means that $\mathcal{A}$ is impossible to execute.
 \end{itemize}
 
-\subsubsection{Termination}
+% \subsubsection{Termination}
 
-\subsubsection{Deadlock}
+% \subsubsection{Deadlock}
 
-\subsubsection{Livelock}
+% \subsubsection{Livelock}
 
-\subsection{TLA\textsuperscript+ Syntax Summary}
+% \subsection{TLA\textsuperscript+ Syntax Summary}
 
 
 
@@ -867,7 +865,8 @@ where
 % ...
 % \subsection{\glsentryshort{WLAN} Security}% you can't use the \gls macro in a heading - but you can get the short (\glsentryshort) or long version (\glsentryshort) or \glsentrylong or even the text entry (\glsentrytext) and then there is no problem - see https://tex.stackexchange.com/questions/198140/glossaries-and-custom-section-headings-broken
 
-\section{Related work area}\todo[inline, backgroundcolor=kth-lightblue]{Relaterande arbeten}
+\section{Related work area}
+% \todo[inline, backgroundcolor=kth-lightblue]{Relaterande arbeten}
 
 \subsection{Decentralized File Distribution}
 
