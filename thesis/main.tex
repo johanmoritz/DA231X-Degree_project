@@ -917,6 +917,38 @@ Writing smart contracts correctly and with high safety is hard. To aid this, sev
 % 	methodology and methods.}
 
 
+% Thoughts on methodology:
+% - Idea: Create asset management of verified .buildinfo files through smart contracts on the Hyperledger Fabric blockchain
+% 
+%	Method:
+%		1. Model relevant parts of known/working blockchain together with chaincode in TLA+ 
+% 		2. Implement chaincode for reproducible builds in TLA+
+%		3. Verify safety and liveness properties of the system with reproducible builds chaincode with TLC
+%		4. Translate reproducible builds chaincode model (from step 2) into actual chaincode (in Java/Go/Typescript)
+%		5. Evaluate functional requirements of the actual system with the reprodcible builds chaincode (from step 4) 
+%		
+%	Evaluation of system model:
+%		A.
+% 			a) Model the system in step 1. from system logs
+%			b) Evaulate model based on informal transaction flow description
+%
+%		B.
+% 			a) Model the system in step 1. from informal transaction flow
+%			b) Evaluate model based on system logs
+%
+%		C.
+% 			a) Model the system in step 1. from both system logs and informal transaction flow
+%			b) No system model evaluation. Assume correct and evaluate through method steps 3 and 5
+%
+%	Additional steps
+% 		- Which evaluation strategy (A, B or C) should we use?
+%		- Decide/Motivate what parts of the initial system that needs to be modelled. 
+% 			What assumptions are made on the rest of the (non-modelled) system?
+% 		- Decide what functional requirements the finished system should conform to? How do we test them? User stories?
+% 		- Decide what safety and liveness properties we should test on the model?
+% 
+
+
 
 % \todo[inline]{Describe the engineering-related contents (preferably with models) and the research methodology and methods that are used in the degree project.\\
 % 	Give a theoretical description of the scientific or engineering methodology are you going to use and why have you chosen this method. What other methods did you consider and why did you reject them.\\
