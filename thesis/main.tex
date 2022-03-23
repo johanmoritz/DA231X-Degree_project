@@ -595,27 +595,31 @@ To bring the reader up to speed, this chapter covers an introduction on reproduc
 
 \section{\glsentryfull{CIA}}
 
-Within information security, the terms confidentiality, integrity and availability are at the core of how researchers and security auditors describe the security of information systems \cite{samonas_cia_nodate}. They each relate to the respective security risk where an actor can read, write or hinder information when they should not have been able to do so.
+Within information security, the terms confidentiality, integrity and availability are at the core of how researchers and security auditors describe the security of information systems \cite{samonas_cia_nodate}. They each relate to the respective security risk where an actor can read, write or hinder information when they should not have been able to do so. \textit{Confidentiality} is the ability to stop unauthorized information leakage \ie you must be authorized to read the information. In a similar vein, \textit{integrity} is the ability to stop unauthorized changes to information. \textit{Availability} is the extent to which a a resource is guaranteed to be present and available to those authorized to manage it.
+
+\section{\glsentryfull{PGP}}
 
 \section{Reproducible builds}
 
-In a response to supply chain attacks on package archives for open source software, several projects have started within the linux community in order to raise build reproducibility \cite{reproducible_builds_project}. Traditionally, linux distributions come with package managers (such as apt \textbf{(cite)} (apt) or pacman \textbf{(cite)} (pacman)) that help users installing and managing programs. While many packages have their source code available online and can be built directly from it by each user, package managers commonly have the functionality to download pre-built programs from an archive. This is convenient for the user but comes with security risks. Using pre-built packages relies on trusting the builder to use the correct source code and that any dependencies needed to build the package are themselves correct.
+As a response to supply chain attacks on package archives for open source software, several projects have started within the linux community in order to raise build reproducibility \cite{reproducible_builds_project}. Traditionally, linux distributions come with package managers (such as apt \textbf{(cite)} (apt) or pacman \textbf{(cite)} (pacman)) that help users installing and managing programs. While many packages have their source code available online and can be built directly from it by each user, package managers commonly have the functionality to download pre-built programs from an archive. This is convenient for the user but comes with security risks. Using pre-built packages relies on trusting the builder to use the correct source code and that any dependencies needed to build the package are themselves non-malicious.
 
-Building a package reproducibly means it is bit-by-bit identical every time it is built \cite{lamb_reproducible_2021}. Verifying its correctness can therefore rely on multiple parties, each building it separately, instead of trusting a single builder. Each builder can supply a hash of the built software which, if everything has been done correctly, should all be the same. Reproducible builds allows a separation between distributing the software artifact and its verification. Different efforts to make builds reproducible have used various strategies, but a core similarity \textbf{is this true??} between them is the use of some kind of specification for the build-environment.
+Building a package reproducibly means it is bit-by-bit identical every time it is built \cite{lamb_reproducible_2021}. Verifying its correctness can therefore rely on multiple parties, each building it separately, instead of trusting a single builder. Each builder can supply a hash of the built software which, if everything has been done correctly, should all be the same. Reproducible builds allows a separation between distributing the software artifact and its verification. Different efforts to make builds reproducible have used various strategies, but a core similarity between them is the use of some kind of specification for the build-environment.
 
-\subsection{Nix}
+\todoinline{Add note on percentage of packages that are reproducible on Debian}
 
-\subsection{Debian}
+% \subsection{Nix}
 
-\subsection{Package archive}
+% \subsection{Debian}
+
+% \subsection{Package archive}
 
 \subsection{.buildinfo}
 
-In order for builds to be reproducible in different computing environments, the Debian project uses .buildinfo files to describe the necessary parts of the environment in which a package was first built. By recreating this environment on a different machine, build artifacts become identical (if the package is reproducible). .buildinfo files include, among other, name and version of the source package, architecture it was built on, checksums for the build artifacts and other packages available on the system \cite{lamb_reproducible_2021}. The .buildinfo files origin and authenticity is given by the builder signing it with their private \glsentryshort{PGP} key. A user can verify that a package has been built from source by comparing its checksum from \textbf{hash example} with the one in a corresponding .buildinfo file from a trusted source.
+In order for builds to be reproducible on different computers, the Debian project uses .buildinfo files to describe the necessary parts of the environment in which a package was first built. By recreating this environment on a different machine, build artifacts become identical, as long as the package is reproducible. .buildinfo files include, among other properties, name and version of the source package, architecture it was built on, checksums for the build artifacts as well as other packages available on the system \cite{lamb_reproducible_2021}. The .buildinfo files origin and authenticity is given by the builder signing it with their private \glsentryshort{PGP} key. A user can verify that a package has been built from source by comparing its checksum from \textbf{hash example} with the one in a corresponding .buildinfo file from a trusted source.
 
-Currently, .buildinfo files are distributed in a centralized archive \textbf{(cite)}. As this is a single-point-of-failure, if a malicious actor takes control of this archive, it could be very hard for users to know whether or not a package should be trusted.
+Currently, .buildinfo files are distributed in a centralized archive \textbf{(cite)}. Because this is a single-point-of-failure, if a malicious actor takes control of this archive, it could be very hard for users to know whether or not a package should be trusted.
 
-\subsection{Rebuilding Debian packages}
+% \subsection{Rebuilding Debian packages}
 
 
 
@@ -623,7 +627,7 @@ Currently, .buildinfo files are distributed in a centralized archive \textbf{(ci
 
 Storing and managing data is commonly done in databases such as \glspl{RDBMS} or key-value stores \textbf{(cite)}. Because of these solutions' often centralized nature, they come with both integrity and availability risks \textbf{(cite)}. They can become single-point-of-failures. If that data storage is interrupted or manipulated, a system relying on it is at risk. \glsentrylongpl{DLT} are an alternative solution to data storage, mitigating the shortcomings of traditional, centralized methods. \glsentryshort{DLT} is an umbrella term for several different technologies which rely on decentralized append-only logs \cite{kannengieser_trade-offs_2021} . The data stored in such a network cannot be changed by a central node. Instead, there has to be a consensus over the participants on how a change is to be made, followed by that change being propagated to all nodes in the network. Depending on the application, different solutions to how consensus is made and how the ledger itself is represented have been designed, each with its strengths and weaknesses.
 
-The term \glsentrylong{DSL} is sometimes used interchangeably with blockchain, but while the latter uses a specific shape on its ledger, the former is more ambiguous. Other examples of \glsentryshortpl{DLT} are Certificate Transparency logs \textbf{(cite)} and peer-two-peer networks.
+The term \glsentrylong{DSL} is sometimes used interchangeably with blockchain, but while the latter uses a specific shape on its ledger, the former is more general. Other examples of \glsentryshortpl{DLT} are Certificate Transparency logs \textbf{(cite)} and peer-two-peer networks.
 
 \subsection{Merkle trees}
 
@@ -631,9 +635,9 @@ Patent approved in 1982 \cite{merkle_method_1982} as a method for managing digit
 
 \subsection{Consensus}
 
-When multiple systems or processes cooperate on a shared state, any change to this state needs to be agreed upon between the different entities. If no agreement, or consensus, can be found, the entities' different views of the state can drift away from each other. This can lead to an in-valid system from which no meaningful progress can be made. The problem of creating consensus can be further complicated by assuming that entities can crash and be revived at any time, or even be malicious in the messages they send to the network.
+When multiple systems or processes cooperate on a shared state, any change to this state needs to be agreed upon between the different entities. If no agreement, or consensus, can be found, the entities' different views of the state can drift away from each other. This can lead to an invalid system from which no meaningful progress can be made. The problem of creating consensus can be further complicated by assuming that entities can crash and be revived at any time, or even be malicious in the messages they send to the network.
 
-A number of consensus algorithms exists, serving various applications. One way to differentiate them is whether they are proof of voting based. In a proof based consensus algorithm, only the party that has provided a certain proof is allowed to change the data. Such algorithms can be found in some public ledger blockchains, such as bitcoin. The proof itself can be, for example, finding a number given certain constraints, which is known as proof-of-work. With proof-of-work, the greater computational investment any one participant makes, the greater is the probability that they will be allowed to change the blockchain. However, the greater the computational power is in the whole network, the more limited is any one participants possibility control it or use it maliciously. Other proof based algorithms exist, but they are all centered on connecting responsibility with some type of resource investment. Voting based consensus algorithms on the other hand relate more to a more intuitive understanding of agreement, \ie democratic voting. Agreement is made only when a certain fraction of the nodes have voted in acknowledgment to a certain decision. This relies on knowing how many nodes there are on the network in total, making voting based consensus less usable in certain scenarios. While simple in idea, a voting based consensus algorithm can become complicated in practice. The algorithm should not only be able to find consensus in perfect conditions, instead a realistic solution should work even if some nodes on the network crashes and, perhaps, even if some nodes are malicious. A consensus algorithm that can handle both of these kinds of issues is called Byzantine resilient \cite{goos_consensus_1983} or that it has Byzantine fault tolerance \cite{nguyen_survey_2018}. If the algorithm only handles crashes but not malicious actors it has Crash fault tolerance.
+A number of consensus algorithms exists, serving various applications. One way to differentiate them is whether they are proof of voting based. In a proof based consensus algorithm, only the party that has provided a certain proof is allowed to change the data. Such algorithms can be found in some public ledger blockchains, such as bitcoin. The proof itself can be, for example, finding a number given certain constraints, which is known as proof-of-work. With proof-of-work, the greater computational investment any one participant makes, the greater is the probability that they will be allowed to change the blockchain. However, the greater the computational power is in the whole network, the more limited is any one participants possibility to control or use it maliciously. Other proof based algorithms exist, but they are all centered on connecting responsibility with some type of resource investment. Voting based consensus algorithms on the other hand relate more to a more intuitive understanding of agreement, \ie democratic voting. Agreement is made only when a certain fraction of the nodes have voted in acknowledgment to a certain decision. This relies on knowing how many nodes there are on the network in total, making voting based consensus less usable in certain scenarios. While simple in idea, a voting based consensus algorithm can become complicated in practice. The algorithm should not only be able to find consensus in perfect conditions, instead a realistic solution should work even if some nodes on the network crashes and, perhaps, even if some nodes are malicious. A consensus algorithm that can handle both of these kinds of issues is called Byzantine resilient \cite{goos_consensus_1983} or that it has Byzantine fault tolerance \cite{nguyen_survey_2018}. If the algorithm only handles crashes but not malicious actors it has Crash fault tolerance.
 
 \todo{Paxos??}
 
@@ -670,17 +674,21 @@ Every peer stores' the networks entire blockchain ledger and validates transacti
 \subsection{Transaction flow}
 \label{subsec:transaction-flow}
 
-A transaction in Hyperledger Fabric goes through a number of steps before a change to the ledger happens. First, a client application invokes a particular chaincode by (as of version 2.4) sending a transaction proposal to the Fabric gateway on the network. The gateway is a service running on a peer which takes care of the transaction details, allowing the client to focus on application logic \cite{fabric_gateway_2022}. After recieving the proposal from the client, the gateway finds the peer within their own organization with the longest ledger, the \textit{endorsing} peer, and forwards it to them. The endorsing peer runs the transaction (\ie chaincode) and notes what parts of the world-state it had to read from and which it will write to (the \textit{read-write set}). This information together with the chaincode's Endorcement Policy informs which organizations has to accept, or endorse, the transaction for it to be valid. Only at the time when every necessary organization has endorsed the transaction can any change be made to the ledger.
+A transaction in Hyperledger Fabric goes through a number of steps before a change to the ledger happens. Figure \ref{fig:fabric-transaction-flow} shows an overview of an example transaction. First, a client application invokes a particular chaincode by (as of version 2.4) sending a transaction proposal to the Fabric gateway on the network. The gateway is a service running on a peer which takes care of the transaction details, allowing the client to focus on application logic \cite{fabric_gateway_2022}. After recieving the proposal from the client, the gateway finds the peer within their own organization with the longest ledger, the \textit{endorsing} peer, and forwards it to them. The endorsing peer runs the transaction (\ie chaincode) and notes what parts of the world-state it had to read from and which it will write to (the \textit{read-write set}). This information together with the chaincode's Endorcement Policy informs which organizations has to accept, or endorse, the transaction for it to be valid. Only at the time when every necessary organization have endorsed the transaction can any change be made to the ledger.
 
-The Fabric gateway is responsible for forwarding endorcement requests with the transaction proposal to peer's of each necessary organization, and gather their responses. Each of these peers will then run the transaction proposal and sign their endorsment for it with their private key, if they deem it correct. The  gateway recieves the read-write sets and endorcements, validates them, and sends a final version of the transaction to the ordering service. The actual transaction contains the read-write set as well as the endorcements from the different organizations.
+The Fabric gateway is responsible for forwarding endorsement requests with the transaction proposal to peers of each necessary organization and gathering their responses. Each of these peers will then run the transaction proposal and sign their endorsement for it with their private key if they deem it correct. The gateway receives the read-write sets and endorsements, validates them, and sends a final version of the transaction to the ordering service. The actual transaction contains the read-write set and the endorsements from the different organizations.
 
-As the ordering service is run on other, orderer, nodes on the network, how the ordering service is implemented is completety separated from the functionality of the peers. Its purpose is to group transactions into blocks, order and distribute them to all the peers on the network. By default, Fabrics' ordering service uses Raft, which is voting based crash fault tolerant consensus algorithm \cite{ongaro_raft_2014}. Attempts have been made to add a Byzantine-fault tolerant ordering service to Fabric \cite{barger_byzantine_2021} but so far none has been added to the project.
+As the ordering service runs on other orderer nodes from the peers, how the ordering service is implemented is completely separated from the functionality of the peers. Its purpose is to group transactions into blocks and order and distribute them to all the peers on the network. By default, Fabrics' ordering service uses Raft, which is a voting based crash-fault tolerant consensus algorithm \cite{ongaro_raft_2014}. Attempts have been made to add a Byzantine-fault tolerant ordering service to Fabric \cite{barger_byzantine_2021}, but so far none have been added to the project.
 
-When a peer recieves a block from the ordering service they add it to their locally stored ledger, validates each transaction and, if valid, updates its local world-state according to the transaction write set. They also notify the client application the status of the transaction. Validation has two parts. First, the transaction must fulfill its endorcement policy and, secondly, the subset of the world-state contained in the read set must not have changed. All transactions, valid and invalid, are added to the ledger, but they are marked to know which ones are which.
+When a peer receives a block from the ordering service they add it to their locally stored ledger, validate each transaction and, if valid, update its local world-state according to the transaction write set. They also notify the client application of the transactions status. Validation has two parts. First, the transaction must fulfill its endorsement policy, and, secondly, the subset of the world-state contained in the read set must not have changed. All transactions, valid and invalid, are added to the ledger, but they are marked to know which ones are which.
 
-
-
-\todoinline{Add figure of transaction flow.}
+\begin{figure}
+	\begin{center}
+		\includegraphics[width=\textwidth]{figures/fabric_transaction_flow.png}
+	\end{center}
+	\caption{A swimlane sequence diagram over the Hyperledger Fabric transaction flow. Note that this is for an earlier version from before the Fabric gateway. As of version 2.4, the behaviour of the client in the diagram is instead performed by the gateway, while the client only initiates a transaction. The image \cite{hyperledger_transaction-flow_nodate}  was created by Hyperledger and is licensed under CC BY 4.0 \cite{noauthor_creative_nodate}.}
+	\label{fig:fabric-transaction-flow}
+\end{figure}
 
 \subsection{Endorsement Policies}
 
@@ -946,6 +954,14 @@ Writing smart contracts correctly and with high safety is hard. To aid this, sev
 % 			What assumptions are made on the rest of the (non-modelled) system?
 % 		- Decide what functional requirements the finished system should conform to? How do we test them? User stories?
 % 		- Decide what safety and liveness properties we should test on the model?
+% 		- Decide how to model the chaincode API
+% 		- Decide which endorsement policies are needed i.e. who is allowed to change a record. How is this represented in the model?
+% 		- Figure out if world state is updated while simulating a chaincode. I.e. does PutState update the worldstate at once, or does it change. Partial answer: The version of a key is the blockchain height of the peer that commited the latest transaction that changed the particular key. 
+% 
+% 	Model Assumptions:
+% 		- All and only the chaincodes that we create are available on the blockchain
+% 		- The ledger itself - we only use the key-value state of the world
+% 		- ==> Versioning of worldstate is done incrementally
 % 
 
 
@@ -1438,17 +1454,17 @@ Writing smart contracts correctly and with high safety is hard. To aid this, sev
 % }
 % \todo[inline, backgroundcolor=kth-lightblue]{Låt Zotero eller annat verktyg fylla i det h��r för dig. Jag föreslår en utökad version av IEEE stil - att inkludera webbadresser, DOI, ISBN etc. - för att göra det lättare för läsaren att hitta dem. Detta kommer att göra livet lättare för dina motståndare och examinator.}
 
-% \cleardoublepage
-% % Print the bibliography (and make it appear in the table of contents)
-% \renewcommand{\bibname}{References}
-% \addcontentsline{toc}{chapter}{References}
+\cleardoublepage
+% Print the bibliography (and make it appear in the table of contents)
+\renewcommand{\bibname}{References}
+\addcontentsline{toc}{chapter}{References}
 
-% \ifbiblatex
-% 	%\typeout{Biblatex current language is \currentlang}
-% 	\printbibliography[heading=bibintoc]
-% \else
-% 	\bibliography{references}
-% \fi
+\ifbiblatex
+	%\typeout{Biblatex current language is \currentlang}
+	\printbibliography[heading=bibintoc]
+\else
+	\bibliography{references}
+\fi
 
 
 
