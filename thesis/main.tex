@@ -661,20 +661,20 @@ Originally described for Bitcoin \cite{nakamoto_bitcoin_nodate, di_pierro_what_2
 
 \section{Hyperledger Fabric}
 
-Run under the umbrella of the Linux Foundation \textbf{(cite)}, the Hyperledger Fabric, or Fabric, is a permissioned blockchain framework with a novel and flexible approach to \gls{DLT}. A Fabric network can for example choose a consensus algorithm suitable for that particular use case, and define specific requirements for when a particular change to the ledger may be allowed \cite{androulaki_hyperledger_2018}. This section will describe and discuss the main components of a Hyperledger Fabric network and how they work together.
+Hosted by the Linux Foundation\cite{linux-foundation_projects_nodate}, the Hyperledger Fabric, or Fabric, is a permissioned blockchain framework with a novel and flexible approach to \gls{DLT}. A Fabric network can, for example, choose a consensus algorithm suitable for that particular usecase and define specific requirements for when a change to the ledger may be allowed \cite{androulaki_hyperledger_2018}. This section will describe and discuss the main components of a Hyperledger Fabric network and how they work together.
 
 \subsection{Overview}
 
-The Hyperledger Fabric ledger is permissioned which, compared to a public one (such as Bitcoin \textbf{(cite)}), means that it is only available to certain participants. This is regulated by \glsentryfullpl{MSP} on the network, verifying the identities of nodes through \glsentryfullpl{CA} \textbf{(cite)}. Besides \glsentryshortpl{MSP}, the nodes on the network can take on one of the roles of \textit{peer} or \textit{orderer}. Every node on network belongs to a some organization whos' \glsentryshort{MSP} determines its role. In this sense, a Fabric network is really a network of organizations rather than one of nodes.
+The Hyperledger Fabric ledger is permissioned. Compared to a public one (such as Bitcoin \cite{nakamoto_bitcoin_nodate}), this means that it is only available to certain participants. This is regulated by \glsentryfullpl{MSP} on the network, verifying the identities of nodes through \glsentryfullpl{CA} \textbf{(cite)}. Besides \glsentryshortpl{MSP}, the nodes on the network can take on one of the roles of \textit{peer} or \textit{orderer}. Every node on network belongs to some organization whos' \glsentryshort{MSP} determines its role. In this sense, a Fabric network is a network of organizations rather than one of nodes.
 
-Every peer stores' the networks entire blockchain ledger and validates transactions and changes to the ledger. Orderers, on the other hand, clump together transactions into blocks and delivers them to the peers. This separation of concern is one of the unique features of Hyperledger Fabric, and makes consensus algorithm selection possible. Changes onto the ledger are made by invoking smart contracts, called chaincodes within Fabric. Chaincodes are authorized programs that are run by peers on the network. If multple peers (according to its endorcement policy) get the same result from running the chaincode, any updates are written to the ledger. For performance reasons, a key-value store representing the current "world-state" is continuously derrived from the ledger and stored on the peers. This allows both reading and writing to happen without going through the entire ledger itself.
+Every peer stores' the network's entire blockchain ledger and validates transactions and changes to the ledger. Orderers, on the other hand, clump together transactions into blocks and delivers them to the peers. This separation of concern is one of the unique features of Hyperledger Fabric, and makes consensus algorithm selection possible. Changes onto the ledger are made by invoking smart contracts, called chaincodes within Fabric. Chaincodes are authorized programs that are run by peers on the network. If multple peers (according to its endorcement policy) get the same result from running the chaincode, any updates are written to the ledger. For performance reasons, a key-value store representing the current "world-state" is continuously derrived from the ledger and stored on the peers. This allows both reading and writing to happen without going through the entire ledger itself.
 
 \todoinline{Bootstraping ordering service with a genesis block containing a configuration transaction \cite{androulaki_hyperledger_2018}}
 
 \subsection{Transaction flow}
 \label{subsec:transaction-flow}
 
-A transaction in Hyperledger Fabric goes through a number of steps before a change to the ledger happens. Figure \ref{fig:fabric-transaction-flow} shows an overview of an example transaction. First, a client application invokes a particular chaincode by (as of version 2.4) sending a transaction proposal to the Fabric gateway on the network. The gateway is a service running on a peer which takes care of the transaction details, allowing the client to focus on application logic \cite{fabric_gateway_2022}. After recieving the proposal from the client, the gateway finds the peer within their own organization with the longest ledger, the \textit{endorsing} peer, and forwards it to them. The endorsing peer runs the transaction (\ie chaincode) and notes what parts of the world-state it had to read from and which it will write to (the \textit{read-write set}). This information together with the chaincode's Endorcement Policy informs which organizations has to accept, or endorse, the transaction for it to be valid. Only at the time when every necessary organization have endorsed the transaction can any change be made to the ledger.
+A transaction in Hyperledger Fabric goes through a number of steps before a change to the ledger happens. Figure \ref{fig:fabric-transaction-flow} shows an overview of an example transaction. First, a client application invokes a particular chaincode by (as of version 2.4) sending a transaction proposal to the Fabric gateway on the network. The gateway is a service running on a peer which takes care of the transaction details, allowing the client to focus on application logic \cite{fabric_gateway_2022}. After receiving the proposal from the client, the gateway finds the peer within their own organization with the longest ledger, the \textit{endorsing} peer, and forwards it to them. The endorsing peer runs the transaction (\ie chaincode) and notes what parts of the world-state it had to read from and which it will write to (the \textit{read-write set}). This information together with the chaincode's Endorsement Policy informs which organizations has to accept, or endorse, the transaction for it to be valid. Only at the time when every necessary organization have endorsed the transaction can any change be made to the ledger.
 
 The Fabric gateway is responsible for forwarding endorsement requests with the transaction proposal to peers of each necessary organization and gathering their responses. Each of these peers will then run the transaction proposal and sign their endorsement for it with their private key if they deem it correct. The gateway receives the read-write sets and endorsements, validates them, and sends a final version of the transaction to the ordering service. The actual transaction contains the read-write set and the endorsements from the different organizations.
 
@@ -706,7 +706,7 @@ An endorsement policy can be defined on three different granularity levels; chai
 
 \subsection{Chaincode}
 
-Many current blockchains have some notion of a smart contract \cite{di_pierro_what_2017}, \ie methods to programatically change the ledger only when certain properties, or contracts, have been fulfilled. Smart contracts makes a blockchain more general purpose as they can be used to model many different protocols and applications. \textbf{examples plz}
+Many current blockchains have some notion of a smart contract \cite{di_pierro_what_2017}, \ie methods to programmatically change the ledger only when certain properties, or contracts, have been fulfilled. Smart contracts make blockchains more general-purpose as they can be used to model many different protocols and applications. \textbf{examples plz}
 
 In Hyperledger Fabric, smart contracts are called chaincode. As there is no inherent asset on the Fabric ledger over which peers can make transactions, chaincodes are the only way the ledger can be changed. They are in other words the only way to create, update and remove assets. Chaincodes has to follow the \textit{fabric-contract} \gls{API} to be run by peers on the network, but what language they can be written in is flexible. The official language options are Java, Javascript and Go, but other languages can be supported in theory. A chaincode smart contract interacts, through the fabric-contract \glsentryshort{API}, with the world-state key-value representation of the ledger and can query, update and set values in it.
 
@@ -1469,11 +1469,14 @@ Writing smart contracts correctly and with high safety is hard. To aid this, sev
 
 
 
-% \cleardoublepage
-% \appendix
-% \renewcommand{\chaptermark}[1]{\markboth{Appendix \thechapter\relax:\thinspace\relax#1}{}}
-% \chapter{Something Extra}
-% \todo[inline, backgroundcolor=kth-lightblue]{svensk: Extra Material som Bilaga}
+\cleardoublepage
+\appendix
+\renewcommand{\chaptermark}[1]{\markboth{Appendix \thechapter\relax:\thinspace\relax#1}{}}
+\chapter{Apache License Version 2.0}
+
+\includepdf[pages=-]{licenses/apache_2.0.pdf}
+
+
 
 % \section{Just for testing KTH colors}
 % \ifdigitaloutput
