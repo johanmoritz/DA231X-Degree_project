@@ -997,6 +997,23 @@ Writing smart contracts correctly and with high safety is hard. To aid this, sev
 % 		- The ledger itself - we only use the key-value state of the world
 % 		- ==> Versioning of worldstate is done incrementally
 % 
+% 
+% 	Purpose of doing formal specification:
+% 		- Testing the behaviour of the composition of chaincodes over time
+% 		- Testing the behaviour of "actors" when running the chaincode
+% 
+% 	Some "bad" behaviours:
+% 		- Peers add different .buildinfo files all the time and none is verified by multiple peers
+% 		
+% 	"Dutch auction" asset management solution:
+% 		1. For each new .buildinfo file: a submission process that looks like an auction begins. A unique_auction_id is created and stored on the ledger.
+% 			- Not all organizations can start a submission process: only the once that behave well in other auctions (what does this mean?)
+% 		2. Each builder creates a submission S = Hash(build + unique_auction_id) and PublicS = Hash(S + unique_submitter_id) and runs a transaction which stores PublicS on the ledger and S in a private collection
+% 		3. On a certain condition (what?): each builder validates all PrivateS submissions (because they have S stored in a private collection) and a consensus of whether or not each submission is valid is reached. The voting scores (valid or invalid) for the buildinfo file is tallied and stored on the ledger. Each builder who did their job correctly (voted with the majority?) gets a reward.
+% 
+% 			Question: What happens with invalid i.e. non-reproducible builds? How are they represented as a submission?
+% 			Question: How is the reward formulated/connection to who can start a submission process?
+% 
 
 
 
