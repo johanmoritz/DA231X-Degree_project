@@ -35,6 +35,7 @@
             "name": "latexmk",
             "command": "latexmk",
             "args": [
+                "-shell-escape",
                 "-synctex=1",
                 "-file-line-error",
                 "-outdir=%OUTDIR%",
@@ -46,6 +47,8 @@
             "name": "xelatexmk",
             "command": "latexmk",
             "args": [
+                "-shell-escape",
+                "-8bit",
                 "-synctex=1",
                 "-file-line-error",
                 "-xelatex",
@@ -60,6 +63,7 @@
             "name": "pdflatex",
             "command": "pdflatex",
             "args": [
+                "-shell-escape",
                 "-synctex=1",
                 "-interaction=nonstopmode",
                 "-halt-on-error",
@@ -72,6 +76,7 @@
             "name": "xelatex",
             "command": "xelatex",
             "args": [
+                "-shell-escape",
                 "-synctex=1",
                 "-interaction=nonstopmode",
                 "-halt-on-error",

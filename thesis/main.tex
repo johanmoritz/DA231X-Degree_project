@@ -708,11 +708,45 @@ An endorsement policy can be defined on three different granularity levels; chai
 
 Many current blockchains have some notion of a smart contract \cite{di_pierro_what_2017}, \ie methods to programmatically change the ledger only when certain properties, or contracts, have been fulfilled. Smart contracts make blockchains more general-purpose as they can be used to model many different protocols and applications. \textbf{examples plz}
 
-In Hyperledger Fabric, smart contracts are called chaincode. As there is no inherent asset on the Fabric ledger over which peers can make transactions, chaincodes are the only way the ledger can be changed. They are in other words the only way to create, update and remove assets. Chaincodes has to follow the \textit{fabric-contract} \gls{API} to be run by peers on the network, but what language they can be written in is flexible. The official language options are Java, Javascript and Go, but other languages can be supported in theory. A chaincode smart contract interacts, through the fabric-contract \glsentryshort{API}, with the world-state key-value representation of the ledger and can query, update and set values in it.
+In Hyperledger Fabric, smart contracts are called chaincode. As there is no inherent asset on the Fabric ledger over which peers can make transactions, chaincodes are the only way the ledger can be changed. They are in other words the only way to create, update and remove assets. Chaincodes has to follow the \textit{fabric-contract} \gls{API} to be run by peers on the network, but what language they can be written in is flexible. The official language options are Java, Javascript and Go, but other languages can be supported in theory. Listing \ref{lst:chaincode-fabcar-example} examplifies how chaincodes can look and the mechanisms through which it interacts with the worldstate. A chaincode smart contract interacts, through the fabric-contract \glsentryshort{API}, with the world-state key-value representation of the ledger and can query, update and set values in it.
 
 Running a chaincode on the network does not update the ledger directly (see \ref{subsec:transaction-flow} for how ledger modifications are implemented). Instead a read-write set of the keys that have been queried from and the changes to the ones that have been set during the execution of the chaincode are generated. The result of the chaincode is this read-write set, which is then further used to update the ledger itself.
 
-\todoinline{Add chaincode example}
+\begin{listing}
+	\begin{minted}[escapeinside=@@
+				 , fontsize=\footnotesize
+				 , tabsize=2]{JavaScript}
+/*
+* Copyright IBM Corp. All Rights Reserved.
+*
+* SPDX-License-Identifier: Apache-2.0
+*/
+@$\vdots$@
+async queryCar(ctx, carNumber) {
+	const carAsBytes = await ctx.stub.getState(carNumber);
+	if (!carAsBytes || carAsBytes.length === 0) {
+		throw new Error(`${carNumber} does not exist`);
+	}
+	return carAsBytes.toString();
+}
+
+async createCar(ctx, carNumber, make, model, color, owner) {
+	const car = {
+		color,
+		docType: 'car',
+		make,
+		model,
+		owner,
+	};
+
+	await ctx.stub.putState(carNumber, 
+	                        Buffer.from(JSON.stringify(car)));
+}
+
+\end{minted}
+	\caption{Modified chaincode excerpts from Hyperledgers sample project fabcar \cite{hyperledger_fabric-samples_2022}. The examples showcases the main chaincode API endpoints \mintinline{Javascript}{getState} and \mintinline{Javascript}{putState} for retrieving and, respectively, updating the ledger.}
+	\label{lst:chaincode-fabcar-example}
+\end{listing}
 
 \todoinline{Find some good references for chaincode besides the official documentation.}
 
@@ -1473,6 +1507,7 @@ Writing smart contracts correctly and with high safety is hard. To aid this, sev
 \appendix
 \renewcommand{\chaptermark}[1]{\markboth{Appendix \thechapter\relax:\thinspace\relax#1}{}}
 \chapter{Apache License Version 2.0}
+\label{ch:Apache2.0}
 
 \includepdf[pages=-]{licenses/apache_2.0.pdf}
 
