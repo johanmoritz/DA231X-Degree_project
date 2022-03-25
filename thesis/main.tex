@@ -763,6 +763,7 @@ Distributed systems can be complex to design and hard to reason about. This is m
 TLA\textsuperscript+ \cite{lamport_specifying_2001} is a language for formal specification where a model describes a systems' behaviour over time. It has been used successfully in industry to verify and finding bugs in distributed systems \cite{joshi_checking_2003,newcombe_how_2015} and can be written in both a mathematical notation style and the more pseudocode-esque PlusCal. The specification can then be verified by the TLC tool which simulates executions of the model in order to find potential faults. TLA\textsuperscript+ is built on the \gls{TLA} \cite{lamport_temporal_1994}, but adds improvements for writing more modular and larger specifications.
 
 \subsection{\glsentryfull{TLA}}
+\label{subsec:tla}
 
 The semantics of \glsentryshort{TLA} are based on infinite sequences of states called behaviours. Here, a state $s$ is a mapping from symbolic variable names to values \eg $[x \mapsto 1, y \mapsto "a", z \mapsto 42]$. Behaviours represent the history of states that a program execution enters, one state for each atomic change. A program incrementing a counter could for example have the behaviour $\langle [x \mapsto 0, \dotsc], [x \mapsto 1, \dotsc], [x \mapsto 1, \dotsc], [x \mapsto 2, \dotsc], \dotsc \rangle$. Note that $x$ does not increment at every state in this behaviour. This is an example of \textit{stuttering} \ie $x$ is allowed to remain the same or increment at every step. Stuttering is an important concept because it allows logical formulas, or programs, to be modular. As an example of this, we can imagine a second counter program running concurrently with the first. The two programs are both incrementing variables but not necessarily at the same time, so at certain states we need stuttering to descibe the combined program. An example of this is shown in figure \ref{fig:concurrent-behaviour}.
 
@@ -890,6 +891,13 @@ where
 	\item $\langle \mathcal{A} \rangle_f \triangleq \mathcal{A} \land \lparen f^\prime \neq f \rparen $ \ie the action $A$ is executed and changes variables in $f$
 	\item $\neg Enabled \langle \mathcal{A} \rangle_f$ means that $\mathcal{A}$ is impossible to execute.
 \end{itemize}
+
+
+\subsection{PlusCal}
+
+\glsentryshort{TLA} is, as can be seen in section \ref{subsec:tla}, quite different from a regular programming language. This has the benefit of being simple and flexible, but can result in hard-to-read code as specifications start to grow in size. It is also not entirely clear from its syntax how an algorithm described in for example pseudocode can be translated to it.
+
+PlusCal is an alternative syntax specifically made for describing concurrent algorithms exactly while bringing the simplicity of writing pseudocode \cite{leucker_pluscal_2009}. It is written within a comment in a TLA\textsuperscript+ file and translated into TLA\textsuperscript+ as part of the parsing step of TLC.
 
 % \subsubsection{Termination}
 
