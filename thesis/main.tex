@@ -760,7 +760,7 @@ Distributed systems can be complex to design and hard to reason about. This is m
 
 \section{TLA\textsuperscript+}
 
-TLA\textsuperscript+ \cite{lamport_specifying_2001} is a language for formal specification where a model describes a systems' behaviour over time. It has been used successfully in industry to verify and finding bugs in distributed systems \cite{joshi_checking_2003,newcombe_how_2015} and can be written in both a mathematical notation style and the more pseudocode-esque PlusCal. The specification can then be verified by the TLC \textbf{(acronym)} tool which simulates executions of the model in order to find potential faults. TLA\textsuperscript+ is built on the \gls{TLA} \cite{lamport_temporal_1994}, but adds improvements for writing more modular and larger specifications.
+TLA\textsuperscript+ \cite{lamport_specifying_2001} is a language for formal specification where a model describes a systems' behaviour over time. It has been used successfully in industry to verify and finding bugs in distributed systems \cite{joshi_checking_2003,newcombe_how_2015} and can be written in both a mathematical notation style and the more pseudocode-esque PlusCal. The specification can then be verified by the TLC tool which simulates executions of the model in order to find potential faults. TLA\textsuperscript+ is built on the \gls{TLA} \cite{lamport_temporal_1994}, but adds improvements for writing more modular and larger specifications.
 
 \subsection{\glsentryfull{TLA}}
 
@@ -859,15 +859,15 @@ Not all combinations of the above mentioned logical and temporal operators are a
 
 \ie either the value of $x$ is equal to 0 or it is one greater or equal to the value of $x$ in the previous state.
 
-\subsection{TLC \textbf{(acronym)} Model Checker}
+\subsection{TLC Model Checker}
 
-TLA\textsuperscript+ is part of a toolbox made for supporting the creation and testing of formal specifications. Instead of validating a TLA model by hand, the TLC \textbf{(acronym)} model checker allows mechanic verification by simulating its possible executions while looking for invalid states and other errors. If TLC \textbf{(acronym)} finds a problem, it terminates the simulation and notifies the user with a timeline of the behaviour that lead up to the particular error. The user can then improve their model, and gain a better understanding of their specification and system. Because verifying a specifcation means TLC \textbf{(acronym)} has to simulate every possible behaviour, this can take a long time to do. A practical way to resolve this is to limit the state space in the model, but that also limits the type of properties TLC \textbf{(acronym)} can test. For example, ensuring the absence of integer overflow from the sum of two 32-bit integers would imply testing all possible pairs, but this would take far too long to test. If we instead limit the possible integer values to, for example, $0 \dotsc 5$ the simulation might terminate without error but we have clearly not managed to validate the absence of overflows.
+TLA\textsuperscript+ is part of a toolbox made for supporting the creation and testing of formal specifications. Instead of validating a TLA model by hand, the TLC model checker allows mechanic verification by simulating its possible executions while looking for invalid states and other errors \cite{goos_model_1999}. If TLC finds a problem, it terminates the simulation and notifies the user with a timeline of the behaviour that lead up to the particular error. The user can then improve their model, and gain a better understanding of their specification and system. Because verifying a specifcation means TLC has to simulate every possible behaviour, this can take a long time to do. A practical way to resolve this is to limit the state space in the model, but that also limits the type of properties TLC can test. For example, ensuring the absence of integer overflow from the sum of two 32-bit integers would imply testing all possible pairs, but this would take far too long to test. If we instead limit the possible integer values to, for example, $0 \dotsc 5$ the simulation might terminate without error but we have clearly not managed to validate the absence of overflows.
 
-Instead, the TLC \textbf{(acronym)} model checker is instead more appropriate for validating time-related and concurrency problems. Here follows a short description of some of the properties that TLC \textbf{(acronym)} can test.
+Instead, the TLC model checker is instead more appropriate for validating time-related and concurrency problems. Here follows a short description of some of the properties that TLC can test.
 
 \subsubsection{Safety}
 
-A specification that can never do anything ``bad'' is said to follow its \textit{safety} property. Variations of this is common to test in software engineering practices such as unit-testing. Safety checking in TLC \textbf{(acronym)} is straightforward as it is done by simply testing every new state during simulation for the relevant property. To examplify this, we can consider type invariants as safety properties. An variable might for example only be allowed to be an integer and nothing else.
+A specification that can never do anything ``bad'' is said to follow its \textit{safety} property. Variations of this is common to test in software engineering practices such as unit-testing. Safety checking in TLC is straightforward as it is done by simply testing every new state during simulation for the relevant property. To examplify this, we can consider type invariants as safety properties. An variable might for example only be allowed to be an integer and nothing else.
 
 \subsubsection{Liveness}
 
@@ -877,7 +877,7 @@ In TLA\textsuperscript+, liveness properties are written with temporal operators
 
 \subsubsection{Fairness}
 
-Two additional examples of liveness properties are the weak and strong fairness properties. A \textit{fair} specification is guaranteed to execute an action as long as it is possible. If the action is weakly fair then it will be performed as long as it is repeatedly possible to do so. If it is strongly fair, then it will be executed unless it is no longer possible to do so. More formally they are defined, for action $\mathcal{A}$ and state function $f$, as
+Two additional examples of liveness properties are the weak and strong fairness properties. A \textit{fair} specification is guaranteed to execute an action as long as it is possible. If the action is weakly fair then it will be performed as long as it is repeatedly possible to do so. If it is strongly fair, then it will be executed unless it is no longer possible to do so at least once. More formally they are defined, for action $\mathcal{A}$ and state function $f$, as
 
 \begin{math}
 	WF_f\lparen \mathcal{A} \rparen \triangleq \lparen \Box \Diamond \langle \mathcal{A} \rangle_f \rparen \lor  \lparen \Box \Diamond \neg Enabled \langle \mathcal{A} \rangle_f \rparen \\
@@ -918,7 +918,7 @@ Instead of using blockchain and \glsentryshort{P2P} technologies together, \text
 
 \subsection{Formal verification of Smart contracts}
 
-Writing smart contracts correctly and with high safety is hard. To aid this, several researchers have looked into using formal methods to verify them. \textcite{bhargavan_formal_2016} translated the Solidity language for writing smart contracts into the general purpose language F$^{\star}$ made for program verification. The authors then used the type system of F$^{\star}$ to enforce certain safety properties in the smart contract. \textcite{beckert_formal_2018} took a similar approach but for the Hyperledger Fabric chaincode. By adding pre- and postconditions in comments to chaincode written in Java and translating these to Java Modeling Language \textbf{(acronym)} they managed to deduce smart contract safety properties statically. In a slightly different direction, \textcite{latif_blockchain_2019} modelled a blockchain for waste management using TLA\textsuperscript+. Their initial system description was written in UML \textbf{(acronym, cite)} which turned out to be a relatively straithforward to translate into a formal specification language. The systems' safety and liveness properties could then be validated with the TLC \textbf{(acronym)} model checker.
+Writing smart contracts that works correctly is hard. To aid this, several researchers have looked into using formal methods to verify them. \textcite{bhargavan_formal_2016} translated the Solidity language for writing smart contracts into the general-purpose language F$^{\star}$ made for program verification. The authors then used the type system of F$^{\star}$ to enforce certain safety properties in the smart contract. \textcite{beckert_formal_2018} took a similar approach but for the Hyperledger Fabric chaincode. By adding pre- and postconditions in comments to chaincode written in Java and translating these to Java Modeling Language \textbf{(acronym)} they managed to deduce smart contract safety properties statically. In a slightly different direction, \textcite{latif_blockchain_2019} modelled a blockchain for waste management using TLA\textsuperscript+. Their initial system description was written in UML \textbf{(acronym, cite)} which turned out to be relatively straightforward to translate into a formal specification language. The system's safety and liveness properties could then be validated with the TLC model checker.
 
 \todoinline{Add work on infering formal specifications from logs}
 
@@ -996,6 +996,7 @@ Writing smart contracts correctly and with high safety is hard. To aid this, sev
 % 		- All and only the chaincodes that we create are available on the blockchain
 % 		- The ledger itself - we only use the key-value state of the world
 % 		- ==> Versioning of worldstate is done incrementally
+% 		- All nodes are authenticated by their respective organizations CA
 % 
 % 
 % 	Purpose of doing formal specification:
@@ -1004,6 +1005,8 @@ Writing smart contracts correctly and with high safety is hard. To aid this, sev
 % 
 % 	Some "bad" behaviours:
 % 		- Peers add different .buildinfo files all the time and none is verified by multiple peers
+% 		- Peers don't actually build packages, instead they just pretend that they did
+% 
 % 		
 % 	"Dutch auction" asset management solution:
 % 		1. For each new .buildinfo file: a submission process that looks like an auction begins. A unique_auction_id is created and stored on the ledger.
@@ -1013,7 +1016,8 @@ Writing smart contracts correctly and with high safety is hard. To aid this, sev
 % 
 % 			Question: What happens with invalid i.e. non-reproducible builds? How are they represented as a submission?
 % 			Question: How is the reward formulated/connection to who can start a submission process?
-% 
+% 			Thought: Malicious organization vs malicious node
+% 			
 
 
 
