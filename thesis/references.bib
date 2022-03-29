@@ -519,10 +519,46 @@
 }
 
 @article{kolb_quartz_2020,
-	title = {Quartz: A Framework for Engineering Secure Smart Contracts},
-	abstract = {We present Quartz, a language and framework for developing and validating smart contracts. A user writes a Quartz contract as an extended finite-state machine in a domain-specific language. Quartz translates this description into a formal specification in {TLA}+. The specification captures both the contract’s logic and the execution semantics of the blockchain. Quartz uses bounded model checking to automatically determine if a contract adheres to user-defined properties. Once validated, the contract’s author uses Quartz to generate a Solidity implementation for deployment on a blockchain. We used a survey of 16 contract case studies, drawn from a variety of domains, to motivate the design of Quartz’s {DSL} and to evaluate its effectiveness. We show that Quartz contracts are consistently more concise than handwritten Solidity equivalents. We present two in-depth case studies where Quartz identifies multiple significant contract vulnerabilities and provides useful execution traces to assist the developer in addressing them. Finally, we demonstrate that Quartz imposes only modest overhead in terms of generated code size and execution efficiency over handwritten Solidity. Quartz is able to automatically verify functional, contract-specific properties. It is the first tool of this type that detects vulnerabilities arising from interactions with external code, such as reentrancy.},
-	pages = {17},
-	author = {Kolb, John and Yang, John B and Katz, Randy H and Culler, David E},
-	langid = {english},
-	file = {Kolb et al. - Quartz A Framework for Engineering Secure Smart C.pdf:C\:\\Users\\johan.moritz\\Zotero\\storage\\HHWIUC8A\\Kolb et al. - Quartz A Framework for Engineering Secure Smart C.pdf:application/pdf},
+  title    = {Quartz: A Framework for Engineering Secure Smart Contracts},
+  abstract = {We present Quartz, a language and framework for developing and validating smart contracts. A user writes a Quartz contract as an extended finite-state machine in a domain-specific language. Quartz translates this description into a formal specification in {TLA}+. The specification captures both the contract’s logic and the execution semantics of the blockchain. Quartz uses bounded model checking to automatically determine if a contract adheres to user-defined properties. Once validated, the contract’s author uses Quartz to generate a Solidity implementation for deployment on a blockchain. We used a survey of 16 contract case studies, drawn from a variety of domains, to motivate the design of Quartz’s {DSL} and to evaluate its effectiveness. We show that Quartz contracts are consistently more concise than handwritten Solidity equivalents. We present two in-depth case studies where Quartz identifies multiple significant contract vulnerabilities and provides useful execution traces to assist the developer in addressing them. Finally, we demonstrate that Quartz imposes only modest overhead in terms of generated code size and execution efficiency over handwritten Solidity. Quartz is able to automatically verify functional, contract-specific properties. It is the first tool of this type that detects vulnerabilities arising from interactions with external code, such as reentrancy.},
+  pages    = {17},
+  author   = {Kolb, John and Yang, John B and Katz, Randy H and Culler, David E},
+  langid   = {english},
+  file     = {Kolb et al. - Quartz A Framework for Engineering Secure Smart C.pdf:C\:\\Users\\johan.moritz\\Zotero\\storage\\HHWIUC8A\\Kolb et al. - Quartz A Framework for Engineering Secure Smart C.pdf:application/pdf}
+}
+
+@incollection{bracciali_building_2020,
+  location  = {Cham},
+  title     = {Building Executable Secure Design Models for Smart Contracts with Formal Methods},
+  volume    = {11599},
+  isbn      = {978-3-030-43724-4 978-3-030-43725-1},
+  url       = {http://link.springer.com/10.1007/978-3-030-43725-1_12},
+  abstract  = {Smart contracts are appealing because they are self-executing business agreements between parties with the predeﬁned and immutable obligations and rights. However, as with all software, smart contracts may contain vulnerabilities because of design ﬂaws, which may be exploited by one of the parties to defraud the others. In this paper, we demonstrate a systematic approach to building secure design models for smart contracts using formal methods. To build the secure models, we ﬁrst model the behaviors of participating parties as state machines, and then, we model the predeﬁned obligations and rights of contracts, which specify the interactions among state machines for achieving the business goal. After that, we illustrate executable secure model design patterns in {TLA}+ (Temporal Logic of Actions) to against well-known smart contract vulnerabilities in terms of state machines and obligations and rights at the design level. These vulnerabilities are found in Ethereum contracts, including Call to the unknown, Gasless send, Reentrancy, Lost in the transfer, and Unpredictable state. The resultant {TLA}+ speciﬁcations are called secure models. We illustrate our approach to detect the vulnerabilities using a real-estate contract example at the design level.},
+  pages     = {154--169},
+  booktitle = {Financial Cryptography and Data Security},
+  publisher = {Springer International Publishing},
+  author    = {Xu, Weifeng and Fink, Glenn A.},
+  editor    = {Bracciali, Andrea and Clark, Jeremy and Pintore, Federico and Rønne, Peter B. and Sala, Massimiliano},
+  urldate   = {2022-03-29},
+  date      = {2020},
+  langid    = {english},
+  doi       = {10.1007/978-3-030-43725-1_12},
+  note      = {Series Title: Lecture Notes in Computer Science},
+  file      = {Xu and Fink - 2020 - Building Executable Secure Design Models for Smart.pdf:C\:\\Users\\johan.moritz\\Zotero\\storage\\5QE5KJXQ\\Xu and Fink - 2020 - Building Executable Secure Design Models for Smart.pdf:application/pdf}
+}
+
+@article{meyer_applying_1992,
+  title        = {Applying 'design by contract'},
+  volume       = {25},
+  issn         = {1558-0814},
+  doi          = {10.1109/2.161279},
+  abstract     = {Methodological guidelines for object-oriented software construction that improve the reliability of the resulting software systems are presented. It is shown that the object-oriented techniques rely on the theory of design by contract, which underlies the design of the Eiffel analysis, design, and programming language and of the supporting libraries, from which a number of examples are drawn. The theory of contract design and the role of assertions in that theory are discussed.{\textless}{\textgreater}},
+  pages        = {40--51},
+  number       = {10},
+  journaltitle = {Computer},
+  author       = {Meyer, B.},
+  date         = {1992-10},
+  note         = {Conference Name: Computer},
+  keywords     = {Books, Computer bugs, Contracts, Guidelines, Object oriented programming, Pressing, Reliability theory, Robustness, Software engineering, Software systems},
+  file         = {IEEE Xplore Abstract Record:C\:\\Users\\johan.moritz\\Zotero\\storage\\R6YE377D\\161279.html:text/html}
 }
