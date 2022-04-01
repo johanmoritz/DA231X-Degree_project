@@ -83,7 +83,7 @@
 
 %% Information for inside title page
 \title{Trust in your friends, on the ledger}
-\subtitle{Safer reproducible builds through decentralized distribution of {\tt .buildinfo} files}
+\subtitle{Safer reproducible builds through decentralized distribution of \texttt{.buildinfo} files}
 
 % give the alternative title - i.e., if the thesis is in English, then give a Swedish title
 \alttitle{Detta är den svenska översättningen av titeln}
@@ -467,11 +467,11 @@ goals of this thesis project, and outlines the structure of the thesis.\\
 % 	throughout your thesis (be consistent). This figure will also help you later
 % 	delimit what you are going to do and what others have done or will do.}
 
-Discussions on how to verify the lack of malicious code in binaries go at least as far back as to Ken Thompson's Turing award lecture \cite{thompson_reflections_1984} where he discusses the issues of trusting code created by others. In recent years, several attacks on popular packages within the \glsentryfull{FOSS} have been executed \cite{lamb_reproducible_2021} where trusted repositories have injected malicious code in their released binaries. These attacks question how much trust in such dependencies is appropriate. In an attempt to raise the level of trust and security in \glsentryfull{FOSS}, the reproducible builds projects \cite{reproducible_builds_project} was started within the Debian community. Its goal was to mitigate the risk that a package is tampered with by ensuring that its builds are deterministic and therefore should be bit-by-bit identical over multiple rebuilds. Any user of a reproducible package can verify that it has indeed been built from its source code and was not manipulated after the fact simply by rebuilding it from the package's {\tt .buildinfo} file. These metadata files for reproducible builds include hashes of the produced build artifacts and a description of the build environment to enable user-side verification. The crucial link to ensure reproducibility is by this notion {\tt .buildinfo}, which also means that a great deal of trust is assumed when using them. Current measures for validating {\tt .buildinfo} files and their corresponding packages involve package repository managers and volunteers running rebuilderd \cite{rebuilderd_public_nodate} instances that test the reproducibility of every {\tt .buildinfo} file added to the relevant package archive. This setup allows users to audit the separate build logs, thus confirming the validity of a particular package. However, because this would be a manual process and the different instances do not coordinate their work, it relies on the user judging on a case-by-case basis whether to trust a package or not.
+Discussions on how to verify the lack of malicious code in binaries go at least as far back as to Ken Thompson's Turing award lecture \cite{thompson_reflections_1984} where he discusses the issues of trusting code created by others. In recent years, several attacks on popular packages within the \glsentryfull{FOSS} have been executed \cite{lamb_reproducible_2021} where trusted repositories have injected malicious code in their released binaries. These attacks question how much trust in such dependencies is appropriate. In an attempt to raise the level of trust and security in \glsentryfull{FOSS}, the \textit{reproducible builds} project \cite{reproducible_builds_project} was started within the Debian community. Its goal was to mitigate the risk that a package is tampered with by ensuring that its builds are deterministic and therefore should be bit-by-bit identical over multiple rebuilds. Any user of a reproducible package can verify that it has indeed been built from its source code and was not manipulated after the fact simply by rebuilding it from the package's \texttt{.buildinfo} file. These metadata files for reproducible builds include hashes of the produced build artifacts and a description of the build environment to enable user-side verification. The crucial link to ensure reproducibility is by this notion \texttt{.buildinfo}, which also means that a great deal of trust is assumed when using them. Current measures for validating \texttt{.buildinfo} files and their corresponding packages involve package repository managers and volunteers running rebuilderd \cite{rebuilderd_public_nodate} instances that test the reproducibility of every \texttt{.buildinfo} file added to the relevant package archive. This setup allows users to audit the separate build logs, thus confirming the validity of a particular package. However, because this would be a manual process and the different instances do not coordinate their work, it relies on the user judging on a case-by-case basis whether to trust a package or not.
 
 Validating the aggregated results from many package builds could potentially be done through \glspl{DLT}. \glsentryshortpl{DLT} were popularized by Bitcoin \cite{di_pierro_what_2017, nakamoto_bitcoin_nodate} for crypto-currencies but has wide ranging applications in trust related domains. A distributed ledger is a log of transaction held by many different nodes on a network. Transactions are validated, ordered and added to the network by a consensus algorithm to ensure that no single or small group of nodes can act maliciously. The log itself is commonly a tree or graph of hashes which allows proving that a particular transaction has happened in an efficient manner. Because of their distributed nature, \glsentryshortpl{DLT} are however hard to test and verify. One way to go about this without loosing accuracy \textbf{Precision?} is by modeling the system with formal specification tools that can validate the properties of the system design. Even though such a model is not a true representation of the system itself,
 
-This project seeks to reduce some of the above mentioned burden from the user while increasing their trust in the software they use by investigating possible decentralized solutions for distributing and proving the correctness of {\tt .buildinfo} files.
+This project seeks to reduce some of the above mentioned burden from the user while increasing their trust in the software they use by investigating possible decentralized solutions for distributing and proving the correctness of \texttt{.buildinfo} files.
 
 \section{Problem}
 \label{sec:problem}
@@ -483,26 +483,29 @@ This project seeks to reduce some of the above mentioned burden from the user wh
 % Longer problem statement\\
 % If possible, end this section with a question as a problem statement.
 
-Equivalences between human readable source code and binaries are hard to prove \textbf{(cite)}. Likewise is it if the comparison is between source and a hash of a binary. A more easily proved variation of this problem is whether multiple binaries have been built from the same, potentially unknown, source. If the binaries are identical and we trust that the builder is not forging their results, we can be confident in that the binaries were all built the same way. The proof, though, is only as strong as our trust in the builder; an actor which could be compromised without us knowing. With multiple builders, we reduce this risk and our trust can increase likewise.
+Equivalences between human-readable source code and binaries are hard to prove \textbf{(cite)}. Likewise, the same holds when comparing the source code and hash of a binary program. A more easily proved variation of this problem is whether multiple binaries have been built from the same, potentially unknown, source. If the binaries are identical and the builder is trusted not to forge their results, the binaries can confidently be assumed to have been built the same way. The proof, though, is only as strong as the trust in the builder; who could potentially be compromised. With multiple builders, the risk is reduced and the trust will likewise increase.
 
-Distributing the workload creates the need for a system where the build results can be aggregated. Because users have different needs, they should be able to choose their own trust models and use the packages they trust based on the build results from the different builders. With this as background, we ask how such a system can be designed and implemented in order to maximize user trust in that the packages they use have been derrived from the correct source code.
+Distributing the workload creates the need for a system where the build results can be aggregated. Because users have different needs, they should be able to choose their own trust models and use the packages they trust based on the build results from the different builders. With this as background, there is the question of how such a system can be designed and implemented in order to maximize user trust in that the packages they use have been derived from the authentic source code.
 
 % Research Question
 \subsection{Original problem and definition}
 \label{sec:researchQuestion}
 % \todo[inline, backgroundcolor=kth-lightblue]{Ursprungligt problem och definition}
 
-The Debian Reproducible Builds project uses {\tt .buildinfo} files to store checksums of derived artifacts. These files can serve as proof that a package has been built from source by a particular builder. Storing the aggregated {\tt .buildinfo} files from multiple builders in a system could increase user trust in {\tt .buildinfo} files, and therefore in packages. With this in mind we ask the following question:
+The \textit{Debian Reproducible Builds} project uses \texttt{.buildinfo} files to store checksums of derived artifacts. These files can serve as proof that a package has been built from source by a particular builder. Storing the aggregated \texttt{.buildinfo} files from multiple builders in a system could increase user trust in \texttt{.buildinfo} files, and therefore in packages. This follows from the fact that even though any particular builder could act maliciously, the probability that all builders are doing so lowers for each added builder. With this in mind we ask the following question:
 
 \begin{itemize}
-	\item To what extent can distributed and decentralized storage secure the integrity of {\tt .buildinfo} files?
+	\item To what extent can distributed and decentralized storage secure the integrity of \texttt{.buildinfo} files?
 \end{itemize}
 
 \subsection{Scientific and engineering issues}
 \label{subsec:scientific-issues}
 % \todo[inline, backgroundcolor=kth-lightblue]{Vetenskaplig och ingenjörsmässig frågeställning}
+
+In the process to answer the research question, the following more technical questions will have to be answered as well:
+
 \begin{itemize}
-	\item Which distributed data storage solutions are applicable for {\tt .buildinfo} files?
+	\item Which distributed data storage solutions are applicable for \texttt{.buildinfo} files?
 	\item How can we model a relevant system for efficient evaluation of integrity preservation?
 \end{itemize}
 
@@ -517,12 +520,12 @@ The Debian Reproducible Builds project uses {\tt .buildinfo} files to store chec
 
 As society relies more and more heavily on software and digital infrastructure, threats to those technologies are increasingly more important to mitigate. By supplying additional safeguards to the way we manage software, we can make it harder for malicious actors to take advantage of users.
 
-One current way of managing software safely is to first downloade its source code and then building it on our own machines. This way, we can be confident in that we are running the software we intend to run. Such a method, however, is time consuming and therefore not particularly user friendly. The purpose of this project is to give alternative solutions with a focus on user trust while not relying on users' building packages themselves. Further more, this project seek to increase trust and security in \glsentrylong{FOSS} and reduce the risk of supply-chain attacks on package archives.
+One current way of managing software in a safe manner is to first download its source code and then building it on our own machines. This way, we can be confident in that we are running the software we intend to run. Such a method, however, is time consuming for the user. The purpose of this project is to give alternative solutions with a focus on user trust while not relying on users' building packages themselves. Furthermore, this project seek to increase trust and security in \glsentrylong{FOSS} and reduce the risk of supply-chain attacks on package archives.
 
 
 \section{Goals}
 
-The main goal of this project is to formulate a plan for how to store {\tt .buildinfo} files in such a way that their integrity is maintained. This involves understanding the purpose of and context within {\tt .buildinfo} files exist. The storage plan should be formulated based on this context and written as a formal specification.
+The main goal of this project is to formulate a plan for how to store \texttt{.buildinfo} files in such a way that their integrity is maintained. This involves understanding the purpose \texttt{.buildinfo} files and the context they exist within. The storage plan should be formulated based on this context and written as a formal specification.
 
 % \todo[inline, backgroundcolor=kth-lightblue]{Mål}
 % \todo[inline, backgroundcolor=kth-lightblue]{Skilj på syfte och mål. Syftet är att åstakomma en förändring i något. Målen är vad som konkret skall göras för att om möjligt uppnå den önskade förändringen (syfte). }
@@ -545,13 +548,13 @@ The main goal of this project is to formulate a plan for how to store {\tt .buil
 % \todo[inline]{Introduce your choice of methodology/methodologies and method/methods – and the reason why you chose them. Contrast them with and explain why you did not choose other methodologies or methods. (The details of the actual methodology and method you have chosen will be given in Chapter~\ref{ch:methods}. Note that in Chapter~\ref{ch:methods}, the focus could be research strategies, data collection, data analysis, and quality assurance.)\\
 % 	In this section you should present your philosophical assumption(s), research method(s), and research approach(es).}
 
-The project will take three different phases. Initially, a pre-study focusing on reproducible builds, \glsentrylongpl{DLT} and formal specifcation will take place. Its purpose will be finding possible technologies, solutions and evaluation methods for solving the issues mentioned under section \ref{subsec:scientific-issues}. With this initial phases finished, an appropriate storage strategy for ensuring the integrity of {\tt .buildinfo} files and a methodology for modeling such a storage system is decided. The last phase involves producing and evaluating the model of said system to produce an answer to the original research question stated in \ref{sec:researchQuestion}.
+The project is in three phases. The initial phase is a pre-study focusing on reproducible builds, \glsentrylongpl{DLT} and formal specification. Its purpose is researching possible technologies, solutions and evaluation methods for solving the issues mentioned under section \ref{subsec:scientific-issues}. With this initial phases finished, an appropriate storage strategy for ensuring the integrity of \texttt{.buildinfo} files and a methodology for modeling such a storage system is decided. The last phase involves producing and evaluating the model of said system to find an answer to the original research question stated in \ref{sec:researchQuestion}.
 
 \section{Delimitations}
 % \todo[inline, backgroundcolor=kth-lightblue]{Avgränsningar}
 % \todo[inline]{Describe the boundary/limits of your thesis project and what you are explicitly not going to do. This will help you bound your efforts – as you have clearly defined what is out of the scope of this thesis project. Explain the delimitations. These are all the things that could affect the study if they were examined and included in the degree project.}
 
-While this project utilizes {\tt .buildinfo} files and reproducible builds as its core problem domain, no builds or {\tt .buildinfo} files are necessarily going to be produced during it. More specifically, the interessting part of .builfinfo files in terms of the project are their meta information and context in the software ecosystem. Their actual content and semantics are mainly irrelevant for the project, and will most likely be represented in an abstract manner in any implementations and artifacts.
+While this project utilizes \texttt{.buildinfo} files and reproducible builds as its core problem domain, no builds or \texttt{.buildinfo} files are necessarily produced during it. More specifically, the relevant part of \texttt{.buildinfo} files in terms of the project are their meta information and context in the software ecosystem. Their actual content and semantics are mainly irrelevant for the project and is represented in an abstract manner in any implementation or artifact.
 
 % \section{Structure of the thesis}\todo[inline, backgroundcolor=kth-lightblue]{ Rapportens disposition}
 % \label{sec:structure}
@@ -572,7 +575,7 @@ While this project utilizes {\tt .buildinfo} files and reproducible builds as it
 % 	project /work (described in this thesis). Explain why and what is not used in
 % 	the degree project and give valid reasons for rejecting the work/research.}
 
-To bring the reader up to speed, this chapter covers an introduction on reproducible builds as seen within the Debian project. It also describes the core ideas in \glsentrylongpl{DLT}, examplified most notably with the blockchain Hyperledger Fabric, and temporal logic and formal specifications written TLA\textsuperscript+. Important terminology such as \glsentrylong{CIA} is also presented. The chapter ends with a review of previous work related to this project.
+This chapter covers an introduction on reproducible builds as seen within the Debian project. It also describes the core ideas in \glsentrylongpl{DLT}, examplified most notably with the blockchain \textit{Hyperledger Fabric} and temporal logic and formal specifications written TLA\textsuperscript+. Important terminology such as \glsentrylong{CIA} is also presented. The chapter ends with a review of previous work related to this project.
 
 
 
@@ -613,11 +616,11 @@ Building a package reproducibly means it is bit-by-bit identical every time it i
 
 % \subsection{Package archive}
 
-\subsection{{\tt .buildinfo}}
+\section{\texttt{.buildinfo}}
 
-In order for builds to be reproducible on different computers, the Debian project uses {\tt .buildinfo} files to describe the necessary parts of the environment in which a package was first built. By recreating this environment on a different machine, build artifacts become identical, as long as the package is reproducible. Included in {\tt .buildinfo} files are, among other properties, name and version of the source package, architecture it was built on, checksums for the build artifacts as well as other packages available on the system \cite{lamb_reproducible_2021}. See appendix \ref{ch:Gzip-buildinfo} for an example file. The {\tt .buildinfo} files origin and authenticity is given by the builder signing it with their private \glsentryshort{PGP} key. A user can verify that a package has been built from source by comparing its checksum from \textbf{hash example} with the one in a corresponding {\tt .buildinfo} file from a trusted source.
+In order for builds to be reproducible on different computers, the Debian project uses \texttt{.buildinfo} files to describe the necessary parts of the environment in which a package was first built. By recreating this environment on a different machine, build artifacts become identical, as long as the package is reproducible. Included in \texttt{.buildinfo} files are, among other properties, name and version of the source package, architecture it was built on, checksums for the build artifacts as well as other packages available on the system \cite{lamb_reproducible_2021}. See appendix \ref{ch:Gzip-buildinfo} for an example file. The \texttt{.buildinfo} files origin and authenticity is given by the builder signing it with their private \glsentryshort{PGP} key. A user can verify that a package has been built from source by comparing its checksum from \textbf{hash example} with the one in a corresponding \texttt{.buildinfo} file from a trusted source.
 
-Currently, {\tt .buildinfo} files are distributed in a centralized archive \textbf{(cite)}. Because this is a single-point-of-failure, if a malicious actor takes control of this archive, it could be very hard for users to know whether or not a package should be trusted.
+Currently, \texttt{.buildinfo} files are distributed in a centralized archive \textbf{(cite)}. Because this is a single-point-of-failure, if a malicious actor takes control of this archive, it could be very hard for users to know whether or not a package should be trusted.
 
 % \subsection{Rebuilding Debian packages}
 
@@ -643,7 +646,7 @@ A number of consensus algorithms exists, serving various applications. One way t
 
 \subsection{Blockchain}
 
-Originally described for Bitcoin \cite{nakamoto_bitcoin_nodate, di_pierro_what_2017}, blockchain is a technology based on \glsentrylong{DLT} for storing transactions without needing a centralized organization. Transactions are represented as simple strings of characters which allows them to model essentially anything. This is why blockchains can be used for a broad spectrum of applications; \eg currencies, ownership contracts etc. \textbf{(cite)}. The name stems from the setup of a blockchain ledger where groups of, closely related in time, transactions are appended together as a block to the current chain by including a hash of the previous block in the latest one. By grouping transactions together, the throuput of the network improves. A consensus algorithm is used to create a total ordering of the blocks so that every node on the network eventually holds the same ledger.
+Originally described for Bitcoin \cite{nakamoto_bitcoin_nodate, di_pierro_what_2017}, blockchain is a technology based on \glsentrylong{DLT} for storing transactions without needing a centralized organization. Transactions are represented as simple strings of characters which allows them to model essentially anything. This is why blockchains can be used for a broad spectrum of applications such as currencies, ownership contracts etc. \textbf{(cite)}. The name stems from the setup of a blockchain ledger where groups of, closely related in time, transactions are appended together as a block to the current chain by including a hash of the previous block in the latest one. By grouping transactions together, the throughput of the network improves. A consensus algorithm is used to create a total ordering of the blocks so that every node on the network eventually holds the same ledger.
 
 \todoinline{Add figure for how one block connects to the next.}
 
@@ -665,9 +668,9 @@ Hosted by the Linux Foundation\cite{linux-foundation_projects_nodate}, the Hyper
 
 \subsection{Overview}
 
-The Hyperledger Fabric ledger is permissioned. Compared to a public one (such as Bitcoin \cite{nakamoto_bitcoin_nodate}), this means that it is only available to certain participants. This is regulated by \glsentryfullpl{MSP} on the network, verifying the identities of nodes through \glsentryfullpl{CA} \textbf{(cite)}. Besides \glsentryshortpl{MSP}, the nodes on the network can take on one of the roles of \textit{peer} or \textit{orderer}. Every node on network belongs to some organization whos' \glsentryshort{MSP} determines its role. In this sense, a Fabric network is a network of organizations rather than one of nodes.
+The Hyperledger Fabric ledger is permissioned. This means that it is only available to certain participants. This is regulated by \glsentryfullpl{MSP} on the network, verifying the identities of nodes through \glsentryfullpl{CA} \textbf{(cite)}. Besides \glsentryshortpl{MSP}, the nodes on the network can take on one of the roles of \textit{peer} or \textit{orderer}. Every node on network belongs to some organization whos' \glsentryshort{MSP} determines its role. In this sense, a Fabric network is a network of organizations rather than one of nodes.
 
-Every peer stores' the network's entire blockchain ledger and validates transactions and changes to the ledger. Orderers, on the other hand, clump together transactions into blocks and delivers them to the peers. This separation of concern is one of the unique features of Hyperledger Fabric, and makes consensus algorithm selection possible. Changes onto the ledger are made by invoking smart contracts, called chaincodes within Fabric. Chaincodes are authorized programs that are run by peers on the network. If multple peers (according to its endorcement policy) get the same result from running the chaincode, any updates are written to the ledger. For performance reasons, a key-value store representing the current "world-state" is continuously derrived from the ledger and stored on the peers. This allows both reading and writing to happen without going through the entire ledger itself.
+Every peer store the network's entire blockchain ledger and validates transactions and changes to the ledger. Orderers, on the other hand, clump together transactions into blocks and delivers them to the peers. This separation of concern makes consensus algorithm selection possible in Hyperledger Fabric. Changes onto the ledger are made by invoking smart contracts, called chaincodes within Fabric. Chaincodes are authorized programs that are run by peers on the network. If multple peers (according to its endorcement policy) get the same result from running the chaincode, any updates are written to the ledger. For performance reasons, a key-value store representing the current "world-state" is continuously derrived from the ledger and stored on the peers. This allows both reading and writing to happen without going through the entire ledger itself.
 
 \todoinline{Bootstraping ordering service with a genesis block containing a configuration transaction \cite{androulaki_hyperledger_2018}}
 
@@ -686,7 +689,7 @@ When a peer receives a block from the ordering service they add it to their loca
 	\begin{center}
 		\includegraphics[width=\textwidth]{figures/fabric_transaction_flow.png}
 	\end{center}
-	\caption{A swimlane sequence diagram over the Hyperledger Fabric transaction flow. Note that this is for an earlier version from before the Fabric gateway. As of version 2.4, the behaviour of the client in the diagram is instead performed by the gateway, while the client only initiates a transaction. The image \cite{hyperledger_transaction-flow_nodate}  was created by Hyperledger and is licensed under CC BY 4.0 \cite{noauthor_creative_nodate}.}
+	\caption[Swimlane sequence diagram over the Hyperledger Fabric transaction flow.]{Swimlane sequence diagram over the Hyperledger Fabric transaction flow. Note that this is for an earlier version from before the Fabric gateway. As of version 2.4, the behaviour of the client in the diagram is instead performed by the gateway, while the client only initiates a transaction. The image \cite{hyperledger_transaction-flow_nodate}  was created by Hyperledger and is licensed under CC BY 4.0 \cite{noauthor_creative_nodate}.}
 	\label{fig:fabric-transaction-flow}
 \end{figure}
 
@@ -978,7 +981,7 @@ To reduce the friction between writing a veryfiable specification of a smart con
 
 
 % Thoughts on methodology:
-% - Idea: Create asset management of verified {\tt .buildinfo} files through smart contracts on the Hyperledger Fabric blockchain
+% - Idea: Create asset management of verified \texttt{.buildinfo} files through smart contracts on the Hyperledger Fabric blockchain
 % 
 %	Method:
 %		1. Model relevant parts of known/working blockchain together with chaincode in TLA+ 
@@ -1022,12 +1025,12 @@ To reduce the friction between writing a veryfiable specification of a smart con
 % 		- Testing the behaviour of "actors" when running the chaincode
 % 
 % 	Some "bad" behaviours:
-% 		- Peers add different {\tt .buildinfo} files all the time and none is verified by multiple peers
+% 		- Peers add different \texttt{.buildinfo} files all the time and none is verified by multiple peers
 % 		- Peers don't actually build packages, instead they just pretend that they did
 % 
 % 		
 % 	"Dutch auction" asset management solution:
-% 		1. For each new {\tt .buildinfo} file: a submission process that looks like an auction begins. A unique_auction_id is created and stored on the ledger.
+% 		1. For each new \texttt{.buildinfo} file: a submission process that looks like an auction begins. A unique_auction_id is created and stored on the ledger.
 % 			- Not all organizations can start a submission process: only the once that behave well in other auctions (what does this mean?)
 % 		2. Each builder creates a submission S = Hash(build + unique_auction_id) and PublicS = Hash(S + unique_submitter_id) and runs a transaction which stores PublicS on the ledger and S in a private collection
 % 		3. On a certain condition (what?): each builder validates all PrivateS submissions (because they have S stored in a private collection) and a consensus of whether or not each submission is valid is reached. The voting scores (valid or invalid) for the buildinfo file is tallied and stored on the ledger. Each builder who did their job correctly (voted with the majority?) gets a reward.
@@ -1550,7 +1553,7 @@ To reduce the friction between writing a veryfiable specification of a smart con
 
 \includepdf[pages=-]{licenses/apache_2.0.pdf}
 
-\chapter{Gzip {\tt .buildinfo} file}
+\chapter{Gzip \texttt{.buildinfo} file}
 \label{ch:Gzip-buildinfo}
 
 \VerbatimInput[fontsize=\footnotesize,
