@@ -1038,7 +1038,72 @@ To reduce the friction between writing a veryfiable specification of a smart con
 % 			Question: What happens with invalid i.e. non-reproducible builds? How are they represented as a submission?
 % 			Question: How is the reward formulated/connection to who can start a submission process?
 % 			Thought: Malicious organization vs malicious node
-% 			
+% 	
+%
+% 
+% 
+% =======================================================
+% Majority decision judgment with reward feedback loop 
+% -------------------------------------------------------
+% 
+% Definitions:
+% 	- Judgment: whether a .buildinfo file is valid or not
+% 	- Package preferences: packages that a particular builder wants to have valid judgments for
+% 	- BuildToken: internal currency, shortform BT
+% 
+% Assumptions:
+% 	- There are byzantine and non-byzantine builders
+% 	- All non-byzantine builders want valid judgments for some packages (!= {}) (that they rely on themselves)
+% 
+% 	- Non-byzantine builders prefer to judge some packages (their package preferences) over other
+% 	- For all packages p, there exists at least one non-byzantine builder who prefer to build p
+% 	- Byzantine builders may collude with each other, non-byzantine builders may not (their package preferences are private)
+% 	- (Each organization has one peer/builder)
+% 
+% Safety: Only valid judgements are stored	
+% Liveness: Every .buildinfo file is eventually judged (builders cannot starve only some judgements)
+%
+% Judgement algorithm:
+% 	Given the name f_name and checksum f_hash of a .buildinfo file, 
+% 			  builders b1,b2, ..., bk,
+% 			  rebuilding function B,
+% 			  cryptographic hash function H,
+% 			  HMAC function HMAC, and
+%		 	  world state W1 = W2 = W3 = W4 = {},
+% 	judge the validity and reproducibility of f_name.
+% 	 1. For each builder bi:
+% 		a) Pick key ki
+% 		b) Build the package p = B(f_name)
+% 		c) Calculate p:s checksum h = H(p)
+% 		c) Verify that f_name should create p (f_name=>p)
+% 		d) ei = if f_name=>p then HMAC(ki, h) else HMAC(ki, "invalid")
+% 		e) Store ki, h privately
+% 		f) W1[bi] = ei
+% 	2. When appropriate (timeout or |W1|): lock W1 from changing
+% 	3. For each builder bi: W2[bi] = ei
+% 	4. When appropriate (timeout or |W2|): lock W2 from changing
+% 	5. For each builder bi: calculate the validity of builder bi:s work:
+% 			W3[bi] = W1[bi] == HMAC(W2[bi], h) || W1[bi] == HMAC(W2[bi], "invalid")
+% 	6. For each builder bi: judge f_name
+% 		if W3[bi]
+% 			then W4 = if W1[bi] == HMAC(W2[bi], h)
+% 						then True  // valid .buildinfo
+% 						else False // invalid .buildinfo
+% 	7. For each builder bi where W3[bi] = True: BT[bi] += reward 
+% 
+% Reward feedback loop algorithm:
+% 	Alt1:
+% 		- Get 1 BT for judging correctly
+% 		- Pay 1 BT for requesting a judgement
+% 
+% 	Alt2: 
+% 		- Anyone can judge or request a judgment (no cost or reward)
+% 
+% 	Alt3:
+% 		- Auction to decide cost and reward
+% 
+% 	Alt4:
+% 		- Cost and reward relative to work input (e.g. buildtime)
 
 
 
