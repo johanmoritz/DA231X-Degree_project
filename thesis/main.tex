@@ -1222,7 +1222,9 @@ Given that the modeling tools have these properties, the validity of the method 
 % \todo[inline, backgroundcolor=kth-lightblue]{Tillförlitlighet av metoder\\
 % 	Hur bra är dina metoder, finns det bättre metoder? Hur kan du förbättra dem?}
 
-The use of a system model instead of an actual implementation is only as reliable as they are similar to each other. If the model is unfaithful in its representation of the system, then very little can be reliably stated based on the method. %An empirical study on a real system implementation 
+The use of a system model written in TLA\textsuperscript+ instead of an actual implementation is only as reliable as they are similar to each other. If the model is unfaithful in its representation of the system, then very little can be reliably stated based on the method. However, assuming the model corresponds well with the implementation, it is a very exact tool. The crucial part is to define the model boundaries so as to not confuse the reader under which conditions the method is reliable. 
+
+The ideal method for this project would be building the system and evaluating it with real world actors interessted in using it. That would give a clear indication of the systems' properties and the outcomes from utilizing it. It would, however, be quite out of scope for this project. To diminish the distance between this ideal method and the one used, the model is made in such a way that the number of assumptions on actors are as few as possible and clearly formulated. As every assumption is encoded in TLA\textsuperscript+, they are defined semantically and can be verified by the reader.
 
 % \subsection{Data validity}
 % \label{sec:dataValidity}
