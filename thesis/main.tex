@@ -870,10 +870,12 @@ TLA\textsuperscript+ is part of a toolbox made for supporting the creation and t
 Instead, the TLC model checker is more appropriate for validating time-related and concurrency problems. An overview of some of those properties are described in the following sections.
 
 \subsubsection*{Safety}
+\label{sec:safetyProperty}
 
 A specification that can never do anything ``bad'' is said to follow its \textit{safety} property. \textit{Bad} in this case is ambiguous but roughly means \textit{unintentional}. There are only certain states that the specification is allowed to enter without breaking its safety property. Variations of this is common to test in software engineering practices such as unit-testing. Safety checking in TLC is straightforward as it is done by simply testing every new state during simulation for the relevant property. To examplify this, we can consider type invariants as safety properties. A variable might for example only be allowed to be an integer and nothing else.
 
 \subsubsection*{Liveness}
+\label{sec:livenessProperty}
 
 While a safe program is guaranteed to never do anything bad, whether or not it will actually do anything at all is not certain. Liveness properties describe what ``good'' things a specification necessarily will do. Some examples can be that an execution is guaranteed to terminate, that no deadlock between processes can happen, or that all processes will progress.
 
@@ -1257,13 +1259,27 @@ This means in particular that any package not prefered by any of the builders wo
 
 While it would be problematic in practice if there are packages that no builder prefers, given that the current public build servers build seemingly every package, this is mainly important for a model definition and not an implementation.
 
-Ensuring that the validity of the judgments on packages made by the system are more trustwordy than those of individual builders, an assumption has to be made that 
+Ensuring that the validity of the judgments on packages made by the system are more trustwordy than those of individual builders, an assumption has to be made that
 
 \begin{quote}
 	\textit{builders do not collude or share knowledge with each others through other means than via the system itself.}
 \end{quote}
 
-If a builder were to be influenced in their judgment of a package by some other builder than their combined trustwordiness would only be as great as the trustwordiness of the influencer. 
+If a builder were to be influenced in their judgment of a package by some other builder than their combined trustwordiness would only be as great as the trustwordiness of the influencer.
+
+\subsection{Model correctness}
+\label{sec:modelCorrectness}
+
+The model correctness is defined in terms of safety and liveness properties. As defined in \ref{sec:safetyProperty}, the safety property descibe all the allowed behaviours of the model, while the liveness property ensures that they happen. The properties are stated as
+
+
+\begin{description}
+	\item[Safety] Only valid judgments on \texttt{.buildinfo} files are stored;
+	\item[Liveness] Every \texttt{.buildinfo} file is eventually judged.
+\end{description}
+
+\textbf{(connect these with the assumptions on builders)}
+
 
 % \subsection{Data validity}
 % \label{sec:dataValidity}
