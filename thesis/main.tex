@@ -1104,6 +1104,12 @@ To reduce the friction between writing a veryfiable specification of a smart con
 % 
 % 	Alt4:
 % 		- Cost and reward relative to work input (e.g. buildtime)
+% 
+% "Vulnerabilities":
+% 	- Builder can take a valid build from somewhere else and claim that they built it
+% 	- Builder can upload an invalid judgment
+% 	- Builder can choose not to judge a package
+% 
 
 
 
@@ -1222,9 +1228,42 @@ Given that the modeling tools have these properties, the validity of the method 
 % \todo[inline, backgroundcolor=kth-lightblue]{Tillförlitlighet av metoder\\
 % 	Hur bra är dina metoder, finns det bättre metoder? Hur kan du förbättra dem?}
 
-The use of a system model written in TLA\textsuperscript+ instead of an actual implementation is only as reliable as they are similar to each other. If the model is unfaithful in its representation of the system, then very little can be reliably stated based on the method. However, assuming the model corresponds well with the implementation, it is a very exact tool. The crucial part is to define the model boundaries so as to not confuse the reader under which conditions the method is reliable. 
+The use of a system model written in TLA\textsuperscript+ instead of an actual implementation is only as reliable as they are similar to each other. If the model is unfaithful in its representation of the system, then very little can be reliably stated based on the method. However, assuming the model corresponds well with the implementation, it is a very exact tool. The crucial part is to define the model boundaries so as to not confuse the reader under which conditions the method is reliable.
 
 The ideal method for this project would be building the system and evaluating it with real world actors interessted in using it. That would give a clear indication of the systems' properties and the outcomes from utilizing it. It would, however, be quite out of scope for this project. To diminish the distance between this ideal method and the one used, the model is made in such a way that the number of assumptions on actors are as few as possible and clearly formulated. As every assumption is encoded in TLA\textsuperscript+, they are defined semantically and can be verified by the reader.
+
+
+\subsection{System actors}
+\label{sec:systemActors}
+
+As described in \ref{sec:background}, the state-of-the-art for verifying reproducible builds are a number of public servers building packages from \texttt{.buildinfo} files and releasing their results separately. The work these \textit{builders} perform would not be changed for the system described in this thesis, only the way they distribute their results. As there is currently no reward besides personal information on package reproducibility for their work, an intial assumption on the motivation of the workers is that
+
+\begin{quote}
+	\textit{all builders are interested in valid judgments for some packages.}
+	\textbf{(label with a number, like an equation)}
+\end{quote}
+
+In other words, every builder has an interest in information regarding the reproducibility of at least one package. These packages are denoted as the builders' \textit{preferences} in this document. Without assuming that every builder has some non-empty prefered set of packages, there is little reason for them to build any packages at all. This is therefore a neccessary requirement of the system. To be noted is that there is nothing stopping a builders set of prefered packages to be exactly all packages. The assumption only states that this set have to be non-empty. The consequence, or definition, of builders having prefered packages is that those are also the packages they prefer to build themselves. This is a natural consequence from the first assumption because a builder would prefer to build a package they are themselves motivated to gain information on. This can be stated as
+
+\begin{quote}
+	\textit{builders prefer to judge (and build) some packages over other.}
+\end{quote}
+
+This means in particular that any package not prefered by any of the builders would never be built. To counteract this in the model, an additional assumption on the relationship between builders and packages state that
+
+\begin{quote}
+	\textit{every package is prefered by at least one builder.}
+\end{quote}
+
+While it would be problematic in practice if there are packages that no builder prefers, given that the current public build servers build seemingly every package, this is mainly important for a model definition and not an implementation.
+
+Ensuring that the validity of the judgments on packages made by the system are more trustwordy than those of individual builders, an assumption has to be made that 
+
+\begin{quote}
+	\textit{builders do not collude or share knowledge with each others through other means than via the system itself.}
+\end{quote}
+
+If a builder were to be influenced in their judgment of a package by some other builder than their combined trustwordiness would only be as great as the trustwordiness of the influencer. 
 
 % \subsection{Data validity}
 % \label{sec:dataValidity}
