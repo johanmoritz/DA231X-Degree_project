@@ -1234,6 +1234,10 @@ The use of a system model written in TLA\textsuperscript+ instead of an actual i
 
 The ideal method for this project would be building the system and evaluating it with real world actors interessted in using it. That would give a clear indication of the systems' properties and the outcomes from utilizing it. It would, however, be quite out of scope for this project. To diminish the distance between this ideal method and the one used, the model is made in such a way that the number of assumptions on actors are as few as possible and clearly formulated. As every assumption is encoded in TLA\textsuperscript+, they are defined semantically and can be verified by the reader.
 
+\subsection{System overview}
+\label{sec:systemOverview}
+
+To answer this projects' research question, a system is designed and evaluated for distributing the reproducibility of packages in the \gls{FOSS} ecosystem. The system takes names and checksums of \texttt{.buildinfo} files as input and stores \textit{judgements} on the reproducibility of the packages built from those file. Judgements are created by a consensus of \textit{builders} communicating over a Hyperledger Fabric network, on which they are stored in an append-only blockchain. The packages to be judged are introduced into the system by the builders, after which a voting scheme takes place where the packages are judged as reproducible or not reproducible. Each builders vote represent the result from them, individually, rebuilding the relevant package from its \texttt{.buildinfo} file and verifying wether it was reproducible. 
 
 \subsection{System actors}
 \label{sec:systemActors}
@@ -1279,6 +1283,38 @@ The model correctness is defined in terms of safety and liveness properties. As 
 \end{description}
 
 \textbf{(connect these with the assumptions on builders)}
+
+\textit{Valid judgment} means that if and only if a package is reproducible, it is also judged to be so. In other words, no non-reproducible packages are stored in the system as reproducible and wise versa. As both of these safety and liveness properties are ambiguous by their natural language definitions, they are better stated in semantically defined TLA\textsuperscript+.
+
+Given a set of \texttt{.buildinfo} files $Files$, a mapping from files to \textit{valid} judgments $Validity: File \mapsto Boolean$ and a mapping from files to system judgments $Judgement: File \mapsto Boolean$, the correctness of the system is defined as
+
+\begin{description}
+	\item[Safety] $\forall f \in range(Judgment): Judgment[f] = Validity[f]$
+	\item[Liveness] $\Diamond\Box(\forall f \in Files: f \in range(Judgment))$ \textbf{(is this really what you mean?)(Use labels like in an equation)}
+\end{description}
+
+\subsection{Modelling assumptions}
+\label{sec:modellingAssumptions}
+
+Hyperledger Fabric is selected as the DLT to build the system on...
+
+The benefits for this project to use Hyperledger Fabric are: permissioned, voting-based, private-collections...
+
+The modell does not include these features of Hyperledger Fabric: ordering, ...
+
+instead they are assumed as...
+
+\subsection{Malicious actors / Threat model}
+\label{sec:maliciousActors}
+
+Builders control the input to the system.
+
+We don't care about how builders get their hands on .buildinfo files or other tools.
+
+Any builder that does not conform to the assumptions in section \ref{sec:systemActors} are denoted as malicious.
+
+Malicious actors are modelled as: random?, ... \textbf{(how?)}
+
 
 
 % \subsection{Data validity}
