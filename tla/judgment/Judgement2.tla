@@ -3,7 +3,9 @@ EXTENDS TLC, FiniteSets, Integers, Sequences
 VARIABLES 
     nextJudgmentId,
     judgments,
-    privateStorage
+    privateStorage,
+    packages,
+    votes
 
 Organizations == {"org1", "org2", "org3"}
 
@@ -47,33 +49,46 @@ Range(f) == {f[k]: k \in DOMAIN f}
 
 \* Begin the judgement of a package
 Begin(client, package) == 
+    \* /\ PrintT("Begin!")
     /\ judgments' = Append(judgments, [
         requester |-> client, 
         package |-> package,
         status |-> "initialized"])
 
 Build(client, package) ==
-    /\ PrintT("Build!")
-    /\  privateStorage' = [privateStorage EXCEPT ![client] = @ \union package]
+    \* /\ PrintT("Build!")
+    /\  privateStorage' = [privateStorage EXCEPT ![client] = @ \union {package}]
+    /\  votes' = [votes EXCEPT ![package] = @ \union {client}]
 
 Init == /\ nextJudgmentId = 0 
         /\ judgments = <<>> 
         /\ privateStorage = [c \in Clients |-> {}]
+        /\ votes = [p \in Packages |-> {}]
+        /\ packages = Packages
 
 Next == 
-    /\ PrintT(judgments)
-    /\ PrintT(privateStorage)
-    /\  \/ \E c \in Clients:
-            \E j \in Range(judgments): 
-                /\ j.package \notin privateStorage[c] 
-                /\ Build(c, j.package)
-
+    /\  \/  /\ \E c \in Clients:
+                \E j \in Range(judgments): 
+                    /\ j.package \notin privateStorage[c] 
+                    /\ Build(c, j.package)
+            /\ UNCHANGED <<judgments, nextJudgmentId, packages>>
+            /\ Cardinality(Range(judgments)) > 0
+                
         \/  /\ \E c \in Clients:
                 \E p \in Packages:
                     /\ \A j \in Range(judgments): j.package # p
                     /\ Begin(c, p)
+                    /\ packages' = packages \ {p}
             /\ nextJudgmentId' = nextJudgmentId + 1
+            /\ UNCHANGED privateStorage
 
-Spec == Init /\ [][Next]_<<nextJudgmentId, judgments, privateStorage>> 
+        \* \/ \E p \in DOMAIN votes:
+        \*         IF votes[p] = 3 THEN 
+        \*             judgments' = 
+            
+    \* /\ PrintT(judgments)
+    \* /\ PrintT(privateStorage)
+
+Spec == Init /\ [][Next]_<<nextJudgmentId, judgments, privateStorage, packages>> 
 
 ====
