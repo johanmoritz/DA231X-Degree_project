@@ -18,8 +18,14 @@ KeyValues(m) == {<<k, m[k]>> : k \in DOMAIN m}
 
 InitialPrivate == private = [
     node1 |-> [
-        judgements |-> <<>>,
-        preferences |-> <<>>
+        preferences |-> <<
+            [package |-> "package1", level |-> 2, status |-> "not-processed"]
+        >>
+    ],
+    node2 |-> [
+        preferences |-> <<
+            [package |-> "package2", level |-> 1, status |-> "not-processed"]
+        >>
     ]
 ]
 
@@ -29,8 +35,8 @@ InitialPublic == public = [
         node2 |-> [wallet |-> 20]
     ],
     \* judgments |-> <<
-    \*     [id |-> "0", package |-> "p1", owner |-> "node1", status |-> "active", maxCost |-> 10],
-    \*     [id |-> "1", package |-> "p1", owner |-> "node2", status |-> "active", maxCost |-> 15]
+    \*     [id |-> "0", package |-> "p1", owner |-> "node1", status |-> "active", targetCost |-> 10],
+    \*     [id |-> "1", package |-> "p1", owner |-> "node2", status |-> "active", targetCost |-> 15]
     \* >>
     judgments |-> <<>>
 ]
@@ -41,9 +47,9 @@ Cost(level) == IF level = 0 THEN 0 ELSE level + Cost(level - 1 )
 
 \* ======== Chaincode ======== 
 
-InitializeJudgment(package, owner, maxCost) == 
+InitializeJudgment(package, owner, targetCost) == 
     \* Guards
-    /\ maxCost <= public.nodes[owner].wallet
+    /\ targetCost <= public.nodes[owner].wallet
     /\ (\A j \in Range(public.judgments): j.status = "active" => j.owner # owner)
     \* Update
     \* TODO: Better ids. Currently there can only be one judgment per package.
@@ -52,9 +58,11 @@ InitializeJudgment(package, owner, maxCost) ==
                     [   id |-> judgmentId, 
                         package |-> package, 
                         owner |-> owner, 
-                        maxCost |-> maxCost, 
+                        targetCost |-> targetCost, 
                         status |-> "active",
-                        secretJudgments |-> <<>>])]
+                        phase |-> "secretVotes",
+                        secretJudgments |-> <<>>,
+                        openJudgments |-> <<>>])]
 
 AddSecretJudgment(judgmentId, judge, secretVote) ==
     \/  Len(public.judgments) = 0
@@ -62,8 +70,9 @@ AddSecretJudgment(judgmentId, judge, secretVote) ==
             LET j == public.judgments[index] IN 
                 /\  j.id = judgmentId
                 /\ j.status = "active"
+                /\ j.phase = "secretVotes"
                 \* Too expensive for the owner?
-                /\ Cost(Len(j.secretJudgments) + 1) <= j.maxCost
+                /\ Cost(Len(j.secretJudgments) + 1) <= j.targetCost
                 \* Has 'judge' added their vote before?
                 /\ {sj \in Range(j.secretJudgments): sj.judge = judge} = {}
                 \* Update
@@ -72,6 +81,34 @@ AddSecretJudgment(judgmentId, judge, secretVote) ==
                         [   judge |-> judge, 
                             vote |-> secretVote])]]] 
 
+EndSecretSubmissions(judgmentId, owner) ==
+    \/ Len(public.judgments) = 0
+    \/ \E index \in DOMAIN public.judgments:
+        LET j == public.judgments[index] IN
+            /\ j.id = judgmentId
+            /\ j.status = "active"
+            /\ j.phase = "secretVotes"
+            /\ j.owner = owner
+            /\ j.targetCost = Cost(Len(j.secretJudgments))
+            /\ public' = [public EXCEPT !.judgments = [@ EXCEPT ![index] =
+                [@ EXCEPT !.phase = "openVotes"]]]
+
+ShowJudgment(judgmentId, judge, openVote) ==
+    \/  Len(public.judgments) = 0
+    \/  \E index \in DOMAIN public.judgments: 
+            LET j == public.judgments[index] IN 
+                /\  j.id = judgmentId
+                /\ j.status = "active"
+                /\ j.phase = "openVotes"
+                \* Has 'judge' added their vote before?
+                /\ {sj \in Range(j.secretJudgments): sj.judge = judge} # {}
+                \* Has 'judge' showed their vote before?
+                /\ {oj \in Range(j.openJudgments): oj.judge = judge} = {}
+                \* Update
+                /\  public' = [public EXCEPT !.judgments = [@ EXCEPT ![index] =
+                    [@ EXCEPT !.openJudgments = Append(@, 
+                        [   judge |-> judge, 
+                            vote |-> openVote])]]] 
 
 \* ======== Invariants ======== 
 
@@ -89,7 +126,7 @@ LessActiveThenNodes ==
 
 CostLessThanMaxCost ==
     \/  Len(public.judgments) = 0
-    \/  \A j \in Range(public.judgments) : Cost(Len(j.secretJudgments)) <= j.maxCost
+    \/  \A j \in Range(public.judgments) : Cost(Len(j.secretJudgments)) <= j.targetCost
 
 \* ======== Spec ======== 
 
@@ -99,17 +136,32 @@ Init ==
     /\ packages = Packages
 Next == 
     \/  \E n \in Nodes:
-        \E p \in packages: 
-            /\ InitializeJudgment(p, n, 10)
-            /\ packages' = packages \ {p}
-            /\ UNCHANGED private    
+        \E index \in DOMAIN private[n].preferences: 
+            LET p == private[n].preferences[index] IN
+                /\ p.status = "not-processed"
+                /\ InitializeJudgment(p.package, n, Cost(p.level))
+                /\ private' = [private EXCEPT   ![n] = [@ EXCEPT 
+                                                !.preferences = [@ EXCEPT 
+                                                ![index] = [@ EXCEPT 
+                                                !.status = "started"]]]]
+                \* /\ packages' = packages \ {p}
+                /\ UNCHANGED packages    
     \/  \E n \in Nodes:
         \E j \in Range(public.judgments):
             LET secretVote == IsReproducible[j.package] IN
             /\ AddSecretJudgment(j.id, n, secretVote)
             /\ UNCHANGED <<private, packages>>
-    \/  /\  Cardinality(packages) = 0
-        /\ UNCHANGED <<public, private, packages>>
+    \/  \E n \in Nodes:
+        \E j \in Range(public.judgments):
+            /\  EndSecretSubmissions(j.id, n)
+            /\ UNCHANGED <<private, packages>>
+    \/  \E n \in Nodes:
+        \E j \in Range(public.judgments):
+            LET openVote == IsReproducible[j.package] IN
+            /\ ShowJudgment(j.id, n, openVote)
+            /\ UNCHANGED <<private, packages>>
+    \* \/  /\  \A j \in Range(public.judgments): j.phase = "openVotes"
+    \*     /\ UNCHANGED <<public, private, packages>>
 
 Spec == Init /\ [][Next]_<<public, private, packages>>
 
