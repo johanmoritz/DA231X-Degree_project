@@ -45,6 +45,24 @@ RECURSIVE Cost(_)
 Cost(level) == IF level = 0 THEN 0 ELSE level + Cost(level - 1 )
 
 
+RECURSIVE WalletUpdatesFromVotes(_, _)
+WalletUpdatesFromVotes(votes, updates) ==
+    IF Len(votes) = 0 
+        THEN updates
+        ELSE LET 
+                reward == Len(votes)
+                judge == Head(votes).judge
+                newUpdates == [updates EXCEPT ![judge].wallet = @ + reward]
+            IN WalletUpdatesFromVotes(Tail(votes), newUpdates)
+
+\* Base reward on timing of open vote
+Rewards(judgment) == 
+    LET updates == WalletUpdatesFromVotes(judgment.openJudgments, [n \in Nodes |-> public.nodes[n]])
+        cost == Cost(Len(judgment.openJudgments))
+    IN  [updates EXCEPT ![judgment.owner].wallet = @ - cost]
+
+
+
 \* ======== Chaincode ======== 
 
 InitializeJudgment(package, owner, targetCost) == 
@@ -97,7 +115,7 @@ ShowJudgment(judgmentId, judge, openVote) ==
     \/  Len(public.judgments) = 0
     \/  \E index \in DOMAIN public.judgments: 
             LET j == public.judgments[index] IN 
-                /\  j.id = judgmentId
+                /\ j.id = judgmentId
                 /\ j.status = "active"
                 /\ j.phase = "openVotes"
                 \* Has 'judge' added their vote before?
@@ -109,6 +127,22 @@ ShowJudgment(judgmentId, judge, openVote) ==
                     [@ EXCEPT !.openJudgments = Append(@, 
                         [   judge |-> judge, 
                             vote |-> openVote])]]] 
+
+
+CloseJudgment(judgmentId, owner) ==
+    \/  Len(public.judgments) = 0
+    \/  \E index \in DOMAIN public.judgments:
+            LET j == public.judgments[index] IN
+                /\  j.id = judgmentId
+                /\  j.status = "active"
+                /\  j.phase = "openVotes"
+                /\  j.owner = owner
+                /\ j.targetCost = Cost(Len(j.openJudgments))
+                /\  public' = [public EXCEPT 
+                        !.judgments = [@ EXCEPT ![index] = 
+                             [@ EXCEPT !.status = "closed", !.phase = "judgment"]],
+                        !.nodes = Rewards(j)]
+                        
 
 \* ======== Invariants ======== 
 
@@ -144,7 +178,6 @@ Next ==
                                                 !.preferences = [@ EXCEPT 
                                                 ![index] = [@ EXCEPT 
                                                 !.status = "started"]]]]
-                \* /\ packages' = packages \ {p}
                 /\ UNCHANGED packages    
     \/  \E n \in Nodes:
         \E j \in Range(public.judgments):
@@ -160,8 +193,17 @@ Next ==
             LET openVote == IsReproducible[j.package] IN
             /\ ShowJudgment(j.id, n, openVote)
             /\ UNCHANGED <<private, packages>>
-    \* \/  /\  \A j \in Range(public.judgments): j.phase = "openVotes"
-    \*     /\ UNCHANGED <<public, private, packages>>
+    \/  \E n \in Nodes:
+        \E j \in Range(public.judgments):
+            /\  CloseJudgment(j.id, n)
+            /\  \E preferenceIndex \in DOMAIN private[n].preferences:
+                    /\  private[n].preferences[preferenceIndex].package = j.package
+                    /\  private' = [private EXCEPT ![n].preferences[preferenceIndex].status = "processed"]
+            /\ UNCHANGED  <<packages>>
+    \/  /\  \A n \in Nodes: 
+            \A p \in Range(private[n].preferences):
+                p.status = "processed"
+        /\ UNCHANGED <<public, private, packages>>
 
 Spec == Init /\ [][Next]_<<public, private, packages>>
 
