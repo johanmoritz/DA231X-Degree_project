@@ -4,17 +4,28 @@ EXTENDS TLC, FiniteSets, Reals, Sequences
 VARIABLE public, private, packages
 
 
-Nodes == {"node1", "node2"}
+Nodes == {"node1", "node2", "node3"}
 
-Packages == {"package1", "package2", "package3"}
+Packages == {"package1", "package2", "package3", "package3"}
 
 Status == {"active", "initialized"}
 
-IsReproducible == [package1 |-> TRUE, package2 |-> FALSE, package3 |-> TRUE]
+IsReproducible == [package1 |-> TRUE, package2 |-> FALSE, package3 |-> TRUE, package4 |-> TRUE, package5 |-> TRUE, package6 |-> TRUE]
 
 Range(f) == {f[k]: k \in DOMAIN f}
 
 KeyValues(m) == {<<k, m[k]>> : k \in DOMAIN m}
+
+\* Source: https://learntla.com/libraries/sets/
+Pick(S) == CHOOSE s \in S : TRUE
+RECURSIVE SetReduce(_, _, _)
+SetReduce(Op(_, _), S, value) == IF S = {} THEN value
+                              ELSE LET s == Pick(S)
+                              IN SetReduce(Op, S \ {s}, Op(s, value)) 
+
+Sum(S) == 
+    LET _op(a, b) == a + b
+    IN  SetReduce(_op, S, 0)
 
 InitialPrivate == private = [
     node1 |-> [
@@ -24,20 +35,26 @@ InitialPrivate == private = [
     ],
     node2 |-> [
         preferences |-> <<
-            [package |-> "package2", level |-> 1, status |-> "not-processed"]
+            [package |-> "package2", level |-> 1, status |-> "not-processed"],
+            [package |-> "package3", level |-> 2, status |-> "not-processed"],
+            [package |-> "package4", level |-> 2, status |-> "not-processed"]
+        >>
+    ],
+    node3 |-> [
+        preferences |-> <<
+            [package |-> "package5", level |-> 3, status |-> "not-processed"],
+            [package |-> "package6", level |-> 3, status |-> "not-processed"]
+        
         >>
     ]
 ]
 
 InitialPublic == public = [
     nodes |-> [
-        node1 |-> [wallet |-> 10],
-        node2 |-> [wallet |-> 20]
+        node1 |-> [wallet |-> 0],
+        node2 |-> [wallet |-> 0],
+        node3 |-> [wallet |-> 6]
     ],
-    \* judgments |-> <<
-    \*     [id |-> "0", package |-> "p1", owner |-> "node1", status |-> "active", targetCost |-> 10],
-    \*     [id |-> "1", package |-> "p1", owner |-> "node2", status |-> "active", targetCost |-> 15]
-    \* >>
     judgments |-> <<>>
 ]
 
@@ -50,7 +67,7 @@ WalletUpdatesFromVotes(votes, updates) ==
     IF Len(votes) = 0 
         THEN updates
         ELSE LET 
-                reward == Len(votes)
+                reward == Len(votes) + 1
                 judge == Head(votes).judge
                 newUpdates == [updates EXCEPT ![judge].wallet = @ + reward]
             IN WalletUpdatesFromVotes(Tail(votes), newUpdates)
@@ -61,6 +78,9 @@ Rewards(judgment) ==
         cost == Cost(Len(judgment.openJudgments))
     IN  [updates EXCEPT ![judgment.owner].wallet = @ - cost]
 
+
+FutureCost(node) ==
+    Sum({Cost(p.level) : p \in Range(private[node].preferences)})
 
 
 \* ======== Chaincode ======== 
@@ -162,6 +182,11 @@ CostLessThanMaxCost ==
     \/  Len(public.judgments) = 0
     \/  \A j \in Range(public.judgments) : Cost(Len(j.secretJudgments)) <= j.targetCost
 
+\* AllButOnePackagedIsJudgedPerNode == \A n \in Nodes: 
+\*         Cardinality({p \in Range(private[n].preferences): p.status = "not-processed"}) <= 1
+
+\* Fairness == WF_public(AllButOnePackagedIsJudgedPerNode)
+
 \* ======== Spec ======== 
 
 Init == 
@@ -182,8 +207,11 @@ Next ==
     \/  \E n \in Nodes:
         \E j \in Range(public.judgments):
             LET secretVote == IsReproducible[j.package] IN
-            /\ AddSecretJudgment(j.id, n, secretVote)
-            /\ UNCHANGED <<private, packages>>
+            \* Nodes only build/judge if they have to  
+            /\  \/  FutureCost(n) > public.nodes[n].wallet
+                \/  j.package \in {p.package : p \in Range(private[n].preferences)}
+            /\  AddSecretJudgment(j.id, n, secretVote)
+            /\  UNCHANGED <<private, packages>>
     \/  \E n \in Nodes:
         \E j \in Range(public.judgments):
             /\  EndSecretSubmissions(j.id, n)
@@ -200,9 +228,8 @@ Next ==
                     /\  private[n].preferences[preferenceIndex].package = j.package
                     /\  private' = [private EXCEPT ![n].preferences[preferenceIndex].status = "processed"]
             /\ UNCHANGED  <<packages>>
-    \/  /\  \A n \in Nodes: 
-            \A p \in Range(private[n].preferences):
-                p.status = "processed"
+    \/  /\  \E n \in Nodes: 
+                Cardinality({p \in Range(private[n].preferences): p.status = "not-processed"}) = 0
         /\ UNCHANGED <<public, private, packages>>
 
 Spec == Init /\ [][Next]_<<public, private, packages>>
