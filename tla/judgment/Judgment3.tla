@@ -3,6 +3,10 @@ EXTENDS TLC, FiniteSets, Reals, Sequences
 
 VARIABLE public, private, packages
 
+\* How to run:
+\* alias tlc="java -XX:+UseParallelGC -Xmx12g -cp tla2tools.jar tlc2.TLC -workers auto" 
+\* tlc -config Judgment3.cfg Judgment3.tla
+
 
 Nodes == {"node1", "node2", "node3"}
 
@@ -10,7 +14,7 @@ Packages == {"package1", "package2", "package3", "package3"}
 
 Status == {"active", "initialized"}
 
-IsReproducible == [package1 |-> TRUE, package2 |-> FALSE, package3 |-> TRUE, package4 |-> TRUE, package5 |-> TRUE, package6 |-> TRUE]
+IsReproducible == [package1 |-> TRUE, package2 |-> FALSE, package3 |-> TRUE, package4 |-> TRUE, package5 |-> TRUE, package6 |-> TRUE, package7 |-> TRUE, package8 |-> TRUE]
 
 Range(f) == {f[k]: k \in DOMAIN f}
 
@@ -30,20 +34,22 @@ Sum(S) ==
 InitialPrivate == private = [
     node1 |-> [
         preferences |-> <<
-            [package |-> "package1", level |-> 2, status |-> "not-processed"]
+            [package |-> "package1", level |-> 1, status |-> "not-processed"],
+            \* [package |-> "package2", level |-> 1, status |-> "not-processed"],
+            [package |-> "package3", level |-> 2, status |-> "not-processed"]
         >>
     ],
     node2 |-> [
         preferences |-> <<
-            [package |-> "package2", level |-> 1, status |-> "not-processed"],
-            [package |-> "package3", level |-> 2, status |-> "not-processed"],
-            [package |-> "package4", level |-> 2, status |-> "not-processed"]
+            \* [package |-> "package4", level |-> 1, status |-> "not-processed"],
+            [package |-> "package5", level |-> 2, status |-> "not-processed"],
+            [package |-> "package6", level |-> 1, status |-> "not-processed"]
         >>
     ],
     node3 |-> [
         preferences |-> <<
-            [package |-> "package5", level |-> 3, status |-> "not-processed"],
-            [package |-> "package6", level |-> 3, status |-> "not-processed"]
+            [package |-> "package7", level |-> 2, status |-> "not-processed"],
+            [package |-> "package8", level |-> 1, status |-> "not-processed"]
         
         >>
     ]
@@ -51,9 +57,10 @@ InitialPrivate == private = [
 
 InitialPublic == public = [
     nodes |-> [
-        node1 |-> [wallet |-> 0],
-        node2 |-> [wallet |-> 0],
-        node3 |-> [wallet |-> 6]
+        node1 |-> [wallet |-> 3],
+        node2 |-> [wallet |-> 3],
+        node3 |-> [wallet |-> 0],
+        node4 |-> [wallet |-> 0]
     ],
     judgments |-> <<>>
 ]
@@ -67,6 +74,7 @@ WalletUpdatesFromVotes(votes, updates) ==
     IF Len(votes) = 0 
         THEN updates
         ELSE LET 
+                \* We add '1' for free (but not to the owner. See below.)
                 reward == Len(votes) + 1
                 judge == Head(votes).judge
                 newUpdates == [updates EXCEPT ![judge].wallet = @ + reward]
@@ -76,7 +84,8 @@ WalletUpdatesFromVotes(votes, updates) ==
 Rewards(judgment) == 
     LET updates == WalletUpdatesFromVotes(judgment.openJudgments, [n \in Nodes |-> public.nodes[n]])
         cost == Cost(Len(judgment.openJudgments))
-    IN  [updates EXCEPT ![judgment.owner].wallet = @ - cost]
+        \* Owners don't get the additional '1'
+    IN  [updates EXCEPT ![judgment.owner].wallet = @ - cost - 1]
 
 
 FutureCost(node) ==
@@ -182,10 +191,10 @@ CostLessThanMaxCost ==
     \/  Len(public.judgments) = 0
     \/  \A j \in Range(public.judgments) : Cost(Len(j.secretJudgments)) <= j.targetCost
 
-\* AllButOnePackagedIsJudgedPerNode == \A n \in Nodes: 
-\*         Cardinality({p \in Range(private[n].preferences): p.status = "not-processed"}) <= 1
+AllButOnePackagedIsJudgedPerNode == \A n \in Nodes: 
+        Cardinality({p \in Range(private[n].preferences): p.status = "not-processed"}) <= 1
 
-\* Fairness == WF_public(AllButOnePackagedIsJudgedPerNode)
+Fairness == WF_public(AllButOnePackagedIsJudgedPerNode)
 
 \* ======== Spec ======== 
 
@@ -219,6 +228,8 @@ Next ==
     \/  \E n \in Nodes:
         \E j \in Range(public.judgments):
             LET openVote == IsReproducible[j.package] IN
+            /\  \/  FutureCost(n) > public.nodes[n].wallet
+                \/  j.package \in {p.package : p \in Range(private[n].preferences)}
             /\ ShowJudgment(j.id, n, openVote)
             /\ UNCHANGED <<private, packages>>
     \/  \E n \in Nodes:
@@ -232,7 +243,7 @@ Next ==
                 Cardinality({p \in Range(private[n].preferences): p.status = "not-processed"}) = 0
         /\ UNCHANGED <<public, private, packages>>
 
-Spec == Init /\ [][Next]_<<public, private, packages>>
+Spec == Init /\ [][Next]_<<public, private, packages>> /\ Fairness
 
 
 ====
