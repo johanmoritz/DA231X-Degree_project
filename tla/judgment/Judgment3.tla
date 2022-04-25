@@ -8,7 +8,7 @@ VARIABLE public, private, packages
 \* tlc -config Judgment3.cfg Judgment3.tla
 
 
-Nodes == {"node1", "node2", "node3"}
+Nodes == {"node1", "node2", "node3", "node4"}
 
 Packages == {"package1", "package2", "package3", "package3"}
 
@@ -34,22 +34,29 @@ Sum(S) ==
 InitialPrivate == private = [
     node1 |-> [
         preferences |-> <<
-            [package |-> "package1", level |-> 1, status |-> "not-processed"],
-            \* [package |-> "package2", level |-> 1, status |-> "not-processed"],
-            [package |-> "package3", level |-> 2, status |-> "not-processed"]
+            [package |-> "package1", level |-> 2, status |-> "not-processed"],
+            [package |-> "package2", level |-> 2, status |-> "not-processed"]
+            \* [package |-> "package3", level |-> 2, status |-> "not-processed"]
         >>
     ],
     node2 |-> [
         preferences |-> <<
-            \* [package |-> "package4", level |-> 1, status |-> "not-processed"],
-            [package |-> "package5", level |-> 2, status |-> "not-processed"],
-            [package |-> "package6", level |-> 1, status |-> "not-processed"]
+            \* [package |-> "package4", level |-> 2, status |-> "not-processed"],
+            [package |-> "package3", level |-> 2, status |-> "not-processed"],
+            [package |-> "package4", level |-> 2, status |-> "not-processed"]
         >>
     ],
     node3 |-> [
         preferences |-> <<
+            [package |-> "package5", level |-> 2, status |-> "not-processed"],
+            [package |-> "package6", level |-> 2, status |-> "not-processed"]
+        
+        >>
+    ],
+    node4 |-> [
+        preferences |-> <<
             [package |-> "package7", level |-> 2, status |-> "not-processed"],
-            [package |-> "package8", level |-> 1, status |-> "not-processed"]
+            [package |-> "package8", level |-> 2, status |-> "not-processed"]
         
         >>
     ]
@@ -57,8 +64,8 @@ InitialPrivate == private = [
 
 InitialPublic == public = [
     nodes |-> [
-        node1 |-> [wallet |-> 3],
-        node2 |-> [wallet |-> 3],
+        node1 |-> [wallet |-> 10],
+        node2 |-> [wallet |-> 0],
         node3 |-> [wallet |-> 0],
         node4 |-> [wallet |-> 0]
     ],
@@ -69,23 +76,28 @@ RECURSIVE Cost(_)
 Cost(level) == IF level = 0 THEN 0 ELSE level + Cost(level - 1 )
 
 
-RECURSIVE WalletUpdatesFromVotes(_, _)
-WalletUpdatesFromVotes(votes, updates) ==
+RECURSIVE WalletUpdatesFromVotes(_, _, _)
+WalletUpdatesFromVotes(judgment, votes, updates) ==
     IF Len(votes) = 0 
         THEN updates
         ELSE LET 
-                \* We add '1' for free (but not to the owner. See below.)
-                reward == Len(votes) + 1
+                finalResult == judgment.tally.for > judgment.tally.against
                 judge == Head(votes).judge
+                \* We add '1' for free (but not to the owner)
+                participationReward == IF judge = judgment.owner THEN 0 ELSE 1
+                positionalReward == Cardinality({v \in Range(votes) : v.vote = finalResult})
+                reward == IF Head(votes).vote = finalResult 
+                            THEN participationReward + positionalReward
+                            ELSE 0 
                 newUpdates == [updates EXCEPT ![judge].wallet = @ + reward]
-            IN WalletUpdatesFromVotes(Tail(votes), newUpdates)
+            IN WalletUpdatesFromVotes(judgment, Tail(votes), newUpdates)
 
 \* Base reward on timing of open vote
 Rewards(judgment) == 
-    LET updates == WalletUpdatesFromVotes(judgment.openJudgments, [n \in Nodes |-> public.nodes[n]])
+    LET updates == WalletUpdatesFromVotes(judgment, judgment.openJudgments, [n \in Nodes |-> public.nodes[n]])
         cost == Cost(Len(judgment.openJudgments))
         \* Owners don't get the additional '1'
-    IN  [updates EXCEPT ![judgment.owner].wallet = @ - cost - 1]
+    IN  [updates EXCEPT ![judgment.owner].wallet = @ - cost]
 
 
 FutureCost(node) ==
@@ -94,18 +106,20 @@ FutureCost(node) ==
 
 \* ======== Chaincode ======== 
 
-InitializeJudgment(package, owner, targetCost) == 
+InitializeJudgment(package, owner, targetVotes) == 
     \* Guards
-    /\ targetCost <= public.nodes[owner].wallet
+    /\ Cost(targetVotes) <= public.nodes[owner].wallet
     /\ (\A j \in Range(public.judgments): j.status = "active" => j.owner # owner)
     \* Update
     \* TODO: Better ids. Currently there can only be one judgment per package.
     /\ LET judgmentId == package IN
         public' = [public EXCEPT !.judgments = Append(@,
                     [   id |-> judgmentId, 
+                        tally |-> [for |-> 0, against |-> 0],
+                        finalResult |-> "undecided",
                         package |-> package, 
                         owner |-> owner, 
-                        targetCost |-> targetCost, 
+                        targetVotes |-> targetVotes, 
                         status |-> "active",
                         phase |-> "secretVotes",
                         secretJudgments |-> <<>>,
@@ -119,7 +133,7 @@ AddSecretJudgment(judgmentId, judge, secretVote) ==
                 /\ j.status = "active"
                 /\ j.phase = "secretVotes"
                 \* Too expensive for the owner?
-                /\ Cost(Len(j.secretJudgments) + 1) <= j.targetCost
+                /\ Len(j.secretJudgments) <= 2 * j.targetVotes
                 \* Has 'judge' added their vote before?
                 /\ {sj \in Range(j.secretJudgments): sj.judge = judge} = {}
                 \* Update
@@ -136,7 +150,8 @@ EndSecretSubmissions(judgmentId, owner) ==
             /\ j.status = "active"
             /\ j.phase = "secretVotes"
             /\ j.owner = owner
-            /\ j.targetCost = Cost(Len(j.secretJudgments))
+            \* Should this be in the smart contract?
+            /\ 2 * j.targetVotes = Len(j.secretJudgments)
             /\ public' = [public EXCEPT !.judgments = [@ EXCEPT ![index] =
                 [@ EXCEPT !.phase = "openVotes"]]]
 
@@ -151,26 +166,50 @@ ShowJudgment(judgmentId, judge, openVote) ==
                 /\ {sj \in Range(j.secretJudgments): sj.judge = judge} # {}
                 \* Has 'judge' showed their vote before?
                 /\ {oj \in Range(j.openJudgments): oj.judge = judge} = {}
+                \* Secret and open votes should be the same
+                \* This validation is done with HMAC in practice
+                /\ \E sj \in Range(j.secretJudgments): 
+                    /\  sj.judge = judge 
+                    /\  openVote = sj.vote
+                \* No majority yet!
+                /\ 2 * j.tally.for <= Len(j.secretJudgments)
+                /\ 2 * j.tally.against <= Len(j.secretJudgments)
                 \* Update
-                /\  public' = [public EXCEPT !.judgments = [@ EXCEPT ![index] =
-                    [@ EXCEPT !.openJudgments = Append(@, 
-                        [   judge |-> judge, 
-                            vote |-> openVote])]]] 
+                /\  public' = [public EXCEPT !.judgments[index] = [@ EXCEPT
+                                !.openJudgments = Append(@, 
+                                    [   judge |-> judge, 
+                                        vote |-> openVote]),
+                                !.tally.for = IF openVote THEN @ + 1 ELSE @,
+                                !.tally.against = IF openVote THEN @ ELSE @ + 1]] 
 
 
 CloseJudgment(judgmentId, owner) ==
     \/  Len(public.judgments) = 0
     \/  \E index \in DOMAIN public.judgments:
-            LET j == public.judgments[index] IN
+            LET j == public.judgments[index]
+                finalResult == j.tally.for > j.tally.against IN
                 /\  j.id = judgmentId
                 /\  j.status = "active"
                 /\  j.phase = "openVotes"
                 /\  j.owner = owner
-                /\ j.targetCost = Cost(Len(j.openJudgments))
-                /\  public' = [public EXCEPT 
-                        !.judgments = [@ EXCEPT ![index] = 
-                             [@ EXCEPT !.status = "closed", !.phase = "judgment"]],
-                        !.nodes = Rewards(j)]
+                    \* Undecided result, majority FOR, or majority AGAINST
+                /\  \/ j.targetVotes = Len(j.openJudgments) 
+                    \/ 2 * j.tally.for > Len(j.secretJudgments)
+                    \/ 2 * j.tally.against > Len(j.secretJudgments)
+                    \* We have a majority!
+                /\  \/  /\  \/  2 * j.tally.for > Len(j.secretJudgments)
+                            \/  2 * j.tally.against > Len(j.secretJudgments)
+                        /\  public' = [public EXCEPT 
+                                !.judgments = [@ EXCEPT ![index] = 
+                                    [@ EXCEPT 
+                                        !.status = "closed", 
+                                        !.phase = "judgment",
+                                        !.finalResult = finalResult]],
+                                !.nodes = Rewards(j)]
+                    \* We don't have a majority
+                    \/  public' = [public EXCEPT !.judgments[index] = [@ EXCEPT 
+                                    !.status = "closed",
+                                    !.finalResult = "undecided"]]
                         
 
 \* ======== Invariants ======== 
@@ -187,9 +226,10 @@ LessActiveThenNodes ==
     LET active == {j \in Range(public.judgments) : j.status = "active"}
     IN  Cardinality(active) <= Cardinality(Nodes)
 
+\* TODO: Add filtering so this one works
 CostLessThanMaxCost ==
     \/  Len(public.judgments) = 0
-    \/  \A j \in Range(public.judgments) : Cost(Len(j.secretJudgments)) <= j.targetCost
+    \/  \A j \in Range(public.judgments) : Len(j.secretJudgments) <= j.targetVotes
 
 AllButOnePackagedIsJudgedPerNode == \A n \in Nodes: 
         Cardinality({p \in Range(private[n].preferences): p.status = "not-processed"}) <= 1
@@ -207,7 +247,7 @@ Next ==
         \E index \in DOMAIN private[n].preferences: 
             LET p == private[n].preferences[index] IN
                 /\ p.status = "not-processed"
-                /\ InitializeJudgment(p.package, n, Cost(p.level))
+                /\ InitializeJudgment(p.package, n, p.level)
                 /\ private' = [private EXCEPT   ![n] = [@ EXCEPT 
                                                 !.preferences = [@ EXCEPT 
                                                 ![index] = [@ EXCEPT 
