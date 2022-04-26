@@ -14,7 +14,7 @@ Packages == {"package1", "package2", "package3", "package3"}
 
 Status == {"active", "initialized"}
 
-IsReproducible == [package1 |-> TRUE, package2 |-> FALSE, package3 |-> TRUE, package4 |-> TRUE, package5 |-> TRUE, package6 |-> TRUE, package7 |-> TRUE, package8 |-> TRUE]
+IsReproducible == [package1 |-> "TRUE", package2 |-> "FALSE", package3 |-> "TRUE", package4 |-> "TRUE", package5 |-> "TRUE", package6 |-> "TRUE", package7 |-> "TRUE", package8 |-> "TRUE"]
 
 Range(f) == {f[k]: k \in DOMAIN f}
 
@@ -64,10 +64,10 @@ InitialPrivate == private = [
 
 InitialPublic == public = [
     nodes |-> [
-        node1 |-> [wallet |-> 10],
-        node2 |-> [wallet |-> 0],
-        node3 |-> [wallet |-> 0],
-        node4 |-> [wallet |-> 0]
+        node1 |-> [wallet |-> 3],
+        node2 |-> [wallet |-> 1],
+        node3 |-> [wallet |-> 1],
+        node4 |-> [wallet |-> 1]
     ],
     judgments |-> <<>>
 ]
@@ -81,7 +81,7 @@ WalletUpdatesFromVotes(judgment, votes, updates) ==
     IF Len(votes) = 0 
         THEN updates
         ELSE LET 
-                finalResult == judgment.tally.for > judgment.tally.against
+                finalResult == ToString(judgment.tally.for > judgment.tally.against)
                 judge == Head(votes).judge
                 \* We add '1' for free (but not to the owner)
                 participationReward == IF judge = judgment.owner THEN 0 ELSE 1
@@ -132,8 +132,8 @@ AddSecretJudgment(judgmentId, judge, secretVote) ==
                 /\  j.id = judgmentId
                 /\ j.status = "active"
                 /\ j.phase = "secretVotes"
-                \* Too expensive for the owner?
-                /\ Len(j.secretJudgments) <= 2 * j.targetVotes
+                \* Should be able to create a majority with j.targetVotes #votes
+                /\ Len(j.secretJudgments) + 1 < 2 * j.targetVotes
                 \* Has 'judge' added their vote before?
                 /\ {sj \in Range(j.secretJudgments): sj.judge = judge} = {}
                 \* Update
@@ -151,7 +151,7 @@ EndSecretSubmissions(judgmentId, owner) ==
             /\ j.phase = "secretVotes"
             /\ j.owner = owner
             \* Should this be in the smart contract?
-            /\ 2 * j.targetVotes = Len(j.secretJudgments)
+            /\ 2 * j.targetVotes - 1 = Len(j.secretJudgments)
             /\ public' = [public EXCEPT !.judgments = [@ EXCEPT ![index] =
                 [@ EXCEPT !.phase = "openVotes"]]]
 
@@ -179,37 +179,47 @@ ShowJudgment(judgmentId, judge, openVote) ==
                                 !.openJudgments = Append(@, 
                                     [   judge |-> judge, 
                                         vote |-> openVote]),
-                                !.tally.for = IF openVote THEN @ + 1 ELSE @,
-                                !.tally.against = IF openVote THEN @ ELSE @ + 1]] 
+                                !.tally.for = IF openVote = "TRUE" THEN @ + 1 ELSE @,
+                                !.tally.against = IF openVote = "FALSE" THEN @ + 1 ELSE @]] 
 
 
 CloseJudgment(judgmentId, owner) ==
     \/  Len(public.judgments) = 0
     \/  \E index \in DOMAIN public.judgments:
             LET j == public.judgments[index]
-                finalResult == j.tally.for > j.tally.against IN
+                finalResult == ToString(j.tally.for > j.tally.against) IN
                 /\  j.id = judgmentId
                 /\  j.status = "active"
                 /\  j.phase = "openVotes"
                 /\  j.owner = owner
                     \* Undecided result, majority FOR, or majority AGAINST
-                /\  \/ j.targetVotes = Len(j.openJudgments) 
+                /\  \/ Len(j.openJudgments) = Len(j.secretJudgments) 
                     \/ 2 * j.tally.for > Len(j.secretJudgments)
                     \/ 2 * j.tally.against > Len(j.secretJudgments)
-                    \* We have a majority!
-                /\  \/  /\  \/  2 * j.tally.for > Len(j.secretJudgments)
-                            \/  2 * j.tally.against > Len(j.secretJudgments)
+                    \* We have a majority for!
+                /\  \/  /\  2 * j.tally.for > Len(j.secretJudgments)
                         /\  public' = [public EXCEPT 
                                 !.judgments = [@ EXCEPT ![index] = 
                                     [@ EXCEPT 
                                         !.status = "closed", 
                                         !.phase = "judgment",
-                                        !.finalResult = finalResult]],
+                                        !.finalResult = "TRUE"]],
                                 !.nodes = Rewards(j)]
-                    \* We don't have a majority
-                    \/  public' = [public EXCEPT !.judgments[index] = [@ EXCEPT 
+                    \* We have a majority against!
+                    \/  /\  2 * j.tally.against > Len(j.secretJudgments)
+                        /\  public' = [public EXCEPT 
+                                !.judgments = [@ EXCEPT ![index] = 
+                                    [@ EXCEPT 
+                                        !.status = "closed", 
+                                        !.phase = "judgment",
+                                        !.finalResult = "FALSE"]],
+                                !.nodes = Rewards(j)]
+                    \* Everyone has voted, and we don't have a majority
+                    \/  /\  Len(j.openJudgments) = Len(j.secretJudgments) 
+                        /\  public' = [public EXCEPT !.judgments[index] = [@ EXCEPT 
                                     !.status = "closed",
                                     !.finalResult = "undecided"]]
+                    \* /\  PrintT("Majority: " \o ToString(public'.judgments[index].tally.for) \o " to " \o ToString(public'.judgments[index].tally.against))
                         
 
 \* ======== Invariants ======== 
@@ -233,6 +243,12 @@ CostLessThanMaxCost ==
 
 AllButOnePackagedIsJudgedPerNode == \A n \in Nodes: 
         Cardinality({p \in Range(private[n].preferences): p.status = "not-processed"}) <= 1
+
+NoPackagesAreWronglyJudged == 
+    \A j \in Range(public.judgments): 
+        \/  j.finalResult = IsReproducible[j.id]
+        \/  j.finalResult = "undecided"
+
 
 Fairness == WF_public(AllButOnePackagedIsJudgedPerNode)
 
@@ -279,9 +295,20 @@ Next ==
                     /\  private[n].preferences[preferenceIndex].package = j.package
                     /\  private' = [private EXCEPT ![n].preferences[preferenceIndex].status = "processed"]
             /\ UNCHANGED  <<packages>>
-    \/  /\  \E n \in Nodes: 
-                Cardinality({p \in Range(private[n].preferences): p.status = "not-processed"}) = 0
+    \* \/  /\  \E n \in Nodes: 
+    \*             Cardinality({p \in Range(private[n].preferences): p.status = "not-processed"}) = 0
+    \*     /\  LET 
+    \*             concat(a, b) == a \o ", " \o b
+    \*             wallets == {ToString(public.nodes[n].wallet): n \in Nodes}
+    \*         IN  PrintT(SetReduce(concat, wallets, ""))
+    \*     /\ UNCHANGED <<public, private, packages>>
+    \/  /\  AllButOnePackagedIsJudgedPerNode
+        \* /\  LET 
+        \*         concat(a, b) == a \o ", " \o b
+        \*         wallets == {ToString(public.nodes[n].wallet): n \in Nodes}
+        \*     IN  PrintT(SetReduce(concat, wallets, ""))
         /\ UNCHANGED <<public, private, packages>>
+
 
 Spec == Init /\ [][Next]_<<public, private, packages>> /\ Fairness
 
