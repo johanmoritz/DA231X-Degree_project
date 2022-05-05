@@ -1385,23 +1385,31 @@ To evaluate the correctness of the TLA\textsuperscript+ model, a number of scena
 
 \section{Model relevance}
 
-While TLA\textsuperscript+ models are useful to test and describe complex systems, to show their relevance they need to correspond to a real implementation. While this work does not include a system implementation, this section describe how one could be made which behaves equivalently to the model with regards to the models correctness properties. The main difference between the system model and a possible implementation is that the later is constrained as well as enhanced by Hyperledger Fabric, on which foundation it would be built. Many of the key security assumptions of the system such as integrity, availability, authentication and authorization rely on Fabrics default behaviour. An implementation built on Hyperledger Fabric can be seen as a refinement of (parts of) the model. To, then, show that an implementation of the model exists, an informal argument is given to claim that the TLA\textsuperscript+ model is a refinement of an implementation built on Hyperledger Fabric. 
+While TLA\textsuperscript+ models are useful to test and describe complex systems, to show their relevance they need to correspond to a real implementation. While this work does not include a system implementation, this section describe how one could be made which behaves equivalently to the model with regards to the models correctness properties. The main difference between the system model and a possible implementation is that the later is constrained as well as enhanced by Hyperledger Fabric, on which foundation it would be built. Many of the key security assumptions of the system such as integrity, availability, authentication and authorization rely on Fabrics default behaviour. An implementation built on Hyperledger Fabric can be seen as a refinement of (parts of) the model. To, then, show that an implementation of the model exists, an informal argument is given to claim that the TLA\textsuperscript+ model is a refinement of an implementation built on Hyperledger Fabric.
 
-A second key difference between the model and a real implementation lies in the modelled behaviour of the system actors. 
+A second key difference between the model and a real implementation lies in the modelled behaviour of the system actors.
 
-\subsection{Model refinement}
+A third one is the use of HMAC.
 
-In Hyperledger Fabric, systems are defined as a set of organizations, a network of nodes each owned by one of the organizations, a set of general policies for how the network is managed and a set of chaincode smart contracts which can read and update the blockchain and worldstate. Every node has some role on the system, such as peer or orderer. 
+\subsection{Hyperledger fabric highlights}
 
-Each builder in the model represents one or many nodes from the same organization that support all the possible roles. There is nothing stopping a this from being true in Hyperledger Fabric, but comonly the roles are distributed over multiple nodes.  
+In Hyperledger Fabric, systems are defined as a set of organizations, a network of nodes each owned by one of the organizations, a set of general policies for how the network is managed and a set of chaincode smart contracts which can read and update the blockchain and worldstate. Every node has some role on the system, such as peers that store the blockchain and run chaincode or orderer that ensures all nodes have the same blockchain history. To support high availability, participating organizations can have several nodes with the same role, thus distributing the load on any one node as well as mitigating risk in the case where some node is not functioning properly. Chaincodes are written in a regular turing-complete programming languages such as Java or Go. For them to be accepted by the network, chaincodes should be deterministic with regards to the read-write sets they generate. If a chaincode non-deterministic behaviour, different peers would not be able to reach the same result when run leading the network to reject the execution. Wether they are accepted or not is highly dependent on the chaincodes' endorsement policies which describe what organizations has to accept the run. While chaincodes can read any parts of the world state, the request parameters of a chaincode call can include information private only to the organization that invoked the request in first hand.
+
+\subsection{Model to network design}
+The TLA\textsuperscript+ model uses a simplified network topology compared to what is expected in a production system. In the model, each organization is represented by a single \texttt{builder}. These builders are actors in the model and play the roles of clients and peers in the network. While not recommended, there is nothing in Hyperledger Fabric stopping a network to only have single node organizations. In fact, this is precisely how the Hyperledger test-network is set up.
+
+\subsection{Model to chaincode}
+
+Because Hyperledger Fabric chaincode are written in turing-complete languages it is fully possible to translate TLA\textsuperscript+ to one of those languages, as long as adherence is made to follow the interface of chaincode.
+To make the translation from model to chaincode, there are five TLA\textsuperscript+ operators that each contain the functionality of a corresponding chaincode.
 
 The model is split into 5 different operators, each representing a chaincode.
 
 Chaincodes are written in turing complete languages and can include anything. The TLA\textsuperscript+ language is a subset of those languages so every chaincode operator in the model can be translated into an equivalent chaincode for Hyperledger Fabric.
 
-Chaincodes have to be deterministic in the state reads/writes they make. All the chaincode operators in the model are deterministic. 
+Chaincodes have to be deterministic in the state reads/writes they make. All the chaincode operators in the model are deterministic.
 
-Model state is split into private and public (there should be a third one as well so private state is split from builder assumptions). Chaincode can only touch public data from the world state, and private data sent in a request (only if from same organization). 
+Model state is split into private and public (there should be a third one as well so private state is split from builder assumptions). Chaincode can only touch public data from the world state, and private data sent in a request (only if from same organization).
 
 Ordering is handled by certain nodes on the network. They ensure that all nodes on the network have the same view of the current state. The model assumes that state updates are imediate and the same for all nodes.
 
