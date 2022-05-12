@@ -12,6 +12,10 @@
 % To optimize for digital output (this changes the color palette add the option: digitaloutput
 \documentclass[english, biblatex, digitaloutput]{kththesis}
 
+\usepackage{subfiles}
+
+\usepackage{tlatex}
+
 \usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
 %  \usepackage[bibstyle=authoryear, citestyle=authoryear,  maxbibnames=99, language=english]{biblatex}
 \addbibresource{references.bib}
@@ -1377,14 +1381,27 @@ judge the validity and reproducibility of f_name.
 
 \section{TLA\textsuperscript+ model}
 
-\includepdf{model/Judgment3.pdf}
+\subfile{model/Judgment}
 
 \section{Model evaluation}
 
 To evaluate the correctness of the TLA\textsuperscript+ model, a number of scenarios are tested with the TLC model checker. Because TLC is a bounded model checker, these scenarios do not prove the correctness of the model in general but gives an indication to under which assumptions it is correct. Particularly, they are selected to show that the system makes progress in non-trivial cases, rather than stopping in a deadlocked state, and that it yields valid results.
 
 \subsection{Scenario 1}
-\dots
+
+% TODO: Move this to results
+
+\begin{table}[h!]
+	\begin{tabular}{c c r r r r r}
+		Max \#closed & Diameter & States        & Distinct states & Time (hh:mm::ss) & Collision Calculated & Collision observed \\
+		\hline                                                                                                                   \\
+		1            & 10       & 734           & 297             & 00:00:04         & 7E-15                &                    \\
+		2            & 19       & 53,438        & 21,609          & 00:00:06         & 3.7E-11              &                    \\
+		3            & 31       & 32,017,982    & 9,987,859       & 00:04:27         & 1.2E-5               & 5.6E-6             \\
+		4            & 40       & 2,432,997,950 & 625,847,049     & 04:53:55         &                      &                    \\
+	\end{tabular}
+	\caption[Three node model check]{The result from running the model checker on a three node scenario. 1 and 2 was ran on a laptop with 6 cores and 12GB memory.}
+\end{table}
 
 \section{Model relevance}
 
