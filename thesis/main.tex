@@ -1385,9 +1385,17 @@ judge the validity and reproducibility of f_name.
 
 \section{Model evaluation}
 
-To evaluate the correctness of the TLA\textsuperscript+ model, a number of scenarios are tested with the TLC model checker. Because TLC is a bounded model checker, these scenarios do not prove the correctness of the model in general but gives an indication to under which assumptions it is correct. Particularly, they are selected to show that the system makes progress in non-trivial cases, rather than stopping in a deadlocked state, and that it yields valid results.
+To evaluate the correctness of the TLA\textsuperscript+ model, a number of scenarios are tested with the TLC model checker. Because TLC is a bounded model checker, these scenarios do not prove the correctness of the model in general but gives an indication to under which assumptions it is correct. Particularly, they are selected to show that the system makes progress in non-trivial cases, rather than stopping in a deadlocked state, and that it yields valid results. In all scenarios, a limit as well as goal is set in terms of the number of packages the system should evaluate correctly before finishing. In other words, for each behaviour (or state sequence) that is tested in a scenario, either the goal is reached or the model has failed the scenario.
 
-\subsection{Scenario 1}
+\subsection{Scenario 1: No malicious builders}
+\label{subsec:scenario_non-malicious}
+
+This scenario is a positive test of the model where every builder is assumed to take egoistical but non-malicious actions, following the behaviour described under section \ref{sec:systemActors}. There are three total builders, each one with two preferred packages at a vote target of two. Two of the builders begin with 0BT in their respective wallets while the third one starts with 3BT. This allows the last builder to initialize the first package judgment, because 3BT is exactly the cost for a package with a vote target of two. The judgment goal of the scenario scales from one up to and including four, thus ensuring that the initially preferred packages of at least one builder have been judged.
+
+\subsection{Scenario 2: Single malicious builder}
+\label{subsec:scenario_single_malicious}
+
+
 
 % TODO: Move this to results
 
@@ -1398,9 +1406,18 @@ To evaluate the correctness of the TLA\textsuperscript+ model, a number of scena
 		1            & 10       & 734           & 297             & 00:00:04         & 7E-15                &                    \\
 		2            & 19       & 53,438        & 21,609          & 00:00:06         & 3.7E-11              &                    \\
 		3            & 31       & 32,017,982    & 9,987,859       & 00:04:27         & 1.2E-5               & 5.6E-6             \\
-		4            & 40       & 2,432,997,950 & 625,847,049     & 04:53:55         &                      &                    \\
+		4            & 40       & 2,432,997,950 & 625,847,049     & 04:53:55         & 0.061                & 0.024              \\
 	\end{tabular}
 	\caption[Three node model check]{The result from running the model checker on a three node scenario. 1 and 2 was ran on a laptop with 6 cores and 12GB memory.}
+\end{table}
+
+\begin{table}[h!]
+	\begin{tabular}{c c r r r r r}
+		Max \#closed & Diameter & States     & Distinct states & Time (hh:mm::ss) & Collision Calculated & Collision observed \\
+		\hline                                                                                                                \\
+		3            & 31       & 23,523,125 & 9,241,353       & 00:03:47         & 7.2E-6               & 3.4E-6             \\
+	\end{tabular}
+	\caption[Three node model check]{V2. The result from running the model checker on a three node scenario. 1 and 2 was ran on a laptop with 6 cores and 12GB memory.}
 \end{table}
 
 \section{Model relevance}
