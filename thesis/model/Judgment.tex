@@ -1,1114 +1,130 @@
 \batchmode %% Suppresses most terminal output.
 \documentclass[../main.tex]{subfiles}
-\setlength{\textwidth}{360pt}
-\setlength{\textheight}{541pt}
-\usepackage{latexsym}
-\usepackage{ifthen}
-% \usepackage{color}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SWITCHES                                                                  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newboolean{shading} 
-\setboolean{shading}{false}
-\makeatletter
- %% this is needed only when inserted into the file, not when
- %% used as a package file.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                                                           %
-% DEFINITIONS OF SYMBOL-PRODUCING COMMANDS                                  %
-%                                                                           %
-%    TLA+      LaTeX                                                        %
-%    symbol    command                                                      %
-%    ------    -------                                                      %
-%    =>        \implies                                                     %
-%    <:        \ltcolon                                                     %
-%    :>        \colongt                                                     %
-%    ==        \defeq                                                       %
-%    ..        \dotdot                                                      %
-%    ::        \coloncolon                                                  %
-%    =|        \eqdash                                                      %
-%    ++        \pp                                                          %
-%    --        \mm                                                          %
-%    **        \stst                                                        %
-%    //        \slsl                                                        %
-%    ^         \ct                                                          %
-%    \A        \A                                                           %
-%    \E        \E                                                           %
-%    \AA       \AA                                                          %
-%    \EE       \EE                                                          %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newlength{\symlength}
-\newcommand{\implies}{\Rightarrow}
-\newcommand{\ltcolon}{\mathrel{<\!\!\mbox{:}}}
-\newcommand{\colongt}{\mathrel{\!\mbox{:}\!\!>}}
-\newcommand{\defeq}{\;\mathrel{\smash   %% keep this symbol from being too tall
-    {{\stackrel{\scriptscriptstyle\Delta}{=}}}}\;}
-\newcommand{\dotdot}{\mathrel{\ldotp\ldotp}}
-\newcommand{\coloncolon}{\mathrel{::\;}}
-\newcommand{\eqdash}{\mathrel = \joinrel \hspace{-.28em}|}
-\newcommand{\pp}{\mathbin{++}}
-\newcommand{\mm}{\mathbin{--}}
-\newcommand{\stst}{*\!*}
-\newcommand{\slsl}{/\!/}
-\newcommand{\ct}{\hat{\hspace{.4em}}}
-\newcommand{\A}{\forall}
-\newcommand{\E}{\exists}
-\renewcommand{\AA}{\makebox{$\raisebox{.05em}{\makebox[0pt][l]{%
-   $\forall\hspace{-.517em}\forall\hspace{-.517em}\forall$}}%
-   \forall\hspace{-.517em}\forall \hspace{-.517em}\forall\,$}}
-\newcommand{\EE}{\makebox{$\raisebox{.05em}{\makebox[0pt][l]{%
-   $\exists\hspace{-.517em}\exists\hspace{-.517em}\exists$}}%
-   \exists\hspace{-.517em}\exists\hspace{-.517em}\exists\,$}}
-\newcommand{\whileop}{\.{\stackrel
-  {\mbox{\raisebox{-.3em}[0pt][0pt]{$\scriptscriptstyle+\;\,$}}}%
-  {-\hspace{-.16em}\triangleright}}}
-
-% Commands are defined to produce the upper-case keywords.
-% Note that some have space after them.
-\newcommand{\ASSUME}{\textsc{assume }}
-\newcommand{\ASSUMPTION}{\textsc{assumption }}
-\newcommand{\AXIOM}{\textsc{axiom }}
-\newcommand{\BOOLEAN}{\textsc{boolean }}
-\newcommand{\CASE}{\textsc{case }}
-\newcommand{\CONSTANT}{\textsc{constant }}
-\newcommand{\CONSTANTS}{\textsc{constants }}
-\newcommand{\ELSE}{\settowidth{\symlength}{\THEN}%
-   \makebox[\symlength][l]{\textsc{ else}}}
-\newcommand{\EXCEPT}{\textsc{ except }}
-\newcommand{\EXTENDS}{\textsc{extends }}
-\newcommand{\FALSE}{\textsc{false}}
-\newcommand{\IF}{\textsc{if }}
-\newcommand{\IN}{\settowidth{\symlength}{\LET}%
-   \makebox[\symlength][l]{\textsc{in}}}
-\newcommand{\INSTANCE}{\textsc{instance }}
-\newcommand{\LET}{\textsc{let }}
-\newcommand{\LOCAL}{\textsc{local }}
-\newcommand{\MODULE}{\textsc{module }}
-\newcommand{\OTHER}{\textsc{other }}
-\newcommand{\STRING}{\textsc{string}}
-\newcommand{\THEN}{\textsc{ then }}
-\newcommand{\THEOREM}{\textsc{theorem }}
-\newcommand{\LEMMA}{\textsc{lemma }}
-\newcommand{\PROPOSITION}{\textsc{proposition }}
-\newcommand{\COROLLARY}{\textsc{corollary }}
-\newcommand{\TRUE}{\textsc{true}}
-\newcommand{\VARIABLE}{\textsc{variable }}
-\newcommand{\VARIABLES}{\textsc{variables }}
-\newcommand{\WITH}{\textsc{ with }}
-\newcommand{\WF}{\textrm{WF}}
-\newcommand{\SF}{\textrm{SF}}
-\newcommand{\CHOOSE}{\textsc{choose }}
-\newcommand{\ENABLED}{\textsc{enabled }}
-\newcommand{\UNCHANGED}{\textsc{unchanged }}
-\newcommand{\SUBSET}{\textsc{subset }}
-\newcommand{\UNION}{\textsc{union }}
-\newcommand{\DOMAIN}{\textsc{domain }}
-% Added for tla2tex
-\newcommand{\BY}{\textsc{by }}
-\newcommand{\OBVIOUS}{\textsc{obvious }}
-\newcommand{\HAVE}{\textsc{have }}
-\newcommand{\QED}{\textsc{qed }}
-\newcommand{\TAKE}{\textsc{take }}
-\newcommand{\DEF}{\textsc{ def }}
-\newcommand{\HIDE}{\textsc{hide }}
-\newcommand{\RECURSIVE}{\textsc{recursive }}
-\newcommand{\USE}{\textsc{use }}
-\newcommand{\DEFINE}{\textsc{define }}
-\newcommand{\PROOF}{\textsc{proof }}
-\newcommand{\WITNESS}{\textsc{witness }}
-\newcommand{\PICK}{\textsc{pick }}
-\newcommand{\DEFS}{\textsc{defs }}
-\newcommand{\PROVE}{\settowidth{\symlength}{\ASSUME}%
-   \makebox[\symlength][l]{\textsc{prove}}\@s{-4.1}}%
-  %% The \@s{-4.1) is a kludge added on 24 Oct 2009 [happy birthday, Ellen]
-  %% so the correct alignment occurs if the user types
-  %%   ASSUME X
-  %%   PROVE  Y
-  %% because it cancels the extra 4.1 pts added because of the 
-  %% extra space after the PROVE.  This seems to works OK.
-  %% However, the 4.1 equals Parameters.LaTeXLeftSpace(1) and
-  %% should be changed if that method ever changes.
-\newcommand{\SUFFICES}{\textsc{suffices }}
-\newcommand{\NEW}{\textsc{new }}
-\newcommand{\LAMBDA}{\textsc{lambda }}
-\newcommand{\STATE}{\textsc{state }}
-\newcommand{\ACTION}{\textsc{action }}
-\newcommand{\TEMPORAL}{\textsc{temporal }}
-\newcommand{\ONLY}{\textsc{only }}              %% added by LL on 2 Oct 2009
-\newcommand{\OMITTED}{\textsc{omitted }}        %% added by LL on 31 Oct 2009
-\newcommand{\@pfstepnum}[2]{\ensuremath{\langle#1\rangle}\textrm{#2}}
-\newcommand{\bang}{\@s{1}\mbox{\small !}\@s{1}}
-%% We should format || differently in PlusCal code than in TLA+ formulas.
-\newcommand{\p@barbar}{\ifpcalsymbols
-   \,\,\rule[-.25em]{.075em}{1em}\hspace*{.2em}\rule[-.25em]{.075em}{1em}\,\,%
-   \else \,||\,\fi}
-%% PlusCal keywords
-\newcommand{\p@fair}{\textbf{fair }}
-\newcommand{\p@semicolon}{\textbf{\,; }}
-\newcommand{\p@algorithm}{\textbf{algorithm }}
-\newcommand{\p@mmfair}{\textbf{-{}-fair }}
-\newcommand{\p@mmalgorithm}{\textbf{-{}-algorithm }}
-\newcommand{\p@assert}{\textbf{assert }}
-\newcommand{\p@await}{\textbf{await }}
-\newcommand{\p@begin}{\textbf{begin }}
-\newcommand{\p@end}{\textbf{end }}
-\newcommand{\p@call}{\textbf{call }}
-\newcommand{\p@define}{\textbf{define }}
-\newcommand{\p@do}{\textbf{ do }}
-\newcommand{\p@either}{\textbf{either }}
-\newcommand{\p@or}{\textbf{or }}
-\newcommand{\p@goto}{\textbf{goto }}
-\newcommand{\p@if}{\textbf{if }}
-\newcommand{\p@then}{\,\,\textbf{then }}
-\newcommand{\p@else}{\ifcsyntax \textbf{else } \else \,\,\textbf{else }\fi}
-\newcommand{\p@elsif}{\,\,\textbf{elsif }}
-\newcommand{\p@macro}{\textbf{macro }}
-\newcommand{\p@print}{\textbf{print }}
-\newcommand{\p@procedure}{\textbf{procedure }}
-\newcommand{\p@process}{\textbf{process }}
-\newcommand{\p@return}{\textbf{return}}
-\newcommand{\p@skip}{\textbf{skip}}
-\newcommand{\p@variable}{\textbf{variable }}
-\newcommand{\p@variables}{\textbf{variables }}
-\newcommand{\p@while}{\textbf{while }}
-\newcommand{\p@when}{\textbf{when }}
-\newcommand{\p@with}{\textbf{with }}
-\newcommand{\p@lparen}{\textbf{(\,\,}}
-\newcommand{\p@rparen}{\textbf{\,\,) }}   
-\newcommand{\p@lbrace}{\textbf{\{\,\,}}   
-\newcommand{\p@rbrace}{\textbf{\,\,\} }}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% REDEFINE STANDARD COMMANDS TO MAKE THEM FORMAT BETTER %
-%                                                       %
-% We redefine \in and \notin                            %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\renewcommand{\_}{\rule{.4em}{.06em}\hspace{.05em}}
-\newlength{\equalswidth}
-\let\oldin=\in
-\let\oldnotin=\notin
-\renewcommand{\in}{%
-   {\settowidth{\equalswidth}{$\.{=}$}\makebox[\equalswidth][c]{$\oldin$}}}
-\renewcommand{\notin}{%
-   {\settowidth{\equalswidth}{$\.{=}$}\makebox[\equalswidth]{$\oldnotin$}}}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                                  %
-% HORIZONTAL BARS:                                 %
-%                                                  %
-%   \moduleLeftDash    |~~~~~~~~~~                 %
-%   \moduleRightDash    ~~~~~~~~~~|                %
-%   \midbar            |----------|                %
-%   \bottombar         |__________|                %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newlength{\charwidth}\settowidth{\charwidth}{{\small\tt M}}
-\newlength{\boxrulewd}\setlength{\boxrulewd}{.4pt}
-\newlength{\boxlineht}\setlength{\boxlineht}{.5\baselineskip}
-\newcommand{\boxsep}{\charwidth}
-\newlength{\boxruleht}\setlength{\boxruleht}{.5ex}
-\newlength{\boxruledp}\setlength{\boxruledp}{-\boxruleht}
-\addtolength{\boxruledp}{\boxrulewd}
-\newcommand{\boxrule}{\leaders\hrule height \boxruleht depth \boxruledp
-                      \hfill\mbox{}}
-\newcommand{\@computerule}{%
-  \setlength{\boxruleht}{.5ex}%
-  \setlength{\boxruledp}{-\boxruleht}%
-  \addtolength{\boxruledp}{\boxrulewd}}
-
-\newcommand{\bottombar}{\hspace{-\boxsep}%
-  \raisebox{-\boxrulewd}[0pt][0pt]{\rule[.5ex]{\boxrulewd}{\boxlineht}}%
-  \boxrule
-  \raisebox{-\boxrulewd}[0pt][0pt]{%
-      \rule[.5ex]{\boxrulewd}{\boxlineht}}\hspace{-\boxsep}\vspace{0pt}}
-
-\newcommand{\moduleLeftDash}%
-   {\hspace*{-\boxsep}%
-     \raisebox{-\boxlineht}[0pt][0pt]{\rule[.5ex]{\boxrulewd
-               }{\boxlineht}}%
-    \boxrule\hspace*{.4em }}
-
-\newcommand{\moduleRightDash}%
-    {\hspace*{.4em}\boxrule
-    \raisebox{-\boxlineht}[0pt][0pt]{\rule[.5ex]{\boxrulewd
-               }{\boxlineht}}\hspace{-\boxsep}}%\vspace{.2em}
-
-\newcommand{\midbar}{\hspace{-\boxsep}\raisebox{-.5\boxlineht}[0pt][0pt]{%
-   \rule[.5ex]{\boxrulewd}{\boxlineht}}\boxrule\raisebox{-.5\boxlineht%
-   }[0pt][0pt]{\rule[.5ex]{\boxrulewd}{\boxlineht}}\hspace{-\boxsep}}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FORMATING COMMANDS                                                        %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% PLUSCAL SHADING                                                           %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% The TeX pcalshading switch is set on to cause PlusCal shading to be
-% performed.  This changes the behavior of the following commands and
-% environments to cause full-width shading to be performed on all lines.
-% 
-%   \tstrut \@x cpar mcom \@pvspace
-% 
-% The TeX pcalsymbols switch is turned on when typesetting a PlusCal algorithm,
-% whether or not shading is being performed.  It causes symbols (other than
-% parentheses and braces and PlusCal-only keywords) that should be typeset
-% differently depending on whether they are in an algorithm to be typeset
-% appropriately.  Currently, the only such symbol is "||".
-%
-% The TeX csyntax switch is turned on when typesetting a PlusCal algorithm in
-% c-syntax.  This allows symbols to be format differently in the two syntaxes.
-% The "else" keyword is the only one that is.
-
-\newif\ifpcalshading \pcalshadingfalse
-\newif\ifpcalsymbols \pcalsymbolsfalse
-\newif\ifcsyntax     \csyntaxtrue
-
-% The \@pvspace command makes a vertical space.  It uses \vspace
-% except with \ifpcalshading, in which case it sets \pvcalvspace
-% and the space is added by a following \@x command.
-%
-\newlength{\pcalvspace}\setlength{\pcalvspace}{0pt}%
-\newcommand{\@pvspace}[1]{%
-  \ifpcalshading
-     \par\global\setlength{\pcalvspace}{#1}%
-  \else
-     \par\vspace{#1}%
-  \fi
-}
-
-% The lcom environment was changed to set \lcomindent equal to
-% the indentation it produces.  This length is used by the
-% cpar environment to make shading extend for the full width
-% of the line.  This assumes that lcom environments are not
-% nested.  I hope TLATeX does not nest them.
-%
-\newlength{\lcomindent}%
-\setlength{\lcomindent}{0pt}%
-
-%\tstrut: A strut to produce inter-paragraph space in a comment.
-%\rstrut: A strut to extend the bottom of a one-line comment so
-%         there's no break in the shading between comments on 
-%         successive lines.
-\newcommand\tstrut%
-  {\raisebox{\vshadelen}{\raisebox{-.25em}{\rule{0pt}{1.15em}}}%
-   \global\setlength{\vshadelen}{0pt}}
-\newcommand\rstrut{\raisebox{-.25em}{\rule{0pt}{1.15em}}%
- \global\setlength{\vshadelen}{0pt}}
-
-
-% \.{op} formats operator op in math mode with empty boxes on either side.
-% Used because TeX otherwise vary the amount of space it leaves around op.
-\renewcommand{\.}[1]{\ensuremath{\mbox{}#1\mbox{}}}
-
-% \@s{n} produces an n-point space
-\newcommand{\@s}[1]{\hspace{#1pt}}           
-
-% \@x{txt} starts a specification line in the beginning with txt
-% in the final LaTeX source.
-\newlength{\@xlen}
-\newcommand\xtstrut%
-  {\setlength{\@xlen}{1.05em}%
-   \addtolength{\@xlen}{\pcalvspace}%
-    \raisebox{\vshadelen}{\raisebox{-.25em}{\rule{0pt}{\@xlen}}}%
-   \global\setlength{\vshadelen}{0pt}%
-   \global\setlength{\pcalvspace}{0pt}}
-
-\newcommand{\@x}[1]{\par
-  \ifpcalshading
-  \makebox[0pt][l]{\shadebox{\xtstrut\hspace*{\textwidth}}}%
-  \fi
-  \mbox{$\mbox{}#1\mbox{}$}}  
-
-% \@xx{txt} continues a specification line with the text txt.
-\newcommand{\@xx}[1]{\mbox{$\mbox{}#1\mbox{}$}}  
-
-% \@y{cmt} produces a one-line comment.
-\newcommand{\@y}[1]{\mbox{\footnotesize\hspace{.65em}%
-  \ifthenelse{\boolean{shading}}{%
-      \shadebox{#1\hspace{-\the\lastskip}\rstrut}}%
-               {#1\hspace{-\the\lastskip}\rstrut}}}
-
-% \@z{cmt} produces a zero-width one-line comment.
-\newcommand{\@z}[1]{\makebox[0pt][l]{\footnotesize
-  \ifthenelse{\boolean{shading}}{%
-      \shadebox{#1\hspace{-\the\lastskip}\rstrut}}%
-               {#1\hspace{-\the\lastskip}\rstrut}}}
-
-
-% \@w{str} produces the TLA+ string "str".
-\newcommand{\@w}[1]{\textsf{``{#1}''}}             
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SHADING                                                                   %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\def\graymargin{1}
-  % The number of points of margin in the shaded box.
-
-% \definecolor{boxshade}{gray}{.85}
-% Defines the darkness of the shading: 1 = white, 0 = black
-% Added by TLATeX only if needed.
-
-% \shadebox{txt} puts txt in a shaded box.
-\newlength{\templena}
-\newlength{\templenb}
-\newsavebox{\tempboxa}
-\newcommand{\shadebox}[1]{{\setlength{\fboxsep}{\graymargin pt}%
-     \savebox{\tempboxa}{#1}%
-     \settoheight{\templena}{\usebox{\tempboxa}}%
-     \settodepth{\templenb}{\usebox{\tempboxa}}%
-     \hspace*{-\fboxsep}\raisebox{0pt}[\templena][\templenb]%
-        {\colorbox{boxshade}{\usebox{\tempboxa}}}\hspace*{-\fboxsep}}}
-
-% \vshade{n} makes an n-point inter-paragraph space, with
-%  shading if the `shading' flag is true.
-\newlength{\vshadelen}
-\setlength{\vshadelen}{0pt}
-\newcommand{\vshade}[1]{\ifthenelse{\boolean{shading}}%
-   {\global\setlength{\vshadelen}{#1pt}}%
-   {\vspace{#1pt}}}
-
-\newlength{\boxwidth}
-\newlength{\multicommentdepth}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% THE cpar ENVIRONMENT                                                      %
-% ^^^^^^^^^^^^^^^^^^^^                                                      %
-% The LaTeX input                                                           %
-%                                                                           %
-%   \begin{cpar}{pop}{nest}{isLabel}{d}{e}{arg6}                            %
-%     XXXXXXXXXXXXXXX                                                       %
-%     XXXXXXXXXXXXXXX                                                       %
-%     XXXXXXXXXXXXXXX                                                       %
-%   \end{cpar}                                                              %
-%                                                                           %
-% produces one of two possible results.  If isLabel is the letter "T",      %
-% it produces the following, where [label] is the result of typesetting     %
-% arg6 in an LR box, and d is is a number representing a distance in        %
-% points.                                                                   %
-%                                                                           %
-%   prevailing |<-- d -->[label]<- e ->XXXXXXXXXXXXXXX                      %
-%         left |                       XXXXXXXXXXXXXXX                      %
-%       margin |                       XXXXXXXXXXXXXXX                      %
-%                                                                           %
-% If isLabel is the letter "F", then it produces                            %
-%                                                                           %
-%   prevailing |<-- d -->XXXXXXXXXXXXXXXXXXXXXXX                            %
-%         left |         <- e ->XXXXXXXXXXXXXXXX                            %
-%       margin |                XXXXXXXXXXXXXXXX                            %
-%                                                                           %
-% where d and e are numbers representing distances in points.               %
-%                                                                           %
-% The prevailing left margin is the one in effect before the most recent    %
-% pop (argument 1) cpar environments with "T" as the nest argument, where   %
-% pop is a number \geq 0.                                                   %
-%                                                                           %
-% If the nest argument is the letter "T", then the prevailing left          %
-% margin is moved to the left of the second (and following) lines of        %
-% X's.  Otherwise, the prevailing left margin is left unchanged.            %
-%                                                                           %
-% An \unnest{n} command moves the prevailing left margin to where it was    %
-% before the most recent n cpar environments with "T" as the nesting        %
-% argument.                                                                 %
-%                                                                           %
-% The environment leaves no vertical space above or below it, or between    %
-% its paragraphs.  (TLATeX inserts the proper amount of vertical space.)    %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\newcounter{pardepth}
-\setcounter{pardepth}{0}
-
-% \setgmargin{txt} defines \gmarginN to be txt, where N is \roman{pardepth}.
-% \thegmargin equals \gmarginN, where N is \roman{pardepth}.
-\newcommand{\setgmargin}[1]{%
-  \expandafter\xdef\csname gmargin\roman{pardepth}\endcsname{#1}}
-\newcommand{\thegmargin}{\csname gmargin\roman{pardepth}\endcsname}
-\newcommand{\gmargin}{0pt}
-
-\newsavebox{\tempsbox}
-
-\newlength{\@cparht}
-\newlength{\@cpardp}
-\newenvironment{cpar}[6]{%
-  \addtocounter{pardepth}{-#1}%
-  \ifthenelse{\boolean{shading}}{\par\begin{lrbox}{\tempsbox}%
-                                 \begin{minipage}[t]{\linewidth}}{}%
-  \begin{list}{}{%
-     \edef\temp{\thegmargin}
-     \ifthenelse{\equal{#3}{T}}%
-       {\settowidth{\leftmargin}{\hspace{\temp}\footnotesize #6\hspace{#5pt}}%
-        \addtolength{\leftmargin}{#4pt}}%
-       {\setlength{\leftmargin}{#4pt}%
-        \addtolength{\leftmargin}{#5pt}%
-        \addtolength{\leftmargin}{\temp}%
-        \setlength{\itemindent}{-#5pt}}%
-      \ifthenelse{\equal{#2}{T}}{\addtocounter{pardepth}{1}%
-                                 \setgmargin{\the\leftmargin}}{}%
-      \setlength{\labelwidth}{0pt}%
-      \setlength{\labelsep}{0pt}%
-      \setlength{\itemindent}{-\leftmargin}%
-      \setlength{\topsep}{0pt}%
-      \setlength{\parsep}{0pt}%
-      \setlength{\partopsep}{0pt}%
-      \setlength{\parskip}{0pt}%
-      \setlength{\itemsep}{0pt}
-      \setlength{\itemindent}{#4pt}%
-      \addtolength{\itemindent}{-\leftmargin}}%
-   \ifthenelse{\equal{#3}{T}}%
-      {\item[\tstrut\footnotesize \hspace{\temp}{#6}\hspace{#5pt}]
-        }%
-      {\item[\tstrut\hspace{\temp}]%
-         }%
-   \footnotesize}
- {\hspace{-\the\lastskip}\tstrut
- \end{list}%
-  \ifthenelse{\boolean{shading}}%
-          {\end{minipage}%
-           \end{lrbox}%
-           \ifpcalshading
-             \setlength{\@cparht}{\ht\tempsbox}%
-             \setlength{\@cpardp}{\dp\tempsbox}%
-             \addtolength{\@cparht}{.15em}%
-             \addtolength{\@cpardp}{.2em}%
-             \addtolength{\@cparht}{\@cpardp}%
-            % I don't know what's going on here.  I want to add a
-            % \pcalvspace high shaded line, but I don't know how to
-            % do it.  A little trial and error shows that the following
-            % does a reasonable job approximating that, eliminating
-            % the line if \pcalvspace is small.
-            \addtolength{\@cparht}{\pcalvspace}%
-             \ifdim \pcalvspace > .8em
-               \addtolength{\pcalvspace}{-.2em}%
-               \hspace*{-\lcomindent}%
-               \shadebox{\rule{0pt}{\pcalvspace}\hspace*{\textwidth}}\par
-               \global\setlength{\pcalvspace}{0pt}%
-               \fi
-             \hspace*{-\lcomindent}%
-             \makebox[0pt][l]{\raisebox{-\@cpardp}[0pt][0pt]{%
-                 \shadebox{\rule{0pt}{\@cparht}\hspace*{\textwidth}}}}%
-             \hspace*{\lcomindent}\usebox{\tempsbox}%
-             \par
-           \else
-             \shadebox{\usebox{\tempsbox}}\par
-           \fi}%
-           {}%
-  }
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% THE ppar ENVIRONMENT                                                       %
-% ^^^^^^^^^^^^^^^^^^^^                                                       %
-% The environment                                                            %
-%                                                                            %
-%   \begin{ppar} ... \end{ppar}                                              %
-%                                                                            %
-% is equivalent to                                                           %
-%                                                                            %
-%   \begin{cpar}{0}{F}{F}{0}{0}{} ... \end{cpar}                             %
-%                                                                            %
-% The environment is put around each line of the output for a PlusCal        %
-% algorithm.                                                                 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\newenvironment{ppar}{%
-%  \ifthenelse{\boolean{shading}}{\par\begin{lrbox}{\tempsbox}%
-%                                 \begin{minipage}[t]{\linewidth}}{}%
-%  \begin{list}{}{%
-%     \edef\temp{\thegmargin}
-%        \setlength{\leftmargin}{0pt}%
-%        \addtolength{\leftmargin}{\temp}%
-%        \setlength{\itemindent}{0pt}%
-%      \setlength{\labelwidth}{0pt}%
-%      \setlength{\labelsep}{0pt}%
-%      \setlength{\itemindent}{-\leftmargin}%
-%      \setlength{\topsep}{0pt}%
-%      \setlength{\parsep}{0pt}%
-%      \setlength{\partopsep}{0pt}%
-%      \setlength{\parskip}{0pt}%
-%      \setlength{\itemsep}{0pt}
-%      \setlength{\itemindent}{0pt}%
-%      \addtolength{\itemindent}{-\leftmargin}}%
-%      \item[\tstrut\hspace{\temp}]}%
-% {\hspace{-\the\lastskip}\tstrut
-% \end{list}%
-%  \ifthenelse{\boolean{shading}}{\end{minipage}  
-%                                 \end{lrbox}%
-%                                 \shadebox{\usebox{\tempsbox}}\par}{}%
-%  }
-
- %%% TESTING
- \newcommand{\xtest}[1]{\par
- \makebox[0pt][l]{\shadebox{\xtstrut\hspace*{\textwidth}}}%
- \mbox{$\mbox{}#1\mbox{}$}} 
-
-% \newcommand{\xxtest}[1]{\par
-% \makebox[0pt][l]{\shadebox{\xtstrut{#1}\hspace*{\textwidth}}}%
-% \mbox{$\mbox{}#1\mbox{}$}} 
-
-%\newlength{\pcalvspace}
-%\setlength{\pcalvspace}{0pt}
-% \newlength{\xxtestlen}
-% \setlength{\xxtestlen}{0pt}
-% \newcommand\xtstrut%
-%   {\setlength{\xxtestlen}{1.15em}%
-%    \addtolength{\xxtestlen}{\pcalvspace}%
-%     \raisebox{\vshadelen}{\raisebox{-.25em}{\rule{0pt}{\xxtestlen}}}%
-%    \global\setlength{\vshadelen}{0pt}%
-%    \global\setlength{\pcalvspace}{0pt}}
-   
-   %%%% TESTING
-   
-   %% The xcpar environment
-   %%  Note: overloaded use of \pcalvspace for testing.
-   %%
-%   \newlength{\xcparht}%
-%   \newlength{\xcpardp}%
-   
-%   \newenvironment{xcpar}[6]{%
-%  \addtocounter{pardepth}{-#1}%
-%  \ifthenelse{\boolean{shading}}{\par\begin{lrbox}{\tempsbox}%
-%                                 \begin{minipage}[t]{\linewidth}}{}%
-%  \begin{list}{}{%
-%     \edef\temp{\thegmargin}%
-%     \ifthenelse{\equal{#3}{T}}%
-%       {\settowidth{\leftmargin}{\hspace{\temp}\footnotesize #6\hspace{#5pt}}%
-%        \addtolength{\leftmargin}{#4pt}}%
-%       {\setlength{\leftmargin}{#4pt}%
-%        \addtolength{\leftmargin}{#5pt}%
-%        \addtolength{\leftmargin}{\temp}%
-%        \setlength{\itemindent}{-#5pt}}%
-%      \ifthenelse{\equal{#2}{T}}{\addtocounter{pardepth}{1}%
-%                                 \setgmargin{\the\leftmargin}}{}%
-%      \setlength{\labelwidth}{0pt}%
-%      \setlength{\labelsep}{0pt}%
-%      \setlength{\itemindent}{-\leftmargin}%
-%      \setlength{\topsep}{0pt}%
-%      \setlength{\parsep}{0pt}%
-%      \setlength{\partopsep}{0pt}%
-%      \setlength{\parskip}{0pt}%
-%      \setlength{\itemsep}{0pt}%
-%      \setlength{\itemindent}{#4pt}%
-%      \addtolength{\itemindent}{-\leftmargin}}%
-%   \ifthenelse{\equal{#3}{T}}%
-%      {\item[\xtstrut\footnotesize \hspace{\temp}{#6}\hspace{#5pt}]%
-%        }%
-%      {\item[\xtstrut\hspace{\temp}]%
-%         }%
-%   \footnotesize}
-% {\hspace{-\the\lastskip}\tstrut
-% \end{list}%
-%  \ifthenelse{\boolean{shading}}{\end{minipage}  
-%                                 \end{lrbox}%
-%                                 \setlength{\xcparht}{\ht\tempsbox}%
-%                                 \setlength{\xcpardp}{\dp\tempsbox}%
-%                                 \addtolength{\xcparht}{.15em}%
-%                                 \addtolength{\xcpardp}{.2em}%
-%                                 \addtolength{\xcparht}{\xcpardp}%
-%                                 \hspace*{-\lcomindent}%
-%                                 \makebox[0pt][l]{\raisebox{-\xcpardp}[0pt][0pt]{%
-%                                      \shadebox{\rule{0pt}{\xcparht}\hspace*{\textwidth}}}}%
-%                                 \hspace*{\lcomindent}\usebox{\tempsbox}%
-%                                 \par}{}%
-%  }
-%  
-% \newlength{\xmcomlen}
-%\newenvironment{xmcom}[1]{%
-%  \setcounter{pardepth}{0}%
-%  \hspace{.65em}%
-%  \begin{lrbox}{\alignbox}\sloppypar%
-%      \setboolean{shading}{false}%
-%      \setlength{\boxwidth}{#1pt}%
-%      \addtolength{\boxwidth}{-.65em}%
-%      \begin{minipage}[t]{\boxwidth}\footnotesize
-%      \parskip=0pt\relax}%
-%       {\end{minipage}\end{lrbox}%
-%       \setlength{\xmcomlen}{\textwidth}%
-%       \addtolength{\xmcomlen}{-\wd\alignbox}%
-%       \settodepth{\alignwidth}{\usebox{\alignbox}}%
-%       \global\setlength{\multicommentdepth}{\alignwidth}%
-%       \setlength{\boxwidth}{\alignwidth}%
-%       \global\addtolength{\alignwidth}{-\maxdepth}%
-%       \addtolength{\boxwidth}{.1em}%
-%       \raisebox{0pt}[0pt][0pt]{%
-%        \ifthenelse{\boolean{shading}}%
-%          {\hspace*{-\xmcomlen}\shadebox{\rule[-\boxwidth]{0pt}{0pt}%
-%                                 \hspace*{\xmcomlen}\usebox{\alignbox}}}%
-%          {\usebox{\alignbox}}}%
-%       \vspace*{\alignwidth}\pagebreak[0]\vspace{-\alignwidth}\par}
-% % a multi-line comment, whose first argument is its width in points.
-%  
-   
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% THE lcom ENVIRONMENT                                                       %
-% ^^^^^^^^^^^^^^^^^^^^                                                       %
-% A multi-line comment with no text to its left is typeset in an lcom        % 
-% environment, whose argument is a number representing the indentation       % 
-% of the left margin, in points.  All the text of the comment should be      % 
-% inside cpar environments.                                                  % 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newenvironment{lcom}[1]{%
-  \setlength{\lcomindent}{#1pt} % Added for PlusCal handling.
-  \par\vspace{.2em}%
-  \sloppypar
-  \setcounter{pardepth}{0}%
-  \footnotesize
-  \begin{list}{}{%
-    \setlength{\leftmargin}{#1pt}
-    \setlength{\labelwidth}{0pt}%
-    \setlength{\labelsep}{0pt}%
-    \setlength{\itemindent}{0pt}%
-    \setlength{\topsep}{0pt}%
-    \setlength{\parsep}{0pt}%
-    \setlength{\partopsep}{0pt}%
-    \setlength{\parskip}{0pt}}
-    \item[]}%
-  {\end{list}\vspace{.3em}\setlength{\lcomindent}{0pt}%
- }
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% THE mcom ENVIRONMENT AND \mutivspace COMMAND                              %
-% ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                              %
-%                                                                           %
-% A part of the spec containing a right-comment of the form                 %
-%                                                                           %
-%      xxxx (*************)                                                 %
-%      yyyy (* ccccccccc *)                                                 %
-%      ...  (* ccccccccc *)                                                 %
-%           (* ccccccccc *)                                                 %
-%           (* ccccccccc *)                                                 %
-%           (*************)                                                 %
-%                                                                           %
-% is typeset by                                                             %
-%                                                                           %
-%     XXXX \begin{mcom}{d}                                                  %
-%            CCCC ... CCC                                                   %
-%          \end{mcom}                                                       %
-%     YYYY ...                                                              %
-%     \multivspace{n}                                                       %
-%                                                                           %
-% where the number d is the width in points of the comment, n is the        %
-% number of xxxx, yyyy, ...  lines to the left of the comment.              %
-% All the text of the comment should be typeset in cpar environments.       %
-%                                                                           %
-% This puts the comment into a single box (so no page breaks can occur      %
-% within it).  The entire box is shaded iff the shading flag is true.       %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newlength{\xmcomlen}%
-\newenvironment{mcom}[1]{%
-  \setcounter{pardepth}{0}%
-  \hspace{.65em}%
-  \begin{lrbox}{\alignbox}\sloppypar%
-      \setboolean{shading}{false}%
-      \setlength{\boxwidth}{#1pt}%
-      \addtolength{\boxwidth}{-.65em}%
-      \begin{minipage}[t]{\boxwidth}\footnotesize
-      \parskip=0pt\relax}%
-       {\end{minipage}\end{lrbox}%
-       \setlength{\xmcomlen}{\textwidth}%       % For PlusCal shading
-       \addtolength{\xmcomlen}{-\wd\alignbox}%  % For PlusCal shading
-       \settodepth{\alignwidth}{\usebox{\alignbox}}%
-       \global\setlength{\multicommentdepth}{\alignwidth}%
-       \setlength{\boxwidth}{\alignwidth}%      % For PlusCal shading
-       \global\addtolength{\alignwidth}{-\maxdepth}%
-       \addtolength{\boxwidth}{.1em}%           % For PlusCal shading
-      \raisebox{0pt}[0pt][0pt]{%
-        \ifthenelse{\boolean{shading}}%
-          {\ifpcalshading
-             \hspace*{-\xmcomlen}%
-             \shadebox{\rule[-\boxwidth]{0pt}{0pt}\hspace*{\xmcomlen}%
-                          \usebox{\alignbox}}%
-           \else
-             \shadebox{\usebox{\alignbox}}
-           \fi
-          }%
-          {\usebox{\alignbox}}}%
-       \vspace*{\alignwidth}\pagebreak[0]\vspace{-\alignwidth}\par}
- % a multi-line comment, whose first argument is its width in points.
-
-
-% \multispace{n} produces the vertical space indicated by "|"s in 
-% this situation
-%   
-%     xxxx (*************)
-%     xxxx (* ccccccccc *)
-%      |   (* ccccccccc *)
-%      |   (* ccccccccc *)
-%      |   (* ccccccccc *)
-%      |   (*************)
-%
-% where n is the number of "xxxx" lines.
-\newcommand{\multivspace}[1]{\addtolength{\multicommentdepth}{-#1\baselineskip}%
- \addtolength{\multicommentdepth}{1.2em}%
- \ifthenelse{\lengthtest{\multicommentdepth > 0pt}}%
-    {\par\vspace{\multicommentdepth}\par}{}}
-
-%\newenvironment{hpar}[2]{%
-%  \begin{list}{}{\setlength{\leftmargin}{#1pt}%
-%                 \addtolength{\leftmargin}{#2pt}%
-%                 \setlength{\itemindent}{-#2pt}%
-%                 \setlength{\topsep}{0pt}%
-%                 \setlength{\parsep}{0pt}%
-%                 \setlength{\partopsep}{0pt}%
-%                 \setlength{\parskip}{0pt}%
-%                 \addtolength{\labelsep}{0pt}}%
-%  \item[]\footnotesize}{\end{list}}
-%    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%    % Typesets a sequence of paragraphs like this:                         %
-%    %                                                                      %
-%    %      left |<-- d1 --> XXXXXXXXXXXXXXXXXXXXXXXX                       %
-%    %    margin |           <- d2 -> XXXXXXXXXXXXXXX                       %
-%    %           |                    XXXXXXXXXXXXXXX                       %
-%    %           |                                                          %
-%    %           |                    XXXXXXXXXXXXXXX                       %
-%    %           |                    XXXXXXXXXXXXXXX                       %
-%    %                                                                      %
-%    % where d1 = #1pt and d2 = #2pt, but with no vspace between            %
-%    % paragraphs.                                                          %
-%    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Commands for repeated characters that produce dashes.              %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \raisedDash{wd}{ht}{thk} makes a horizontal line wd characters wide, 
-% raised a distance ht ex's above the baseline, with a thickness of 
-% thk em's.
-\newcommand{\raisedDash}[3]{\raisebox{#2ex}{\setlength{\alignwidth}{.5em}%
-  \rule{#1\alignwidth}{#3em}}}
-
-% The following commands take a single argument n and produce the
-% output for n repeated characters, as follows
-%   \cdash:    -
-%   \tdash:    ~
-%   \ceqdash:  =
-%   \usdash:   _
-\newcommand{\cdash}[1]{\raisedDash{#1}{.5}{.04}}
-\newcommand{\usdash}[1]{\raisedDash{#1}{0}{.04}}
-\newcommand{\ceqdash}[1]{\raisedDash{#1}{.5}{.08}}
-\newcommand{\tdash}[1]{\raisedDash{#1}{1}{.08}}
-
-\newlength{\spacewidth}
-\setlength{\spacewidth}{.2em}
-\newcommand{\e}[1]{\hspace{#1\spacewidth}}
-%% \e{i} produces space corresponding to i input spaces.
-
-
-%% Alignment-file Commands
-
-\newlength{\alignboxwidth}
-\newlength{\alignwidth}
-\newsavebox{\alignbox}
-
-% \al{i}{j}{txt} is used in the alignment file to put "%{i}{j}{wd}"
-% in the log file, where wd is the width of the line up to that point,
-% and txt is the following text.
-\newcommand{\al}[3]{%
-  \typeout{\%{#1}{#2}{\the\alignwidth}}%
-  \cl{#3}}
-
-%% \cl{txt} continues a specification line in the alignment file
-%% with text txt.
-\newcommand{\cl}[1]{%
-  \savebox{\alignbox}{\mbox{$\mbox{}#1\mbox{}$}}%
-  \settowidth{\alignboxwidth}{\usebox{\alignbox}}%
-  \addtolength{\alignwidth}{\alignboxwidth}%
-  \usebox{\alignbox}}
-
-% \fl{txt} in the alignment file begins a specification line that
-% starts with the text txt.
-\newcommand{\fl}[1]{%
-  \par
-  \savebox{\alignbox}{\mbox{$\mbox{}#1\mbox{}$}}%
-  \settowidth{\alignwidth}{\usebox{\alignbox}}%
-  \usebox{\alignbox}}
-
-
-
-  
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Ordinarily, TeX typesets letters in math mode in a special math italic    %
-% font.  This makes it typeset "it" to look like the product of the         %
-% variables i and t, rather than like the word "it".  The following         %
-% commands tell TeX to use an ordinary italic font instead.                 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\ifx\documentclass\undefined
-\else
-  \DeclareSymbolFont{tlaitalics}{\encodingdefault}{cmr}{m}{it}
-  \let\itfam\symtlaitalics
-\fi
-
-\makeatletter
-\newcommand{\tlx@c}{\c@tlx@ctr\advance\c@tlx@ctr\@ne}
-\newcounter{tlx@ctr}
-\c@tlx@ctr=\itfam \multiply\c@tlx@ctr"100\relax \advance\c@tlx@ctr "7061\relax
-\mathcode`a=\tlx@c \mathcode`b=\tlx@c \mathcode`c=\tlx@c \mathcode`d=\tlx@c
-\mathcode`e=\tlx@c \mathcode`f=\tlx@c \mathcode`g=\tlx@c \mathcode`h=\tlx@c
-\mathcode`i=\tlx@c \mathcode`j=\tlx@c \mathcode`k=\tlx@c \mathcode`l=\tlx@c
-\mathcode`m=\tlx@c \mathcode`n=\tlx@c \mathcode`o=\tlx@c \mathcode`p=\tlx@c
-\mathcode`q=\tlx@c \mathcode`r=\tlx@c \mathcode`s=\tlx@c \mathcode`t=\tlx@c
-\mathcode`u=\tlx@c \mathcode`v=\tlx@c \mathcode`w=\tlx@c \mathcode`x=\tlx@c
-\mathcode`y=\tlx@c \mathcode`z=\tlx@c
-\c@tlx@ctr=\itfam \multiply\c@tlx@ctr"100\relax \advance\c@tlx@ctr "7041\relax
-\mathcode`A=\tlx@c \mathcode`B=\tlx@c \mathcode`C=\tlx@c \mathcode`D=\tlx@c
-\mathcode`E=\tlx@c \mathcode`F=\tlx@c \mathcode`G=\tlx@c \mathcode`H=\tlx@c
-\mathcode`I=\tlx@c \mathcode`J=\tlx@c \mathcode`K=\tlx@c \mathcode`L=\tlx@c
-\mathcode`M=\tlx@c \mathcode`N=\tlx@c \mathcode`O=\tlx@c \mathcode`P=\tlx@c
-\mathcode`Q=\tlx@c \mathcode`R=\tlx@c \mathcode`S=\tlx@c \mathcode`T=\tlx@c
-\mathcode`U=\tlx@c \mathcode`V=\tlx@c \mathcode`W=\tlx@c \mathcode`X=\tlx@c
-\mathcode`Y=\tlx@c \mathcode`Z=\tlx@c
-\makeatother
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                THE describe ENVIRONMENT                %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%
-% It is like the description environment except it takes an argument
-% ARG that should be the text of the widest label.  It adjusts the
-% indentation so each item with label LABEL produces
-%%      LABEL             blah blah blah
-%%      <- width of ARG ->blah blah blah
-%%                        blah blah blah
-\newenvironment{describe}[1]%
-   {\begin{list}{}{\settowidth{\labelwidth}{#1}%
-            \setlength{\labelsep}{.5em}%
-            \setlength{\leftmargin}{\labelwidth}% 
-            \addtolength{\leftmargin}{\labelsep}%
-            \addtolength{\leftmargin}{\parindent}%
-            \def\makelabel##1{\rm ##1\hfill}}%
-            \setlength{\topsep}{0pt}}%% 
-                % Sets \topsep to 0 to reduce vertical space above
-                % and below embedded displayed equations
-   {\end{list}}
-
-%   For tlatex.TeX
-\usepackage{verbatim}
-\makeatletter
-\def\tla{\let\%\relax%
-         \@bsphack
-         \typeout{\%{\the\linewidth}}%
-             \let\do\@makeother\dospecials\catcode`\^^M\active
-             \let\verbatim@startline\relax
-             \let\verbatim@addtoline\@gobble
-             \let\verbatim@processline\relax
-             \let\verbatim@finish\relax
-             \verbatim@}
-\let\endtla=\@esphack
-
-\let\pcal=\tla
-\let\endpcal=\endtla
-\let\ppcal=\tla
-\let\endppcal=\endtla
-
-% The tlatex environment is used by TLATeX.TeX to typeset TLA+.
-% TLATeX.TLA starts its files by writing a \tlatex command.  This
-% command/environment sets \parindent to 0 and defines \% to its
-% standard definition because the writing of the log files is messed up
-% if \% is defined to be something else.  It also executes
-% \@computerule to determine the dimensions for the TLA horizonatl
-% bars.
-\newenvironment{tlatex}{\@computerule%
-                        \setlength{\parindent}{0pt}%
-                       \makeatletter\chardef\%=`\%}{}
-
-
-% The notla environment produces no output.  You can turn a 
-% tla environment to a notla environment to prevent tlatex.TeX from
-% re-formatting the environment.
-
-\def\notla{\let\%\relax%
-         \@bsphack
-             \let\do\@makeother\dospecials\catcode`\^^M\active
-             \let\verbatim@startline\relax
-             \let\verbatim@addtoline\@gobble
-             \let\verbatim@processline\relax
-             \let\verbatim@finish\relax
-             \verbatim@}
-\let\endnotla=\@esphack
-
-\let\nopcal=\notla
-\let\endnopcal=\endnotla
-\let\noppcal=\notla
-\let\endnoppcal=\endnotla
-
-%%%%%%%%%%%%%%%%%%%%%%%% end of tlatex.sty file %%%%%%%%%%%%%%%%%%%%%%% 
-% last modified on Fri  3 August 2012 at 14:23:49 PST by lamport
 
 \begin{document}
 \tlatex
 \@x{}\moduleLeftDash\@xx{ {\MODULE} Judgment}\moduleRightDash\@xx{}%
 \@x{ {\EXTENDS} TLC ,\, FiniteSets ,\, Reals ,\, Sequences}%
 \@pvspace{8.0pt}%
-\@x{ {\VARIABLE} public ,\, private ,\, packages ,\, nextPackageId ,\,
-    isReproducible}%
+\@x{ {\VARIABLE} public ,\, private ,\, nextPackageId}%
 \@pvspace{8.0pt}%
-\@x{}%
-\@y{\@s{0}%
-    How to run:
-}%
-\@xx{}%
-\@x{}%
-\@y{\@s{0}%
-alias \ensuremath{tlc\.{=}}``\ensuremath{java \.{-}XX\.{:}\.{+}UseParallelGC
-\.{-}Xmx12g \.{-}cp} \ensuremath{tla2tools.jar} \ensuremath{tlc2.TLC
-\.{-}}workers auto''
-}%
-\@xx{}%
-\@x{}%
-\@y{\@s{0}%
-\ensuremath{tlc \.{-}config} \ensuremath{Judgment3.cfg}
-\ensuremath{Judgment3.tla
-}}%
-\@xx{}%
+\@x{ {\CONSTANT} NumberOfClosedJudgmentsGoal}%
 \@pvspace{16.0pt}%
-\@x{ Nodes \.{\defeq} \{\@w{node1} ,\,\@w{node2} ,\,\@w{node3} \}}%
+ \@x{ Nodes \.{\defeq} \{\@w{node1} ,\,\@w{node2} ,\,\@w{node3} ,\,\@w{node4}
+ \}}%
+\@x{ MaliciousNodes \.{\defeq} \{\@w{node4} \}}%
 \@pvspace{8.0pt}%
-\@x{ Packages \.{\defeq} \{\@w{package1} ,\,\@w{package2} ,\,\@w{package3}
-,\,\@w{package3} \}}%
-\@pvspace{8.0pt}%
-\@x{ Status \.{\defeq} \{\@w{active} ,\,\@w{initialized} \}}%
-\@pvspace{8.0pt}%
-\@x{ IsReproducible ( p ) \.{\defeq} isReproducible [ p ]}%
-\@pvspace{8.0pt}%
-\@x{ Range ( f ) \.{\defeq} \{ f [ k ] \.{:} k \.{\in} {\DOMAIN} f \}}%
-\@pvspace{8.0pt}%
-\@x{ KeyValues ( m ) \.{\defeq} \{ {\langle} k ,\, m [ k ] {\rangle} \.{:} k
-\.{\in} {\DOMAIN} m \}}%
-\@pvspace{8.0pt}%
-\@x{}%
-\@y{\@s{0}%
-Source: https:\ensuremath{\.{\slsl}learntla.com}/libraries/sets/
-}%
-\@xx{}%
-\@x{ Pick ( S ) \.{\defeq} {\CHOOSE} s \.{\in} S \.{:} {\TRUE}}%
-\@x{ {\RECURSIVE} SetReduce ( \_ ,\, \_ ,\, \_ )}%
-\@x{ SetReduce ( Op ( \_ ,\, \_ ) ,\, S ,\, value ) \.{\defeq} {\IF} S \.{=}
-\{ \} \.{\THEN} value}%
-\@x{\@s{130.43} \.{\ELSE} \.{\LET} s \.{\defeq} Pick ( S )}%
-\@x{\@s{130.43} \.{\IN} SetReduce ( Op ,\, S \.{\,\backslash\,} \{ s \} ,\,
-Op ( s ,\, value ) )}%
-\@pvspace{8.0pt}%
-\@x{ Sum ( S ) \.{\defeq}}%
-\@x{\@s{23.82} \.{\LET} \_op ( a ,\, b ) \.{\defeq} a \.{+} b}%
-\@x{\@s{23.82} \.{\IN} SetReduce ( \_op ,\, S ,\, 0 )}%
-\@pvspace{8.0pt}%
-\@x{ InitialPrivate \.{\defeq} private \.{=} [}%
+\@x{ InitialPrivate\@s{9.53} \.{\defeq} private \.{=} [}%
 \@x{\@s{16.4} node1 \.{\mapsto} [}%
 \@x{\@s{32.8} preferences \.{\mapsto} {\langle}}%
-\@x{\@s{49.19} [ package \.{\mapsto}\@w{package1} ,\, level \.{\mapsto} 2 ,\,
-status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
-\@x{\@s{49.19} [ package \.{\mapsto}\@w{package2} ,\, level \.{\mapsto} 2 ,\,
-status \.{\mapsto}\@w{not{-}processed} ]}%
-\@x{\@s{49.19}}%
-\@y{\@s{0}%
-[\ensuremath{package \.{\mapsto} \@w{package3}}, \ensuremath{level
-\.{\mapsto} 2}, \ensuremath{status \.{\mapsto} \@w{not-processed}}]
-}%
-\@xx{}%
+ \@x{\@s{49.19} [ package \.{\mapsto}\@w{package1} ,\, level \.{\mapsto} 2 ,\,
+ status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
+ \@x{\@s{49.19} [ package \.{\mapsto}\@w{package2} ,\, level \.{\mapsto} 2 ,\,
+ status \.{\mapsto}\@w{not{-}processed} ]}%
 \@x{\@s{32.8} {\rangle}}%
 \@x{\@s{16.4} ] ,\,}%
 \@x{\@s{16.4} node2 \.{\mapsto} [}%
 \@x{\@s{32.8} preferences \.{\mapsto} {\langle}}%
-\@x{\@s{49.19}}%
-\@y{\@s{0}%
-[\ensuremath{package \.{\mapsto} \@w{package4}}, \ensuremath{level
-\.{\mapsto} 2}, \ensuremath{status \.{\mapsto} \@w{not-processed}}],
-}%
-\@xx{}%
-\@x{\@s{49.19} [ package \.{\mapsto}\@w{package3} ,\, level \.{\mapsto} 2 ,\,
-status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
-\@x{\@s{49.19} [ package \.{\mapsto}\@w{package4} ,\, level \.{\mapsto} 2 ,\,
-status \.{\mapsto}\@w{not{-}processed} ]}%
+ \@x{\@s{49.19} [ package \.{\mapsto}\@w{package3} ,\, level \.{\mapsto} 2 ,\,
+ status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
+ \@x{\@s{49.19} [ package \.{\mapsto}\@w{package4} ,\, level \.{\mapsto} 2 ,\,
+ status \.{\mapsto}\@w{not{-}processed} ]}%
 \@x{\@s{32.8} {\rangle}}%
 \@x{\@s{16.4} ] ,\,}%
 \@x{\@s{16.4} node3 \.{\mapsto} [}%
 \@x{\@s{32.8} preferences \.{\mapsto} {\langle}}%
-\@x{\@s{49.19} [ package \.{\mapsto}\@w{package5} ,\, level \.{\mapsto} 2 ,\,
-status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
-\@x{\@s{49.19} [ package \.{\mapsto}\@w{package6} ,\, level \.{\mapsto} 2 ,\,
-status \.{\mapsto}\@w{not{-}processed} ]}%
+ \@x{\@s{49.19} [ package \.{\mapsto}\@w{package5} ,\, level \.{\mapsto} 2 ,\,
+ status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
+ \@x{\@s{49.19} [ package \.{\mapsto}\@w{package6} ,\, level \.{\mapsto} 2 ,\,
+ status \.{\mapsto}\@w{not{-}processed} ]}%
+\@pvspace{8.0pt}%
+\@x{\@s{32.8} {\rangle}}%
+\@x{\@s{16.4} ] ,\,}%
+\@x{\@s{16.4} node4 \.{\mapsto} [}%
+\@x{\@s{32.8} preferences \.{\mapsto} {\langle}}%
+ \@x{\@s{49.19} [ package \.{\mapsto}\@w{package7} ,\, level \.{\mapsto} 2 ,\,
+ status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
+ \@x{\@s{49.19} [ package \.{\mapsto}\@w{package8} ,\, level \.{\mapsto} 2 ,\,
+ status \.{\mapsto}\@w{not{-}processed} ]}%
 \@pvspace{8.0pt}%
 \@x{\@s{32.8} {\rangle}}%
 \@x{\@s{16.4} ]}%
-\@x{}%
-\@y{\@s{7.5}%
-    ,
-}%
-\@xx{}%
-\@x{}%
-\@y{\@s{7.5}%
-\ensuremath{node4 \.{\mapsto}} [
-}%
-\@xx{}%
-\@x{}%
-\@y{\@s{17.5}%
-\ensuremath{preferences \.{\mapsto} {\langle}
-}}%
-\@xx{}%
-\@x{}%
-\@y{\@s{27.5}%
-[\ensuremath{package \.{\mapsto}} ``\ensuremath{package7}'',
-\ensuremath{level \.{\mapsto} 2}, \ensuremath{status \.{\mapsto}
-\@w{not-processed}}],
-}%
-\@xx{}%
-\@x{}%
-\@y{\@s{27.5}%
-[\ensuremath{package \.{\mapsto}} ``\ensuremath{package8}'',
-\ensuremath{level \.{\mapsto} 2}, \ensuremath{status \.{\mapsto}
-\@w{not-processed}}]
-}%
-\@xx{}%
-\@x{}%
-\@y{}%
-\@xx{}%
-\@x{}%
-\@y{\@s{17.5}%
-    \ensuremath{{\rangle}
-    }}%
-\@xx{}%
-\@x{}%
-\@y{\@s{7.5}%
-    ]
-}%
-\@xx{}%
 \@x{ ]}%
 \@pvspace{8.0pt}%
 \@x{ InitialPublic \.{\defeq} public \.{=} [}%
 \@x{\@s{16.4} nodes \.{\mapsto} [}%
 \@x{\@s{32.8} node1 \.{\mapsto} [ wallet \.{\mapsto} 3 ] ,\,}%
 \@x{\@s{32.8} node2 \.{\mapsto} [ wallet \.{\mapsto} 0 ] ,\,}%
-\@x{\@s{32.8} node3 \.{\mapsto} [ wallet \.{\mapsto} 0 ]}%
-\@x{}%
-\@y{\@s{17.5}%
-    ,
-}%
-\@xx{}%
-\@x{}%
-\@y{\@s{17.5}%
-\ensuremath{node4 \.{\mapsto}} [\ensuremath{wallet \.{\mapsto} 0}]
-}%
-\@xx{}%
+\@x{\@s{32.8} node3 \.{\mapsto} [ wallet \.{\mapsto} 0 ] ,\,}%
+\@x{\@s{32.8} node4 \.{\mapsto} [ wallet \.{\mapsto} 0 ]}%
 \@x{\@s{16.4} ] ,\,}%
 \@x{\@s{16.4} judgments \.{\mapsto} {\langle} {\rangle}}%
 \@x{ ]}%
 \@pvspace{8.0pt}%
+ \@x{ IsReproducibleData \.{\defeq}\@s{8.2} [ package1 \.{\mapsto} {\TRUE}
+ ,\,}%
+\@x{\@s{114.37} package2 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package3 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package4 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package5 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package6 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package7 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package8 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package9 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package10 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package11 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package12 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package13 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package14 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package15 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package16 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package17 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package18 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package19 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package20 \.{\mapsto} {\FALSE} ]}%
+\@pvspace{8.0pt}%
+\@x{ Range ( f ) \.{\defeq} \{ f [ k ] \.{:} k \.{\in} {\DOMAIN} f \}}%
+\@pvspace{8.0pt}%
+ \@x{ KeyValues ( m ) \.{\defeq} \{ {\langle} k ,\, m [ k ] {\rangle} \.{:} k
+ \.{\in} {\DOMAIN} m \}}%
+\@pvspace{8.0pt}%
+\@x{}%
+\@y{\@s{0}%
+ Source: https:\ensuremath{\.{\slsl}learntla.com}/libraries/sets/
+}%
+\@xx{}%
+\@x{ Pick ( S ) \.{\defeq} {\CHOOSE} s \.{\in} S \.{:} {\TRUE}}%
+\@x{ {\RECURSIVE} SetReduce ( \_ ,\, \_ ,\, \_ )}%
+ \@x{ SetReduce ( Op ( \_ ,\, \_ ) ,\, S ,\, value ) \.{\defeq} {\IF} S \.{=}
+ \{ \} \.{\THEN} value}%
+\@x{\@s{130.43} \.{\ELSE} \.{\LET} s \.{\defeq} Pick ( S )}%
+ \@x{\@s{130.43} \.{\IN} SetReduce ( Op ,\, S \.{\,\backslash\,} \{ s \} ,\,
+ Op ( s ,\, value ) )}%
+\@pvspace{8.0pt}%
+\@x{ Sum ( S ) \.{\defeq}}%
+\@x{\@s{23.82} \.{\LET} \_op ( a ,\, b ) \.{\defeq} a \.{+} b}%
+\@x{\@s{23.82} \.{\IN} SetReduce ( \_op ,\, S ,\, 0 )}%
+\@pvspace{8.0pt}%
+\@x{ IsReproducible ( p ) \.{\defeq} IsReproducibleData [ p ]}%
+\@pvspace{8.0pt}%
 \@x{ {\RECURSIVE} Cost ( \_ )}%
-\@x{ Cost ( level ) \.{\defeq} {\IF} level \.{=} 0 \.{\THEN} 0 \.{\ELSE}
-level \.{+} Cost ( level \.{-} 1 )}%
+ \@x{ Cost ( level ) \.{\defeq} {\IF} level \.{=} 0 \.{\THEN} 0 \.{\ELSE}
+ level \.{+} Cost ( level \.{-} 1 )}%
 \@pvspace{8.0pt}%
 \@x{ {\RECURSIVE} LevelHelp ( \_ ,\, \_ )}%
 \@x{ LevelHelp ( available ,\, stepCost ) \.{\defeq}}%
-\@x{\@s{16.4} {\IF} stepCost \.{>} available \.{\THEN} 0 \.{\ELSE} 1 \.{+}
-LevelHelp ( available \.{-} stepCost ,\, stepCost \.{+} 1 )}%
+\@x{\@s{16.4} {\IF} stepCost \.{>} available}%
+\@x{\@s{32.65} \.{\THEN} 0}%
+ \@x{\@s{32.65} \.{\ELSE} 1 \.{+} LevelHelp ( available \.{-} stepCost ,\,
+ stepCost \.{+} 1 )}%
 \@pvspace{8.0pt}%
 \@x{ Level ( cost ) \.{\defeq} LevelHelp ( cost ,\, 1 )}%
 \@pvspace{8.0pt}%
 \@x{ {\RECURSIVE} WalletUpdatesForVoters ( \_ ,\, \_ ,\, \_ ,\, \_ )}%
-\@x{ WalletUpdatesForVoters ( judgment ,\, votes ,\, reward ,\, updates )
-\.{\defeq}}%
-\@x{\@s{16.4} \.{\LET} finalResult \.{\defeq} ToString ( judgment . tally .
-for \.{>} judgment . tally . against )}%
+ \@x{ WalletUpdatesForVoters ( judgment ,\, votes ,\, reward ,\, updates )
+ \.{\defeq}}%
+ \@x{\@s{16.4} \.{\LET} finalResult \.{\defeq} ToString ( judgment . tally .
+ for \.{>} judgment . tally . against )}%
 \@x{\@s{36.79} judge \.{\defeq} Head ( votes ) . judge}%
 \@x{\@s{36.79} vote \.{\defeq} Head ( votes ) . vote}%
 \@x{\@s{16.4} \.{\IN}}%
@@ -1117,256 +133,195 @@ for \.{>} judgment . tally . against )}%
 \@x{\@s{32.8} \.{\ELSE} {\IF} judge \.{=} judgment . owner}%
 \@x{\@s{49.19}}%
 \@y{\@s{0}%
-    Skip the owner
+ Skip the owner
 }%
 \@xx{}%
-\@x{\@s{49.19} \.{\THEN} WalletUpdatesForVoters ( judgment ,\, Tail ( votes )
-,\, reward ,\, updates )}%
+\@x{\@s{49.19} \.{\THEN} WalletUpdatesForVoters (}%
+\@x{\@s{65.6} judgment ,\, Tail ( votes ) ,\, reward ,\, updates )}%
 \@x{\@s{32.8} \.{\ELSE} {\IF} vote \.{\neq} finalResult \.{\THEN} \.{\LET}}%
 \@x{\@s{49.19}}%
 \@y{\@s{0}%
-    Minority voter
+ Minority voter
 }%
 \@xx{}%
-\@x{\@s{65.6} newUpdates \.{\defeq} [ updates {\EXCEPT} {\bang} [ judge ] .
-wallet \.{=} @ ]}%
-\@x{\@s{49.19} \.{\IN} WalletUpdatesForVoters ( judgment ,\, Tail ( votes )
-,\, reward ,\, newUpdates )}%
+ \@x{\@s{65.6} newUpdates \.{\defeq} [ updates {\EXCEPT} {\bang} [ judge ] .
+ wallet \.{=} @ ]}%
+\@x{\@s{49.19} \.{\IN} WalletUpdatesForVoters (}%
+\@x{\@s{73.69} judgment ,\, Tail ( votes ) ,\, reward ,\, newUpdates )}%
 \@x{\@s{32.8} \.{\ELSE} \.{\LET}}%
 \@x{\@s{49.19}}%
 \@y{\@s{0}%
-    Majority voter
+ Majority voter
 }%
 \@xx{}%
-\@x{\@s{65.6} newUpdates \.{\defeq} [ updates {\EXCEPT} {\bang} [ judge ] .
-wallet \.{=} @ \.{+} reward \.{+} 1 ]}%
-\@x{\@s{73.69} newReward \.{\defeq} {\IF} reward \.{=} 0 \.{\THEN} 0
-\.{\ELSE} reward \.{-} 1}%
-\@x{\@s{53.29} \.{\IN} WalletUpdatesForVoters ( judgment ,\, Tail ( votes )
-,\, newReward ,\, newUpdates )}%
-\@pvspace{24.0pt}%
-\@x{ {\RECURSIVE} WalletUpdatesFromVotes ( \_ ,\, \_ ,\, \_ )}%
-\@x{ WalletUpdatesFromVotes ( judgment ,\, votes ,\, updates ) \.{\defeq}}%
-\@x{\@s{16.4} {\IF} Len ( votes ) \.{=} 0}%
-\@x{\@s{32.65} \.{\THEN} updates}%
-\@x{\@s{32.65} \.{\ELSE} \.{\LET}}%
-\@x{\@s{76.26} finalResult \.{\defeq} ToString ( judgment . tally . for \.{>}
-judgment . tally . against )}%
-\@x{\@s{76.26} judge \.{\defeq} Head ( votes ) . judge}%
-\@x{\@s{76.26}}%
-\@y{\@s{0}%
-We add \mbox{'}\ensuremath{1\.{'}} for free (but not to the owner)
-}%
-\@xx{}%
-\@x{\@s{76.26} participationReward \.{\defeq} {\IF} judge \.{=} judgment .
-owner \.{\THEN} 0 \.{\ELSE} 1}%
-\@x{\@s{76.26} positionalReward \.{\defeq} Cardinality ( \{ v \.{\in} Range (
-votes ) \.{:} v . vote \.{=} finalResult \} )}%
-\@x{\@s{76.26} reward \.{\defeq} {\IF} Head ( votes ) . vote \.{=}
-finalResult}%
-\@x{\@s{133.26} \.{\THEN} participationReward \.{+} positionalReward}%
-\@x{\@s{133.26} \.{\ELSE} 0}%
-\@x{\@s{76.26} newUpdates \.{\defeq} [ updates {\EXCEPT} {\bang} [ judge ] .
-wallet \.{=} @ \.{+} reward ]}%
-\@x{\@s{49.05} \.{\IN} WalletUpdatesFromVotes ( judgment ,\, Tail ( votes )
-,\, newUpdates )}%
-\@pvspace{16.0pt}%
+ \@x{\@s{65.6} newUpdates \.{\defeq} [ updates {\EXCEPT} {\bang} [ judge ] .
+ wallet \.{=} @ \.{+} reward \.{+} 1 ]}%
+ \@x{\@s{73.69} newReward \.{\defeq} {\IF} reward \.{=} 0 \.{\THEN} 0
+ \.{\ELSE} reward \.{-} 1}%
+\@x{\@s{53.29} \.{\IN} WalletUpdatesForVoters (}%
+\@x{\@s{90.09} judgment ,\, Tail ( votes ) ,\, newReward ,\, newUpdates )}%
+\@pvspace{8.0pt}%
 \@x{ {\RECURSIVE} WalletUpdatesForNotVoting ( \_ ,\, \_ )}%
 \@x{ WalletUpdatesForNotVoting ( nonVoters ,\, updates ) \.{\defeq}}%
 \@x{\@s{16.4} {\IF} nonVoters \.{=} \{ \}}%
 \@x{\@s{32.65} \.{\THEN} updates}%
 \@x{\@s{32.65} \.{\ELSE}}%
-\@x{\@s{49.05} \.{\LET} v \.{\defeq} {\CHOOSE} voter \.{\in} nonVoters \.{:}
-{\TRUE}}%
-\@x{\@s{73.55} newUpdates \.{\defeq} [ updates {\EXCEPT} {\bang} [ v ] .
-wallet \.{=} @ \.{-} 1 ]}%
-\@x{\@s{49.05} \.{\IN}\@s{4.09} WalletUpdatesForNotVoting ( nonVoters
-\.{\,\backslash\,} \{ v \} ,\, newUpdates )}%
-\@pvspace{8.0pt}%
-\@x{}%
-\@y{\@s{0}%
-    Base reward on timing of open vote
-}%
-\@xx{}%
-\@x{ Rewards ( judgment ) \.{\defeq}}%
-\@x{\@s{16.4} \.{\LET} secretVoters \.{\defeq} \{ j . judge \.{:} j \.{\in}
-Range ( judgment . secretJudgments ) \}}%
-\@x{\@s{36.79} openVotersWithoutOwner \.{\defeq} \{ j \.{\in} Range (
-judgment . openJudgments ) \.{:} j . judge \.{\neq} judgment . owner \}}%
-\@x{\@s{36.79} nonVoters \.{\defeq} Nodes \.{\,\backslash\,} secretVoters}%
-\@x{\@s{36.79} cost \.{\defeq} Cost ( Cardinality ( openVotersWithoutOwner )
-)}%
-\@x{\@s{36.79} updatesForVoters \.{\defeq} WalletUpdatesFromVotes ( judgment
-,\, judgment . openJudgments ,\, [ n \.{\in} Nodes \.{\mapsto} public .
-nodes [ n ] ] )}%
-\@x{\@s{36.79} updatesForNonVoters \.{\defeq} WalletUpdatesForNotVoting (
-nonVoters ,\, updatesForVoters )}%
-\@x{\@s{40.89}}%
-\@y{\@s{0}%
-    Owners have to pay the cost
-}%
-\@xx{}%
-\@x{\@s{16.4} \.{\IN}\@s{4.09} [ updatesForNonVoters {\EXCEPT} {\bang} [
-        judgment . owner ] . wallet \.{=} @ \.{-} cost ]}%
+ \@x{\@s{49.05} \.{\LET} v \.{\defeq} {\CHOOSE} voter \.{\in} nonVoters \.{:}
+ {\TRUE}}%
+ \@x{\@s{73.55} newUpdates \.{\defeq} [ updates {\EXCEPT} {\bang} [ v ] .
+ wallet \.{=} @ \.{-} 1 ]}%
+ \@x{\@s{49.05} \.{\IN}\@s{4.09} WalletUpdatesForNotVoting ( nonVoters
+ \.{\,\backslash\,} \{ v \} ,\, newUpdates )}%
 \@pvspace{16.0pt}%
 \@x{ FutureCost ( node ) \.{\defeq}}%
-\@x{\@s{16.4} \.{\LET} NotProcessedYet \.{\defeq} \{ p \.{\in} Range (
-private [ node ] . preferences ) \.{:} p . status \.{\neq}\@w{processed} \}}%
-\@x{\@s{16.4} \.{\IN} Sum ( \{ Cost ( p . level ) \.{:} p \.{\in}
-NotProcessedYet \} )}%
+\@x{\@s{16.4} \.{\LET} NotProcessedYet \.{\defeq}}%
+ \@x{\@s{53.19} \{ p \.{\in} Range ( private [ node ] . preferences ) \.{:} p
+ . status \.{\neq}\@w{processed} \}}%
+ \@x{\@s{16.4} \.{\IN} Sum ( \{ Cost ( p . level ) \.{:} p \.{\in}
+ NotProcessedYet \} )}%
 \@pvspace{16.0pt}%
 \@x{ AllPreferences \.{\defeq}}%
 \@x{\@s{16.4} \.{\LET} op ( a ,\, b ) \.{\defeq} a \.{\circ} b}%
-\@x{\@s{16.4} \.{\IN} SetReduce ( op ,\, \{ p . preferences \.{:} p \.{\in}
-Range ( private ) \} ,\, {\langle} {\rangle} )}%
+ \@x{\@s{16.4} \.{\IN} SetReduce ( op ,\, \{ p . preferences \.{:} p \.{\in}
+ Range ( private ) \} ,\, {\langle} {\rangle} )}%
 \@pvspace{8.0pt}%
 \@x{ Min ( S ) \.{\defeq}}%
 \@x{\@s{22.31} {\CHOOSE} e \.{\in} S \.{\cup} \{ 0 \} \.{:}}%
 \@x{\@s{38.71} \A\, e2 \.{\in} S \.{:} e \.{\leq} e2}%
 \@pvspace{8.0pt}%
 \@x{ SecretJudges ( judgment ) \.{\defeq}}%
-\@x{\@s{16.4} \{ j . judge \.{:} j \.{\in} Range ( judgment . secretJudgments
-) \}}%
+ \@x{\@s{16.4} \{ j . judge \.{:} j \.{\in} Range ( judgment . secretJudgments
+ ) \}}%
 \@pvspace{8.0pt}%
 \@x{ OpenJudges ( judgment ) \.{\defeq}}%
-\@x{\@s{16.4} \{ j . judge \.{:} j \.{\in} Range ( judgment . openJudgments )
-\}}%
+ \@x{\@s{16.4} \{ j . judge \.{:} j \.{\in} Range ( judgment . openJudgments )
+ \}}%
 \@pvspace{8.0pt}%
-\@x{ Rewards2 ( judgment ) \.{\defeq}}%
-\@x{\@s{16.4} \.{\LET}\@s{5.06} openVotes\@s{1.99} \.{\defeq} judgment .
-openJudgments}%
-\@x{\@s{41.86} topReward \.{\defeq} judgment . targetVotes}%
-\@x{\@s{41.86} wallets \.{\defeq} public . nodes}%
-\@x{\@s{41.86} openVoters \.{\defeq} OpenJudges ( judgment )}%
-\@x{\@s{41.86} nonVoters\@s{1.63} \.{\defeq} Nodes \.{\,\backslash\,}
-openVoters}%
-\@x{\@s{41.86} ownerCost \.{\defeq} Cost ( judgment . targetVotes )}%
-\@x{\@s{41.86} updatesForVoters \.{\defeq} WalletUpdatesForVoters ( judgment
-,\, openVotes ,\, topReward ,\, wallets )}%
-\@x{\@s{41.86} updatesForNonVoters \.{\defeq} WalletUpdatesForNotVoting (
-nonVoters ,\, updatesForVoters )}%
-\@x{\@s{16.4} \.{\IN}\@s{5.06} [ updatesForNonVoters {\EXCEPT} {\bang} [
-        judgment . owner ] . wallet \.{=} @ \.{-} ownerCost ]}%
+\@x{ Rewards ( judgment ) \.{\defeq}}%
+ \@x{\@s{16.4} \.{\LET} openVotes\@s{4.11} \.{\defeq} judgment .
+ openJudgments}%
+\@x{\@s{36.79} topReward\@s{2.12} \.{\defeq} judgment . targetVotes}%
+\@x{\@s{36.79} wallets \.{\defeq} public . nodes}%
+\@x{\@s{36.79} openVoters \.{\defeq} OpenJudges ( judgment )}%
+ \@x{\@s{36.79} nonVoters\@s{1.63} \.{\defeq} Nodes \.{\,\backslash\,}
+ openVoters}%
+\@x{\@s{36.79} ownerCost \.{\defeq} Cost ( judgment . targetVotes )}%
+\@x{\@s{36.79} updatesForVoters \.{\defeq}}%
+ \@x{\@s{53.19} WalletUpdatesForVoters ( judgment ,\, openVotes ,\, topReward
+ ,\, wallets )}%
+\@x{\@s{40.89} updatesForNonVoters \.{\defeq}}%
+\@x{\@s{57.29} WalletUpdatesForNotVoting ( nonVoters ,\, updatesForVoters )}%
+ \@x{\@s{16.4} \.{\IN}\@s{4.09} [ updatesForNonVoters {\EXCEPT} {\bang} [
+ judgment . owner ] . wallet \.{=} @ \.{-} ownerCost ]}%
 \@pvspace{24.0pt}%
 \@x{ AddPreferencedPackage ( node ) \.{\defeq}}%
-\@x{\@s{16.4} \.{\LET} currentBalance \.{\defeq} public . nodes [ node ] .
-wallet}%
+ \@x{\@s{16.4} \.{\LET} currentBalance \.{\defeq} public . nodes [ node ] .
+ wallet}%
 \@x{\@s{36.79} pendingPackagesCount \.{\defeq} Level ( FutureCost ( node ) )}%
-\@x{\@s{36.79} maxJudgmentCost \.{\defeq} currentBalance \.{-} FutureCost (
-node )}%
+ \@x{\@s{36.79} maxJudgmentCost \.{\defeq} currentBalance \.{-} FutureCost (
+ node )}%
 \@x{\@s{36.79} maxJudgmentLevel \.{\defeq} Level ( maxJudgmentCost )}%
 \@x{\@s{36.79} packageLevel \.{\defeq} maxJudgmentLevel}%
-\@x{\@s{36.79} packageName \.{\defeq}\@w{package} \.{\circ} ToString (
-nextPackageId )}%
+ \@x{\@s{36.79} packageName \.{\defeq}\@w{package} \.{\circ} ToString (
+ nextPackageId )}%
 \@x{\@s{36.79} package \.{\defeq} [ package \.{\mapsto} packageName ,\,}%
 \@x{\@s{92.43} level \.{\mapsto} packageLevel ,\,}%
 \@x{\@s{92.43} status \.{\mapsto}\@w{not{-}processed} ]}%
 \@x{\@s{16.4} \.{\IN}}%
 \@x{\@s{32.8} \.{\land} packageLevel \.{>} 1}%
 \@x{\@s{32.8} \.{\land} pendingPackagesCount \.{<} 2}%
-\@x{\@s{32.8} \.{\land} private \.{'} \.{=} [ private {\EXCEPT} {\bang} [
-        node ] . preferences \.{=} Append ( @ ,\, package ) ]}%
-\@x{}%
-\@y{\@s{17.5}%
-\ensuremath{\.{\land} isReproducible\.{'} \.{=}}
-[\ensuremath{isReproducible} \ensuremath{{\EXCEPT} {\bang}[packageName]
-\.{=} {\TRUE}}]
-}%
-\@xx{}%
+ \@x{\@s{32.8} \.{\land} private \.{'} \.{=} [ private {\EXCEPT} {\bang} [
+ node ] . preferences}%
+\@x{\@s{52.11} \.{=} Append ( @ ,\, package ) ]}%
 \@x{\@s{32.8} \.{\land} nextPackageId \.{'} \.{=} nextPackageId \.{+} 1}%
 \@pvspace{8.0pt}%
-\@x{ NoActiveJudgments \.{\defeq}}%
-\@x{\@s{16.4} \A\, j \.{\in} Range ( public . judgments ) \.{:} j . status
-\.{\neq}\@w{active}}%
+\@x{ ActiveJudgments \.{\defeq}}%
+ \@x{\@s{16.4} \{ j \.{\in} Range ( public . judgments ) \.{:} j . status
+ \.{=}\@w{active} \}}%
 \@pvspace{8.0pt}%
-\@x{ RunSimulation \.{\defeq} Cardinality ( \{ j \.{\in} Range ( public .
-judgments ) \.{:} j . status \.{=}\@w{closed} \} ) \.{<} 4}%
+\@x{ ClosedJudgments \.{\defeq}}%
+ \@x{\@s{16.4} \{ j \.{\in} Range ( public . judgments ) \.{:} j . status
+ \.{=}\@w{closed} \}}%
+\@pvspace{8.0pt}%
+\@x{ RunSimulation \.{\defeq}}%
+ \@x{\@s{16.4} Cardinality ( ClosedJudgments ) \.{<}
+ NumberOfClosedJudgmentsGoal}%
+\@pvspace{8.0pt}%
+\@x{ IsFinanciallyIncentivizedToVote ( node ) \.{\defeq}}%
+ \@x{\@s{16.4} FutureCost ( node ) \.{\leq} public . nodes [ node ] . wallet
+ \.{-} 1}%
+\@pvspace{8.0pt}%
+\@x{ PreferredPackages ( node ) \.{\defeq}}%
+ \@x{\@s{16.4} \{ p . package \.{:} p \.{\in} Range ( private [ node ] .
+ preferences ) \}}%
 \@pvspace{8.0pt}%
 \@x{}%
 \@y{\@s{0}%
-    \ceqdash{8} \ensuremath{Chaincode} \ceqdash{8}
+ \ceqdash{8} \ensuremath{Chaincode} \ceqdash{8}
 }%
 \@xx{}%
 \@pvspace{8.0pt}%
 \@x{ InitializeJudgment ( package ,\, owner ,\, targetVotes ) \.{\defeq}}%
 \@x{\@s{16.4}}%
 \@y{\@s{0}%
-    Guards
+ Guards
 }%
 \@xx{}%
-\@x{}%
-\@y{\@s{7.5}%
-\ensuremath{\.{\land} NoActiveJudgments \.{\,\backslash\,}\.{*}} This is
-*optional*
-}%
-\@xx{}%
-\@x{\@s{16.4} \.{\land} Cost ( targetVotes ) \.{\leq} public . nodes [ owner
-    ] . wallet}%
-\@x{\@s{16.4} \.{\land} ( \A\, j \.{\in} Range ( public . judgments ) \.{:} j
-. status \.{=}\@w{active} \.{\implies} j . owner \.{\neq} owner )}%
+ \@x{\@s{16.4} \.{\land} Cost ( targetVotes ) \.{\leq} public . nodes [ owner
+ ] . wallet}%
+ \@x{\@s{16.4} \.{\land} \A\, j \.{\in} ActiveJudgments \.{:} j . owner
+ \.{\neq} owner}%
 \@x{\@s{16.4}}%
 \@y{\@s{0}%
-    Update
+ Update
 }%
 \@xx{}%
 \@x{\@s{16.4}}%
 \@y{\@s{0}%
-    \ensuremath{TODO}: Better ids. Currently there can only be one judgment per
-    package.
+ \ensuremath{TODO}: Better ids. Currently there can only be one judgment per
+ package.
 }%
 \@xx{}%
-\@x{\@s{16.4} \.{\land} \.{\LET} judgmentId \.{\defeq} package \.{\IN}}%
-\@x{\@s{31.61} public \.{'} \.{=} [ public {\EXCEPT} {\bang} . judgments
-\.{=} Append ( @ ,\,}%
-\@x{\@s{80.49} [\@s{8.2} id \.{\mapsto} judgmentId ,\,}%
-\@x{\@s{91.47} tally \.{\mapsto} [ for \.{\mapsto} 0 ,\, against \.{\mapsto}
-0 ] ,\,}%
-\@x{\@s{91.47} finalResult \.{\mapsto}\@w{undecided} ,\,}%
-\@x{\@s{91.47} package \.{\mapsto} package ,\,}%
-\@x{\@s{91.47} owner \.{\mapsto} owner ,\,}%
-\@x{\@s{91.47} targetVotes \.{\mapsto} targetVotes ,\,}%
-\@x{\@s{91.47} status \.{\mapsto}\@w{active} ,\,}%
-\@x{\@s{91.47} phase \.{\mapsto}\@w{secretVotes} ,\,}%
-\@x{\@s{91.47} secretJudgments \.{\mapsto} {\langle} {\rangle} ,\,}%
-\@x{\@s{91.47} openJudgments \.{\mapsto} {\langle} {\rangle} ] ) ]}%
+\@x{\@s{16.4} \.{\land} \.{\LET} judgmentId \.{\defeq} package}%
+\@x{\@s{47.91} judgment \.{\defeq} [ id \.{\mapsto} judgmentId ,\,}%
+ \@x{\@s{110.39} tally \.{\mapsto} [ for \.{\mapsto} 0 ,\, against \.{\mapsto}
+ 0 ] ,\,}%
+\@x{\@s{110.39} finalResult \.{\mapsto}\@w{undecided} ,\,}%
+\@x{\@s{110.39} package \.{\mapsto} package ,\,}%
+\@x{\@s{110.39} owner \.{\mapsto} owner ,\,}%
+\@x{\@s{110.39} targetVotes \.{\mapsto} targetVotes ,\,}%
+\@x{\@s{110.39} status \.{\mapsto}\@w{active} ,\,}%
+\@x{\@s{110.39} phase \.{\mapsto}\@w{secretVotes} ,\,}%
+\@x{\@s{110.39} secretJudgments \.{\mapsto} {\langle} {\rangle} ,\,}%
+\@x{\@s{110.39} openJudgments \.{\mapsto} {\langle} {\rangle} ] \.{\IN}}%
+ \@x{\@s{31.61} public \.{'} \.{=} [ public {\EXCEPT} {\bang} . judgments
+ \.{=} Append ( @ ,\, judgment ) ]}%
 \@pvspace{8.0pt}%
 \@x{ AddSecretJudgment ( judgmentId ,\, judge ,\, secretVote ) \.{\defeq}}%
 \@x{\@s{16.4} \.{\lor}\@s{4.1} Len ( public . judgments ) \.{=} 0}%
-\@x{\@s{16.4} \.{\lor}\@s{4.09} \E\, index \.{\in} {\DOMAIN} public .
-judgments \.{:}}%
+ \@x{\@s{16.4} \.{\lor}\@s{4.09} \E\, index \.{\in} {\DOMAIN} public .
+ judgments \.{:}}%
 \@x{\@s{42.93} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
-\@x{\@s{63.33} \.{\land}\@s{4.1} j . id \.{=} judgmentId}%
+\@x{\@s{63.33} \.{\land} j . id \.{=} judgmentId}%
 \@x{\@s{63.33} \.{\land} j . status \.{=}\@w{active}}%
 \@x{\@s{63.33} \.{\land} j . phase \.{=}\@w{secretVotes}}%
 \@x{\@s{63.33}}%
 \@y{\@s{0}%
-Should be able to create a majority with \ensuremath{j.targetVotes
-\.{\neq}votes
-}}%
-\@xx{}%
-\@x{}%
-\@y{\@s{37.5}%
-\ensuremath{\.{\land} Len(j.secretJudgments) \.{+} 1 \.{<} 2 \.{*}
-j.targetVotes
-}}%
-\@xx{}%
-\@x{\@s{65.6}}%
-\@y{\@s{0}%
-Has \mbox{'}judge\mbox{'} added their vote before\.{?}
+ Has \mbox{'}judge\mbox{'} added their vote before\.{?}
 }%
 \@xx{}%
-\@x{\@s{65.6} \.{\land} \{ sj \.{\in} Range ( j . secretJudgments ) \.{:} sj
-. judge \.{=} judge \} \.{=} \{ \}}%
-\@x{\@s{65.6}}%
+ \@x{\@s{63.33} \.{\land} \{ sj \.{\in} Range ( j . secretJudgments ) \.{:} sj
+ . judge \.{=} judge \} \.{=} \{ \}}%
+\@x{\@s{63.33}}%
 \@y{\@s{0}%
-    Update
+ Update
 }%
 \@xx{}%
-\@x{\@s{65.6} \.{\land}\@s{4.1} public \.{'} \.{=} [ public {\EXCEPT} {\bang}
-. judgments \.{=} [ @ {\EXCEPT} {\bang} [ index ] \.{=}}%
-\@x{\@s{80.81} [ @ {\EXCEPT} {\bang} . secretJudgments \.{=} Append ( @ ,\,}%
-\@x{\@s{95.46} [\@s{8.2} judge \.{\mapsto} judge ,\,}%
-\@x{\@s{106.44} vote \.{\mapsto} secretVote ] ) ] ] ]}%
+\@x{\@s{63.33} \.{\land}\@s{4.1} public \.{'} \.{=}}%
+ \@x{\@s{94.94} [ public {\EXCEPT} {\bang} . judgments [ index ] .
+ secretJudgments \.{=}}%
+\@x{\@s{110.02} Append ( @ ,\, [ judge \.{\mapsto} judge ,\,}%
+\@x{\@s{164.08} vote \.{\mapsto} secretVote ] ) ]}%
 \@pvspace{8.0pt}%
 \@x{ EndSecretSubmissions ( judgmentId ,\, owner ) \.{\defeq}}%
 \@x{\@s{16.4} \.{\lor} Len ( public . judgments ) \.{=} 0}%
@@ -1376,410 +331,300 @@ Has \mbox{'}judge\mbox{'} added their vote before\.{?}
 \@x{\@s{52.01} \.{\land} j . status \.{=}\@w{active}}%
 \@x{\@s{52.01} \.{\land} j . phase\@s{2.49} \.{=}\@w{secretVotes}}%
 \@x{\@s{52.01} \.{\land} j . owner \.{=} owner}%
-\@x{\@s{52.01}}%
-\@y{\@s{0}%
-Should this be in the smart contract\.{?}
-}%
-\@xx{}%
-\@x{\@s{52.01} \.{\land} 2 \.{*} j . targetVotes \.{-} 1 \.{\leq} Len ( j .
-secretJudgments )}%
-\@x{\@s{52.01} \.{\land} public \.{'} \.{=} [ public {\EXCEPT} {\bang} .
-judgments \.{=} [ @ {\EXCEPT} {\bang} [ index ] \.{=}}%
-\@x{\@s{67.22} [ @ {\EXCEPT} {\bang} . phase \.{=}\@w{openVotes} ] ] ]}%
+ \@x{\@s{52.01} \.{\land} 2 \.{*} j . targetVotes \.{-} 1 \.{\leq} Len ( j .
+ secretJudgments )}%
+ \@x{\@s{52.01} \.{\land} public \.{'} \.{=} [ public {\EXCEPT} {\bang} .
+ judgments [ index ] . phase}%
+\@x{\@s{116.10} \.{=}\@w{openVotes} ]}%
 \@pvspace{8.0pt}%
 \@x{ ShowJudgment ( judgmentId ,\, judge ,\, openVote ) \.{\defeq}}%
-\@x{\@s{16.4} \.{\lor}\@s{4.1} Len ( public . judgments ) \.{=} 0}%
-\@x{\@s{16.4} \.{\lor}\@s{4.09} \E\, index \.{\in} {\DOMAIN} public .
-judgments \.{:}}%
-\@x{\@s{42.93} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
-\@x{\@s{63.33} \.{\land} j . id \.{=} judgmentId}%
-\@x{\@s{63.33} \.{\land} j . status \.{=}\@w{active}}%
-\@x{\@s{63.33} \.{\land} j . phase \.{=}\@w{openVotes}}%
-\@x{\@s{63.33}}%
+\@x{\@s{16.4} \.{\lor} Len ( public . judgments ) \.{=} 0}%
+\@x{\@s{16.4} \.{\lor} \E\, index \.{\in} {\DOMAIN} public . judgments \.{:}}%
+\@x{\@s{31.61} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
+\@x{\@s{52.01} \.{\land} j . id \.{=} judgmentId}%
+\@x{\@s{52.01} \.{\land} j . status \.{=}\@w{active}}%
+\@x{\@s{52.01} \.{\land} j . phase \.{=}\@w{openVotes}}%
+\@x{\@s{52.01}}%
 \@y{\@s{0}%
-Has \mbox{'}judge\mbox{'} added their vote before\.{?}
+ Has \mbox{'}judge\mbox{'} added their vote before\.{?}
 }%
 \@xx{}%
-\@x{\@s{63.33} \.{\land} \{ sj \.{\in} Range ( j . secretJudgments ) \.{:} sj
-. judge \.{=} judge \} \.{\neq} \{ \}}%
-\@x{\@s{63.33}}%
+ \@x{\@s{52.01} \.{\land} \{ sj \.{\in} Range ( j . secretJudgments ) \.{:} sj
+ . judge \.{=} judge \} \.{\neq} \{ \}}%
+\@x{\@s{52.01}}%
 \@y{\@s{0}%
-Has \mbox{'}judge\mbox{'} showed their vote before\.{?}
+ Has \mbox{'}judge\mbox{'} showed their vote before\.{?}
 }%
 \@xx{}%
-\@x{\@s{63.33} \.{\land} \{ oj \.{\in} Range ( j . openJudgments ) \.{:} oj .
-judge \.{=} judge \} \.{=} \{ \}}%
-\@x{\@s{63.33}}%
+ \@x{\@s{52.01} \.{\land} \{ oj \.{\in} Range ( j . openJudgments ) \.{:} oj .
+ judge \.{=} judge \} \.{=} \{ \}}%
+\@x{\@s{52.01}}%
 \@y{\@s{0}%
-    Secret and open votes should be the same
+ Secret and open votes should be the same
 }%
 \@xx{}%
-\@x{\@s{63.33}}%
+\@x{\@s{52.01}}%
 \@y{\@s{0}%
-    This validation is done with \ensuremath{HMAC} in practice
+ This validation is done with \ensuremath{HMAC} in practice
 }%
 \@xx{}%
-\@x{\@s{63.33} \.{\land} \E\, sj \.{\in} Range ( j . secretJudgments ) \.{:}}%
-\@x{\@s{78.54} \.{\land}\@s{4.1} sj . judge\@s{5.50} \.{=} judge}%
-\@x{\@s{78.54} \.{\land}\@s{4.09} openVote \.{=} sj . vote}%
-\@x{\@s{63.33}}%
+\@x{\@s{52.01} \.{\land} \E\, sj \.{\in} Range ( j . secretJudgments ) \.{:}}%
+\@x{\@s{67.22} \.{\land}\@s{4.1} sj . judge\@s{5.50} \.{=} judge}%
+\@x{\@s{67.22} \.{\land}\@s{4.09} openVote \.{=} sj . vote}%
+\@x{\@s{52.01}}%
 \@y{\@s{0}%
-    No majority yet!
+ Update
 }%
 \@xx{}%
-\@x{}%
-\@y{\@s{37.5}%
-\ensuremath{\.{\land} 2 \.{*} j.tally.for \.{\leq} Len(j.secretJudgments)
-}}%
-\@xx{}%
-\@x{}%
-\@y{\@s{37.5}%
-\ensuremath{\.{\land} 2 \.{*} j.tally.against \.{\leq} Len(j.secretJudgments)
-}}%
-\@xx{}%
-\@x{\@s{65.6}}%
-\@y{\@s{0}%
-    Update
-}%
-\@xx{}%
-\@x{\@s{65.6} \.{\land}\@s{4.1} public \.{'} \.{=} [ public {\EXCEPT} {\bang}
-. judgments [ index ] \.{=} [ @ {\EXCEPT}}%
-\@x{\@s{129.69} {\bang} . openJudgments \.{=} Append ( @ ,\,}%
-\@x{\@s{145.23} [\@s{8.2} judge \.{\mapsto} judge ,\,}%
-\@x{\@s{156.21} vote \.{\mapsto} openVote ] ) ,\,}%
-\@x{\@s{129.69} {\bang} . tally . for \.{=} {\IF} openVote \.{=}\@w{TRUE}
-\.{\THEN} @ \.{+} 1 \.{\ELSE} @ ,\,}%
-\@x{\@s{129.69} {\bang} . tally . against \.{=} {\IF} openVote
-\.{=}\@w{FALSE} \.{\THEN} @ \.{+} 1 \.{\ELSE} @ ] ]}%
+ \@x{\@s{52.01} \.{\land}\@s{4.1} public \.{'} \.{=} [ public {\EXCEPT}
+ {\bang} . judgments [ index ] \.{=} [ @ {\EXCEPT}}%
+\@x{\@s{116.10} {\bang} . openJudgments \.{=} Append ( @ ,\,}%
+\@x{\@s{131.65} [\@s{8.2} judge \.{\mapsto} judge ,\,}%
+\@x{\@s{142.62} vote \.{\mapsto} openVote ] ) ,\,}%
+\@x{\@s{116.10} {\bang} . tally . for \.{=} {\IF} openVote \.{=}\@w{TRUE}}%
+\@x{\@s{181.02} \.{\THEN} @ \.{+} 1}%
+\@x{\@s{181.02} \.{\ELSE} @ ,\,}%
+ \@x{\@s{116.10} {\bang} . tally . against \.{=} {\IF} openVote
+ \.{=}\@w{FALSE}}%
+\@x{\@s{177.89} \.{\THEN} @ \.{+} 1}%
+\@x{\@s{177.89} \.{\ELSE} @ ] ]}%
 \@pvspace{16.0pt}%
 \@x{ CloseJudgment ( judgmentId ,\, owner ) \.{\defeq}}%
 \@x{\@s{16.4} \.{\lor}\@s{4.1} Len ( public . judgments ) \.{=} 0}%
-\@x{\@s{16.4} \.{\lor}\@s{4.09} \E\, index \.{\in} {\DOMAIN} public .
-judgments \.{:}}%
+ \@x{\@s{16.4} \.{\lor}\@s{4.09} \E\, index \.{\in} {\DOMAIN} public .
+ judgments \.{:}}%
 \@x{\@s{42.93} \.{\LET} j \.{\defeq} public . judgments [ index ]}%
-\@x{\@s{63.33} finalResult \.{\defeq} ToString ( j . tally . for \.{>} j .
-tally . against ) \.{\IN}}%
-\@x{}%
-\@y{\@s{37.5}%
-\ensuremath{\.{\land} PrintT(j.id \.{\circ} j.status \.{\circ} j.phase
-\.{\circ} j.owner)
-}}%
-\@xx{}%
-\@x{\@s{65.6} \.{\land}\@s{4.1} j . id \.{=} judgmentId}%
-\@x{\@s{65.6} \.{\land}\@s{4.09} j . status \.{=}\@w{active}}%
-\@x{\@s{65.6} \.{\land}\@s{4.09} j . phase\@s{2.49} \.{=}\@w{openVotes}}%
-\@x{\@s{65.6} \.{\land}\@s{4.09} j . owner \.{=} owner}%
-\@x{\@s{80.81}}%
+ \@x{\@s{63.33} finalResult \.{\defeq} ToString ( j . tally . for \.{>} j .
+ tally . against ) \.{\IN}}%
+\@x{\@s{63.33} \.{\land}\@s{4.1} j . id \.{=} judgmentId}%
+\@x{\@s{63.33} \.{\land}\@s{4.09} j . status \.{=}\@w{active}}%
+\@x{\@s{63.33} \.{\land}\@s{4.09} j . phase\@s{2.49} \.{=}\@w{openVotes}}%
+\@x{\@s{63.33} \.{\land}\@s{4.09} j . owner \.{=} owner}%
+ \@x{\@s{63.33} \.{\land} 2 \.{*} j . targetVotes \.{-} 1 \.{\leq} Len ( j .
+ openJudgments )}%
+\@x{\@s{78.54}}%
 \@y{\@s{0}%
-    Undecided result, majority FOR, or majority AGAINST
+ We have a majority!
 }%
 \@xx{}%
-\@x{}%
-\@y{\@s{37.5}%
-\ensuremath{\.{\land} \.{\lor} Len(j.openJudgments) \.{=}
-Len(j.secretJudgments)
-}}%
-\@xx{}%
-\@x{}%
-\@y{\@s{47.5}%
-\ensuremath{\.{\lor} 2 \.{*} j.tally.for \.{>} Len(j.secretJudgments)
-}}%
-\@xx{}%
-\@x{}%
-\@y{\@s{47.5}%
-\ensuremath{\.{\lor} 2 \.{*} j.tally.against \.{>} Len(j.secretJudgments)
-}}%
-\@xx{}%
-\@x{\@s{82.0}}%
+ \@x{\@s{63.33} \.{\land}\@s{4.09} \.{\lor}\@s{4.1} \.{\land}\@s{4.1} j .
+ tally . for \.{\neq} j . tally . against}%
+\@x{\@s{93.75} \.{\land}\@s{4.09} public \.{'} \.{=} [ public {\EXCEPT}}%
+\@x{\@s{125.36} {\bang} . judgments [ index ] \.{=}}%
+\@x{\@s{140.91} [ @ {\EXCEPT}}%
+\@x{\@s{155.56} {\bang} . status \.{=}\@w{closed} ,\,}%
+\@x{\@s{155.56} {\bang} . phase \.{=}\@w{judgment} ,\,}%
+\@x{\@s{155.56} {\bang} . finalResult \.{=} finalResult ] ,\,}%
+\@x{\@s{125.36} {\bang} . nodes \.{=} Rewards ( j ) ]}%
+\@x{\@s{78.54}}%
 \@y{\@s{0}%
-    We have a majority \ensuremath{for{\bang}
-    }}%
-\@xx{}%
-\@x{\@s{65.6} \.{\land}\@s{5.28} \.{\lor}\@s{4.1} \.{\land}\@s{4.1} j . tally
-. for \.{>} j . tally . against}%
-\@x{\@s{97.21} \.{\land}\@s{4.09} public \.{'} \.{=} [ public {\EXCEPT}}%
-\@x{\@s{128.82} {\bang} . judgments \.{=} [ @ {\EXCEPT} {\bang} [ index ]
-\.{=}}%
-\@x{\@s{144.36} [ @ {\EXCEPT}}%
-\@x{\@s{159.02} {\bang} . status \.{=}\@w{closed} ,\,}%
-\@x{\@s{159.02} {\bang} . phase \.{=}\@w{judgment} ,\,}%
-\@x{\@s{159.02} {\bang} . finalResult \.{=}\@w{TRUE} ] ] ,\,}%
-\@x{\@s{128.82} {\bang} . nodes \.{=} Rewards2 ( j ) ]}%
-\@x{\@s{82.0}}%
-\@y{\@s{0}%
-    We have a majority \ensuremath{against{\bang}
-    }}%
-\@xx{}%
-\@x{\@s{82.0} \.{\lor}\@s{4.1} \.{\land}\@s{4.1} j . tally . against \.{>} j
-. tally . for}%
-\@x{\@s{97.21} \.{\land}\@s{4.09} public \.{'} \.{=} [ public {\EXCEPT}}%
-\@x{\@s{128.82} {\bang} . judgments \.{=} [ @ {\EXCEPT} {\bang} [ index ]
-\.{=}}%
-\@x{\@s{144.36} [ @ {\EXCEPT}}%
-\@x{\@s{159.02} {\bang} . status \.{=}\@w{closed} ,\,}%
-\@x{\@s{159.02} {\bang} . phase \.{=}\@w{judgment} ,\,}%
-\@x{\@s{159.02} {\bang} . finalResult \.{=}\@w{FALSE} ] ] ,\,}%
-\@x{\@s{128.82} {\bang} . nodes \.{=} Rewards2 ( j ) ]}%
-\@x{\@s{82.0}}%
-\@y{\@s{0}%
-    Everyone has voted, and we don\mbox{'}t have a majority
+ Everyone has voted, and we don\mbox{'}t have a majority
 }%
 \@xx{}%
-\@x{\@s{82.0} \.{\lor}\@s{4.1} \.{\land}\@s{4.1} j . tally . for \.{=} j .
-tally . against}%
-\@x{\@s{97.21} \.{\land}\@s{4.09} public \.{'} \.{=} [ public {\EXCEPT}
-    {\bang} . judgments [ index ] \.{=} [ @ {\EXCEPT}}%
-\@x{\@s{141.09} {\bang} . status \.{=}\@w{closed} ,\,}%
-\@x{\@s{141.09} {\bang} . finalResult \.{=}\@w{undecided} ] ]}%
-\@x{\@s{82.0}}%
-\@y{\@s{0}%
-\ensuremath{\.{\land} PrintT(\mbox{``}Majority\.{:} \mbox{''} \.{\circ}
-ToString(public\.{'}.judgments[index].tally.for) \.{\circ} \mbox{``} to
-\mbox{''} \.{\circ} ToString(public\.{'}.judgments[index].tally.against))
-}}%
-\@xx{}%
+ \@x{\@s{78.54} \.{\lor}\@s{4.1} \.{\land}\@s{4.1} j . tally . for \.{=} j .
+ tally . against}%
+ \@x{\@s{93.75} \.{\land}\@s{4.09} public \.{'} \.{=} [ public {\EXCEPT}
+ {\bang} . judgments [ index ] \.{=} [ @ {\EXCEPT}}%
+\@x{\@s{157.84} {\bang} . status \.{=}\@w{closed} ,\,}%
+\@x{\@s{157.84} {\bang} . finalResult \.{=}\@w{undecided} ] ]}%
 \@pvspace{16.0pt}%
 \@x{}%
 \@y{\@s{0}%
-    \ceqdash{8} Invariants \ceqdash{8}
+ \ceqdash{8} Invariants \ceqdash{8}
 }%
 \@xx{}%
 \@pvspace{8.0pt}%
 \@x{ OwnOneJudgmentAtATime \.{\defeq}}%
 \@x{\@s{16.4}}%
 \@y{\@s{0}%
-For all active judgments \ensuremath{j}, \ensuremath{j2} where \ensuremath{j
-\.{\neq} j2}: \ensuremath{j.owner \.{\neq} j2.owner
+ For all active judgments \ensuremath{j}, \ensuremath{j2} where \ensuremath{j
+ \.{\neq} j2}: \ensuremath{j.owner \.{\neq} j2.owner
 }}%
 \@xx{}%
 \@x{\@s{16.4}}%
 \@y{\@s{0}%
-    Needed to ensure that judgments can be paid for.
+ Needed to ensure that judgments can be paid for.
 }%
 \@xx{}%
-\@x{\@s{16.4} \A\, j \.{\in} Range ( public . judgments ) \.{:} j . status
-\.{=}\@w{active} \.{\implies}}%
-\@x{\@s{27.72} ( \A\, j2 \.{\in} Range ( public . judgments ) \.{:} j2 .
-status \.{=}\@w{active} \.{\land}}%
-\@x{\@s{38.83} j . id \.{\neq} j2 . id \.{\implies} j . owner \.{\neq} j2 .
-owner )}%
+ \@x{\@s{16.4} \A\, j \.{\in} Range ( public . judgments ) \.{:} j . status
+ \.{=}\@w{active} \.{\implies}}%
+ \@x{\@s{27.72} ( \A\, j2 \.{\in} Range ( public . judgments ) \.{:} j2 .
+ status \.{=}\@w{active} \.{\land}}%
+ \@x{\@s{38.83} j . id \.{\neq} j2 . id \.{\implies} j . owner \.{\neq} j2 .
+ owner )}%
 \@pvspace{8.0pt}%
 \@x{ LessActiveThenNodes \.{\defeq}}%
 \@x{\@s{16.4}}%
 \@y{\@s{0}%
-    There should never be more active judgments than nodes
+ There should never be more active judgments than nodes
 }%
 \@xx{}%
-\@x{\@s{16.4} \.{\LET} active \.{\defeq} \{ j \.{\in} Range ( public .
-judgments ) \.{:} j . status \.{=}\@w{active} \}}%
+ \@x{\@s{16.4} \.{\LET} active \.{\defeq} \{ j \.{\in} Range ( public .
+ judgments ) \.{:} j . status \.{=}\@w{active} \}}%
 \@x{\@s{16.4} \.{\IN} Cardinality ( active ) \.{\leq} Cardinality ( Nodes )}%
-\@pvspace{8.0pt}%
-\@x{}%
-\@y{\@s{0}%
-    \ensuremath{TODO}: Add filtering so this one works
-}%
-\@xx{}%
-\@x{ CostLessThanMaxCost \.{\defeq}}%
-\@x{\@s{16.4} \.{\lor}\@s{4.1} Len ( public . judgments ) \.{=} 0}%
-\@x{\@s{16.4} \.{\lor}\@s{4.09} \A\, j \.{\in} Range ( public . judgments )
-\.{:} Len ( j . secretJudgments ) \.{\leq} j . targetVotes}%
-\@pvspace{8.0pt}%
-\@x{ AllButOnePackagedIsJudgedPerNode \.{\defeq} \A\, n \.{\in} Nodes \.{:}}%
-\@x{\@s{32.8} Cardinality ( \{ p \.{\in} Range ( private [ n ] . preferences
-) \.{:} p . status \.{\neq}\@w{processed} \} ) \.{\leq} 1}%
-\@pvspace{8.0pt}%
-\@x{ TooFewWantsToBuild \.{\defeq}}%
-\@x{\@s{16.4} \.{\LET}\@s{16.4} WantsToBuild \.{\defeq} \{ n \.{\in} Nodes
-\.{:} FutureCost ( n ) \.{>} public . nodes [ n ] . wallet \.{-} 1 \}}%
-\@x{\@s{53.19} NotYetProcessed \.{\defeq} \{ p \.{\in} Range ( AllPreferences
-) \.{:} p . status \.{=}\@w{not{-}processed} \}}%
-\@x{\@s{53.19} MinimumBuilderDemand \.{\defeq} Min ( \{ p . level \.{:} p
-\.{\in} NotYetProcessed \} )}%
-\@x{\@s{16.4} \.{\IN}\@s{4.1} Cardinality ( WantsToBuild ) \.{<} 2 \.{*}
-MinimumBuilderDemand}%
 \@pvspace{16.0pt}%
 \@x{ NoPackagesAreWronglyJudged \.{\defeq}}%
 \@x{\@s{16.4} \A\, j \.{\in} Range ( public . judgments ) \.{:}}%
-\@x{\@s{27.72} \.{\lor}\@s{4.1} j . finalResult \.{=} IsReproducible ( j . id
-)}%
+ \@x{\@s{27.72} \.{\lor}\@s{4.1} j . finalResult \.{=} ToString (
+ IsReproducible ( j . id ) )}%
 \@x{\@s{27.72} \.{\lor}\@s{4.09} j . finalResult \.{=}\@w{undecided}}%
-\@pvspace{16.0pt}%
-\@x{ Fairness \.{\defeq} {\WF}_{ public} ( AllButOnePackagedIsJudgedPerNode
-)}%
 \@pvspace{8.0pt}%
 \@x{}%
 \@y{\@s{0}%
-    \ceqdash{8} \ensuremath{Spec} \ceqdash{8}
+ \ceqdash{8} \ensuremath{Spec} \ceqdash{8}
 }%
 \@xx{}%
 \@pvspace{8.0pt}%
 \@x{ Init \.{\defeq}}%
 \@x{\@s{16.4} \.{\land} InitialPublic}%
 \@x{\@s{16.4} \.{\land} InitialPrivate}%
-\@x{\@s{16.4} \.{\land} packages \.{=} Packages}%
 \@x{\@s{16.4} \.{\land} nextPackageId \.{=} 9}%
-\@x{\@s{16.4} \.{\land} isReproducible \.{=} [ package1 \.{\mapsto}\@w{TRUE}
-,\,}%
-\@x{\@s{106.22} package2 \.{\mapsto}\@w{FALSE} ,\,}%
-\@x{\@s{106.22} package3 \.{\mapsto}\@w{TRUE} ,\,}%
-\@x{\@s{106.22} package4 \.{\mapsto}\@w{TRUE} ,\,}%
-\@x{\@s{106.22} package5 \.{\mapsto}\@w{TRUE} ,\,}%
-\@x{\@s{106.22} package6 \.{\mapsto}\@w{TRUE} ,\,}%
-\@x{\@s{106.22} package7 \.{\mapsto}\@w{TRUE} ,\,}%
-\@x{\@s{106.22} package8 \.{\mapsto}\@w{TRUE} ,\,}%
-\@x{\@s{106.22} package9 \.{\mapsto}\@w{FALSE} ,\,}%
-\@x{\@s{106.22} package10 \.{\mapsto}\@w{FALSE} ,\,}%
-\@x{\@s{106.22} package11 \.{\mapsto}\@w{FALSE} ,\,}%
-\@x{\@s{106.22} package12 \.{\mapsto}\@w{FALSE} ,\,}%
-\@x{\@s{106.22} package13 \.{\mapsto}\@w{FALSE} ,\,}%
-\@x{\@s{106.22} package14 \.{\mapsto}\@w{FALSE} ,\,}%
-\@x{\@s{106.22} package15 \.{\mapsto}\@w{FALSE} ,\,}%
-\@x{\@s{106.22} package16 \.{\mapsto}\@w{FALSE} ,\,}%
-\@x{\@s{106.22} package17 \.{\mapsto}\@w{FALSE} ,\,}%
-\@x{\@s{106.22} package18 \.{\mapsto}\@w{FALSE} ,\,}%
-\@x{\@s{106.22} package19 \.{\mapsto}\@w{FALSE} ,\,}%
-\@x{\@s{106.22} package20 \.{\mapsto}\@w{FALSE} ]}%
 \@pvspace{8.0pt}%
 \@x{ Next \.{\defeq}}%
-\@x{}%
-\@y{\@s{7.5}%
-\ensuremath{\.{\land} {\IF}} \ensuremath{Cardinality(\{j \.{\in}
-Range(public.judgments)\.{:} j.status \.{=} \@w{closed}\}) \.{\neq} 0}
-\ensuremath{\.{\THEN} PrintT(Cardinality(\{j \.{\in}
-Range(public.judgments)\.{:} j.status \.{=} \@w{closed}\})) \.{\ELSE} {\TRUE}
-}}%
-\@xx{}%
-\@x{}%
-\@y{\@s{7.5}%
-\ensuremath{\.{\land} Cardinality(\{j \.{\in} Range(public.judgments)\.{:}
-j.status \.{=} \@w{closed}\}) \.{<} 1
-}}%
-\@xx{}%
-\@x{\@s{32.8} \.{\lor}\@s{4.1} \.{\land}\@s{4.1}
-AllButOnePackagedIsJudgedPerNode}%
-\@x{\@s{48.01} \.{\land}\@s{4.10} RunSimulation}%
-\@x{\@s{48.01} \.{\land} {\UNCHANGED} {\langle} public ,\, private ,\,
-packages ,\, nextPackageId ,\, isReproducible {\rangle}}%
-\@x{\@s{16.4}}%
-\@y{\@s{7.5}%
-\ensuremath{\.{\lor} \.{\land} TooFewWantsToBuild
-}}%
-\@xx{}%
-\@x{\@s{16.4}}%
-\@y{\@s{17.5}%
-\ensuremath{\.{\land} {\UNCHANGED} {\langle}public,\, private,\, packages,\,
-nextPackageId,\, isReproducible{\rangle}
-}}%
-\@xx{}%
-\@x{\@s{32.8} \.{\lor}\@s{4.1} \.{\land}\@s{4.1} Cardinality ( \{ j \.{\in}
-Range ( public . judgments ) \.{:} j . status \.{=}\@w{processed} \} ) \.{=}
-1}%
-\@x{\@s{48.01} \.{\land}\@s{4.10} RunSimulation}%
-\@x{\@s{48.01} \.{\land} {\UNCHANGED} {\langle} public ,\, private ,\,
-packages ,\, nextPackageId ,\, isReproducible {\rangle}}%
-\@x{\@s{32.8} \.{\lor}\@s{4.09} \E\, n \.{\in} Nodes \.{:}}%
-\@x{\@s{48.01} \E\, index \.{\in} {\DOMAIN} private [ n ] . preferences
-\.{:}}%
-\@x{\@s{59.33} \.{\LET} p \.{\defeq} private [ n ] . preferences [ index ]
-\.{\IN}}%
-\@x{\@s{79.73} \.{\land} RunSimulation}%
-\@x{\@s{79.73} \.{\land} p . status \.{=}\@w{not{-}processed}}%
-\@x{\@s{79.73} \.{\land} InitializeJudgment ( p . package ,\, n ,\, p . level
-)}%
-\@x{\@s{79.73} \.{\land} private \.{'} \.{=} [ private {\EXCEPT}\@s{8.2}
-{\bang} [ n ] \.{=} [ @ {\EXCEPT}}%
-\@x{\@s{221.54} {\bang} . preferences \.{=} [ @ {\EXCEPT}}%
-\@x{\@s{221.54} {\bang} [ index ] \.{=} [ @ {\EXCEPT}}%
-\@x{\@s{221.54} {\bang} . status\@s{0.90} \.{=}\@w{started} ] ] ] ]}%
-\@x{\@s{16.4}}%
-\@y{\@s{37.5}%
-\ensuremath{\.{\land} PrintT(\mbox{``}Started\.{\dots}\mbox{''})
-}}%
-\@xx{}%
-\@x{\@s{82.0} \.{\land} {\UNCHANGED} {\langle} packages ,\, nextPackageId ,\,
-isReproducible {\rangle}}%
-\@x{\@s{32.8} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
-\@x{\@s{48.01} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
-\@x{\@s{59.33} \.{\LET} secretVote \.{\defeq} IsReproducible ( j . package )
-\.{\IN}}%
-\@x{\@s{59.33} \.{\land} RunSimulation}%
-\@x{\@s{59.33}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
 \@y{\@s{0}%
-    Nodes only build/judge if they have to
+ Initializing a package judgment
 }%
 \@xx{}%
-\@x{\@s{59.33} \.{\land}\@s{4.1} \.{\lor}\@s{4.1} FutureCost ( n ) \.{>}
-public . nodes [ n ] . wallet \.{-} 1}%
-\@x{\@s{74.54} \.{\lor}\@s{4.10} j . owner \.{=} n}%
-\@x{\@s{74.54} \.{\lor}\@s{4.10} j . package \.{\in} \{ p . package \.{:} p
-\.{\in} Range ( private [ n ] . preferences ) \}}%
-\@x{\@s{59.33} \.{\land}\@s{4.09} AddSecretJudgment ( j . id ,\, n ,\,
-secretVote )}%
-\@x{\@s{59.33} \.{\land}\@s{4.09} {\UNCHANGED} {\langle} private ,\, packages
-,\, nextPackageId ,\, isReproducible {\rangle}}%
-\@x{\@s{32.8} \.{\lor}\@s{4.09} \E\, n \.{\in} Nodes \.{:}}%
-\@x{\@s{48.01} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
-\@x{\@s{59.33} \.{\land} RunSimulation}%
-\@x{\@s{59.33}}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+ \@x{\@s{48.45} \E\, index \.{\in} {\DOMAIN} private [ n ] . preferences
+ \.{:}}%
+ \@x{\@s{59.77} \.{\LET} p \.{\defeq} private [ n ] . preferences [ index ]
+ \.{\IN}}%
+\@x{\@s{80.17} \.{\land} RunSimulation}%
+\@x{\@s{80.17} \.{\land} p . status \.{=}\@w{not{-}processed}}%
+ \@x{\@s{80.17} \.{\land} InitializeJudgment ( p . package ,\, n ,\, p . level
+ )}%
+\@x{\@s{80.17} \.{\land} private \.{'} \.{=}}%
+ \@x{\@s{95.38} [ private {\EXCEPT} {\bang} [ n ] . preferences [ index ] .
+ status \.{=}\@w{started} ]}%
+\@x{\@s{80.17} \.{\land} {\UNCHANGED} {\langle} nextPackageId {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
 \@y{\@s{0}%
-We assume that everyone \ensuremath{whoe \.{*}}needs* to vote will have the
-time to do so
+ Adding a secret vote
 }%
 \@xx{}%
-\@x{\@s{59.33} \.{\land}\@s{4.1} \A\, nonVoter \.{\in} Nodes
-\.{\,\backslash\,} SecretJudges ( j ) \.{:}}%
-\@x{\@s{85.86} FutureCost ( nonVoter ) \.{\leq} public . nodes [ nonVoter ] .
-wallet \.{-} 1}%
-\@x{\@s{59.33} \.{\land}\@s{4.09} EndSecretSubmissions ( j . id ,\, n )}%
-\@x{\@s{59.33} \.{\land} {\UNCHANGED} {\langle} private ,\, packages ,\,
-nextPackageId ,\, isReproducible {\rangle}}%
-\@x{\@s{32.8} \.{\lor}\@s{4.09} \E\, n \.{\in} Nodes \.{:}}%
-\@x{\@s{48.01} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
-\@x{\@s{59.33} \.{\LET} openVote \.{\defeq} IsReproducible ( j . package )
-\.{\IN}}%
-\@x{\@s{59.33} \.{\land} RunSimulation}%
-\@x{\@s{59.33} \.{\land}\@s{4.1} \.{\lor}\@s{4.1} FutureCost ( n ) \.{>}
-public . nodes [ n ] . wallet \.{-} 1}%
-\@x{\@s{74.54} \.{\lor}\@s{4.10} j . owner \.{=} n}%
-\@x{\@s{74.54} \.{\lor}\@s{4.10} j . package \.{\in} \{ p . package \.{:} p
-\.{\in} Range ( private [ n ] . preferences ) \}}%
-\@x{\@s{59.33} \.{\land} ShowJudgment ( j . id ,\, n ,\, openVote )}%
-\@x{\@s{59.33} \.{\land} {\UNCHANGED} {\langle} private ,\, packages ,\,
-nextPackageId ,\, isReproducible {\rangle}}%
-\@x{\@s{32.8} \.{\lor}\@s{4.09} \E\, n \.{\in} Nodes \.{:}}%
-\@x{\@s{48.01} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
-\@x{\@s{59.33} \.{\land} RunSimulation}%
-\@x{\@s{59.33}}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
+\@x{\@s{59.77} \.{\LET} secretVote \.{\defeq} {\IF} n \.{\in} MaliciousNodes}%
+\@x{\@s{152.12} \.{\THEN} {\lnot} IsReproducible ( j . package )}%
+\@x{\@s{152.12} \.{\ELSE} IsReproducible ( j . package )}%
+\@x{\@s{59.77} \.{\IN}}%
+\@x{\@s{76.17} \.{\land} RunSimulation}%
+\@x{\@s{76.17}}%
 \@y{\@s{0}%
-We assume that everyone \ensuremath{whoe \.{*}}needs* to vote will have the
-time to do so
+ Nodes only build/judge if they have to
 }%
 \@xx{}%
-\@x{\@s{59.33} \.{\land}\@s{4.1} \A\, nonVoter \.{\in} Nodes
-\.{\,\backslash\,} OpenJudges ( j ) \.{:}}%
-\@x{\@s{85.86} FutureCost ( nonVoter ) \.{\leq} public . nodes [ nonVoter ] .
-wallet \.{-} 1}%
-\@x{\@s{59.33} \.{\land}\@s{4.09} CloseJudgment ( j . id ,\, n )}%
-\@x{\@s{59.33} \.{\land}\@s{4.09} \E\, preferenceIndex \.{\in} {\DOMAIN}
-private [ n ] . preferences \.{:}}%
-\@x{\@s{85.86} \.{\land}\@s{4.1} private [ n ] . preferences [
-        preferenceIndex ] . package \.{=} j . package}%
-\@x{\@s{85.86} \.{\land}\@s{4.09} private \.{'} \.{=} [ private {\EXCEPT}
-    {\bang} [ n ] . preferences [ preferenceIndex ] . status \.{=}\@w{processed}
-]}%
-\@x{\@s{59.33} \.{\land} {\UNCHANGED}\@s{4.1} {\langle} packages ,\,
-nextPackageId ,\, isReproducible {\rangle}}%
-\@x{\@s{32.8} \.{\lor}\@s{4.09} \E\, n \.{\in} Nodes \.{:}}%
-\@x{\@s{48.01} \.{\land} RunSimulation}%
-\@x{\@s{48.01} \.{\land} AddPreferencedPackage ( n )}%
-\@x{\@s{48.01} \.{\land} {\UNCHANGED} {\langle} public ,\, packages ,\,
-isReproducible {\rangle}}%
-\@x{\@s{32.8} \.{\lor}\@s{4.09} {\UNCHANGED} {\langle} private ,\, packages
-,\, public ,\, nextPackageId ,\, isReproducible {\rangle}}%
+ \@x{\@s{76.17} \.{\land}\@s{4.1} \.{\lor}\@s{4.1} FutureCost ( n ) \.{>}
+ public . nodes [ n ] . wallet \.{-} 1}%
+\@x{\@s{91.38} \.{\lor}\@s{4.09} j . owner \.{=} n}%
+\@x{\@s{91.38} \.{\lor}\@s{4.09} j . package \.{\in} PreferredPackages ( n )}%
+ \@x{\@s{76.17} \.{\land}\@s{4.09} AddSecretJudgment ( j . id ,\, n ,\,
+ ToString ( secretVote ) )}%
+ \@x{\@s{76.17} \.{\land}\@s{4.09} {\UNCHANGED} {\langle} private ,\,
+ nextPackageId {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+ End submission of secret votes
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
+\@x{\@s{59.77} \.{\land} RunSimulation}%
+\@x{\@s{59.77}}%
+\@y{\@s{0}%
+ Assume that every node that *needs* to vote will have the time to do so
+}%
+\@xx{}%
+ \@x{\@s{59.77} \.{\land}\@s{4.1} \A\, nonVoter \.{\in} Nodes
+ \.{\,\backslash\,} SecretJudges ( j ) \.{:}}%
+\@x{\@s{86.30} \.{\lor}\@s{4.1} IsFinanciallyIncentivizedToVote ( nonVoter )}%
+\@x{\@s{86.30} \.{\lor}\@s{4.09} n \.{\in} MaliciousNodes}%
+\@x{\@s{59.77} \.{\land}\@s{4.09} EndSecretSubmissions ( j . id ,\, n )}%
+ \@x{\@s{59.77} \.{\land} {\UNCHANGED} {\langle} private ,\, nextPackageId
+ {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+ Add an open vote
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
+\@x{\@s{59.77} \.{\LET} openVote \.{\defeq} {\IF} n \.{\in} MaliciousNodes}%
+\@x{\@s{155.70} \.{\THEN} {\lnot} IsReproducible ( j . package )}%
+\@x{\@s{155.70} \.{\ELSE} IsReproducible ( j . package )}%
+\@x{\@s{59.77} \.{\IN}}%
+\@x{\@s{76.17} \.{\land} RunSimulation}%
+ \@x{\@s{76.17} \.{\land}\@s{4.1} \.{\lor}\@s{4.1} FutureCost ( n ) \.{>}
+ public . nodes [ n ] . wallet \.{-} 1}%
+\@x{\@s{91.38} \.{\lor}\@s{4.09} j . owner \.{=} n}%
+\@x{\@s{91.38} \.{\lor}\@s{4.09} j . package \.{\in} PreferredPackages ( n )}%
+ \@x{\@s{76.17} \.{\land} ShowJudgment ( j . id ,\, n ,\, ToString ( openVote
+ ) )}%
+ \@x{\@s{76.17} \.{\land} {\UNCHANGED} {\langle} private ,\, nextPackageId
+ {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+ Close judgment
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
+\@x{\@s{59.77} \.{\land} RunSimulation}%
+\@x{\@s{59.77}}%
+\@y{\@s{0}%
+ Assume that every node that *needs* to vote will have the time to do so
+}%
+\@xx{}%
+ \@x{\@s{59.77} \.{\land}\@s{4.1} \A\, nonVoter \.{\in} Nodes
+ \.{\,\backslash\,} OpenJudges ( j ) \.{:}}%
+\@x{\@s{86.30} \.{\lor} IsFinanciallyIncentivizedToVote ( nonVoter )}%
+\@x{\@s{86.30} \.{\lor} n \.{\in} MaliciousNodes}%
+\@x{\@s{59.77} \.{\land}\@s{4.09} CloseJudgment ( j . id ,\, n )}%
+\@x{\@s{59.77}}%
+\@y{\@s{0}%
+ Update the nodes preferences
+}%
+\@xx{}%
+ \@x{\@s{59.77} \.{\land}\@s{4.1} \E\, preferenceIndex \.{\in} {\DOMAIN}
+ private [ n ] . preferences \.{:}}%
+ \@x{\@s{86.30} \.{\land} private [ n ] . preferences [ preferenceIndex ] .
+ package}%
+\@x{\@s{117.92} \.{=} j . package}%
+\@x{\@s{86.30} \.{\land} private \.{'} \.{=}}%
+ \@x{\@s{97.42} [ private {\EXCEPT} {\bang} [ n ] . preferences [
+ preferenceIndex ] . status}%
+\@x{\@s{116.59} \.{=}\@w{processed} ]}%
+ \@x{\@s{59.77} \.{\land} {\UNCHANGED}\@s{4.1} {\langle} nextPackageId
+ {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+ Add additional package to node
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \.{\land} RunSimulation}%
+\@x{\@s{48.45} \.{\land} AddPreferencedPackage ( n )}%
+\@x{\@s{48.45} \.{\land} {\UNCHANGED} {\langle} public {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+ End simulation
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \.{\land} {\lnot} RunSimulation}%
+ \@x{\@s{48.45} \.{\land} {\UNCHANGED} {\langle} private ,\, public ,\,
+ nextPackageId {\rangle}}%
 \@pvspace{16.0pt}%
-\@x{ Spec \.{\defeq} Init \.{\land} {\Box} [ Next ]_{ {\langle} public ,\,
-private ,\, packages ,\, nextPackageId ,\, isReproducible {\rangle}}
-\.{\land} Fairness}%
+ \@x{ Spec\@s{1.46} \.{\defeq} Init \.{\land} {\Box} [ Next ]_{ {\langle}
+ public ,\, private ,\, nextPackageId {\rangle}}}%
 \@pvspace{16.0pt}%
 \@x{}\bottombar\@xx{}%
 \end{document}

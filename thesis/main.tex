@@ -14,6 +14,7 @@
 
 \usepackage{subfiles}
 
+% Styling for TLA+ as tex
 \usepackage{tlatex}
 
 \usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
@@ -1395,7 +1396,7 @@ This scenario is a positive test of the model where every builder is assumed to 
 \subsection{Scenario 2: Single malicious builder}
 \label{subsec:scenario_single_malicious}
 
-To test the model under a more realistic scenario, this scenario extends the one in \ref{subsec:scenario_non-malicious} with a malicious builder. The malicious builder acts similarly to the builders from \ref{sec:systemActors}, but will always judge packages incorrectly. With the added malicious builder, this scenario has a total of four builders. To improve model checking time with the additional builder, the judgment goal is slightly lessened to up to and including three. The main purpose of this scenario is to ensure that the model works as intended when not all judgments are the same.
+To test the model under a more realistic scenario, this scenario extends the one in \ref{subsec:scenario_non-malicious} with a malicious builder. The malicious builder acts similarly to the builders from \ref{sec:systemActors}, but will always judge packages incorrectly. With the added malicious builder, this scenario has a total of four builders. To improve model checking time with the additional builder, the judgment goal is lessened to up to and including two packages. The main purpose of this scenario is to ensure that the model works as intended when not all judgments are the equal.
 
 
 
