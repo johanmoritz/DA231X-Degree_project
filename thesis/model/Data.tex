@@ -1,0 +1,86 @@
+% \batchmode %% Suppresses most terminal output.
+% \documentclass[../main.tex]{subfiles}
+
+% \begin{document}
+% \tlatex
+% \linenumbers[1]
+\@x{}\moduleLeftDash\@xx{ {\MODULE} Judgment}\moduleRightDash\@xx{}%
+\@x{ {\EXTENDS} TLC ,\, FiniteSets ,\, Reals ,\, Sequences}\label{line:ExtendedModules}%
+\@pvspace{8.0pt}%
+\@x{ {\VARIABLE} public ,\, private ,\, nextPackageId}%
+\@pvspace{8.0pt}%
+\@x{ {\CONSTANT} NumberOfClosedJudgmentsGoal}%
+\@pvspace{16.0pt}%
+\@x{ Nodes \.{\defeq} \{\@w{node1} ,\,\@w{node2} ,\,\@w{node3} ,\,\@w{node4}
+\}}%
+\@x{ MaliciousNodes \.{\defeq} \{\@w{node4} \}}%
+\@pvspace{8.0pt}%
+\@x{ InitialPrivate\@s{9.53} \.{\defeq} private \.{=} [}%
+\@x{\@s{16.4} node1 \.{\mapsto} [}%
+\@x{\@s{32.8} preferences \.{\mapsto} {\langle}}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package1} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package2} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ]}%
+\@x{\@s{32.8} {\rangle}}%
+\@x{\@s{16.4} ] ,\,}%
+\@x{\@s{16.4} node2 \.{\mapsto} [}%
+\@x{\@s{32.8} preferences \.{\mapsto} {\langle}}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package3} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package4} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ]}%
+\@x{\@s{32.8} {\rangle}}%
+\@x{\@s{16.4} ] ,\,}%
+\@x{\@s{16.4} node3 \.{\mapsto} [}%
+\@x{\@s{32.8} preferences \.{\mapsto} {\langle}}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package5} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package6} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ]}%
+\@pvspace{8.0pt}%
+\@x{\@s{32.8} {\rangle}}%
+\@x{\@s{16.4} ] ,\,}%
+\@x{\@s{16.4} node4 \.{\mapsto} [}%
+\@x{\@s{32.8} preferences \.{\mapsto} {\langle}}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package7} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package8} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ]}%
+\@pvspace{8.0pt}%
+\@x{\@s{32.8} {\rangle}}%
+\@x{\@s{16.4} ]}%
+\@x{ ]}%
+\@pvspace{8.0pt}%
+\@x{ InitialPublic \.{\defeq} public \.{=} [}%
+\@x{\@s{16.4} nodes \.{\mapsto} [}%
+\@x{\@s{32.8} node1 \.{\mapsto} [ wallet \.{\mapsto} 3 ] ,\,}%
+\@x{\@s{32.8} node2 \.{\mapsto} [ wallet \.{\mapsto} 0 ] ,\,}%
+\@x{\@s{32.8} node3 \.{\mapsto} [ wallet \.{\mapsto} 0 ] ,\,}%
+\@x{\@s{32.8} node4 \.{\mapsto} [ wallet \.{\mapsto} 0 ]}%
+\@x{\@s{16.4} ] ,\,}%
+\@x{\@s{16.4} judgments \.{\mapsto} {\langle} {\rangle}}%
+\@x{ ]}%
+\@pvspace{8.0pt}%
+\@x{ IsReproducibleData \.{\defeq}\@s{8.2} [ package1 \.{\mapsto} {\TRUE}
+,\,}%
+\@x{\@s{114.37} package2 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package3 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package4 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package5 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package6 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package7 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package8 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package9 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package10 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package11 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package12 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package13 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package14 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package15 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package16 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package17 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package18 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package19 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package20 \.{\mapsto} {\FALSE} ]}%
+% \end{document}

@@ -1,0 +1,157 @@
+\batchmode %% Suppresses most terminal output.
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+\tlatex
+% \linenumbers[1]
+\@x{ Init \.{\defeq}}%
+\@x{\@s{16.4} \.{\land} InitialPublic}%
+\@x{\@s{16.4} \.{\land} InitialPrivate}%
+\@x{\@s{16.4} \.{\land} nextPackageId \.{=} 9}%
+\@pvspace{8.0pt}%
+\@x{ Next \.{\defeq}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    Initializing a package judgment
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, index \.{\in} {\DOMAIN} private [ n ] . preferences
+\.{:}}%
+\@x{\@s{59.77} \.{\LET} p \.{\defeq} private [ n ] . preferences [ index ]
+\.{\IN}}%
+\@x{\@s{80.17} \.{\land} RunSimulation}%
+\@x{\@s{80.17} \.{\land} p . status \.{=}\@w{not{-}processed}}%
+\@x{\@s{80.17} \.{\land} InitializeJudgment ( p . package ,\, n ,\, p . level
+)}%
+\@x{\@s{80.17} \.{\land} private \.{'} \.{=}}%
+\@x{\@s{95.38} [ private {\EXCEPT} {\bang} [ n ] . preferences [ index ] .
+status \.{=}\@w{started} ]}%
+\@x{\@s{80.17} \.{\land} {\UNCHANGED} {\langle} nextPackageId {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    Adding a secret vote
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
+\@x{\@s{59.77} \.{\LET} secretVote \.{\defeq} {\IF} n \.{\in} MaliciousNodes}%
+\@x{\@s{152.12} \.{\THEN} {\lnot} IsReproducible ( j . package )}%
+\@x{\@s{152.12} \.{\ELSE} IsReproducible ( j . package )}%
+\@x{\@s{59.77} \.{\IN}}%
+\@x{\@s{76.17} \.{\land} RunSimulation}%
+\@x{\@s{76.17}}%
+\@y{\@s{0}%
+    Nodes only build/judge if they have to
+}%
+\@xx{}%
+\@x{\@s{76.17} \.{\land}\@s{4.1} \.{\lor}\@s{4.1} FutureCost ( n ) \.{>}
+public . nodes [ n ] . wallet \.{-} 1}%
+\@x{\@s{91.38} \.{\lor}\@s{4.09} j . owner \.{=} n}%
+\@x{\@s{91.38} \.{\lor}\@s{4.09} j . package \.{\in} PreferredPackages ( n )}%
+\@x{\@s{76.17} \.{\land}\@s{4.09} AddSecretJudgment ( j . id ,\, n ,\,
+ToString ( secretVote ) )}%
+\@x{\@s{76.17} \.{\land}\@s{4.09} {\UNCHANGED} {\langle} private ,\,
+nextPackageId {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    End submission of secret votes
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
+\@x{\@s{59.77} \.{\land} RunSimulation}%
+\@x{\@s{59.77}}%
+\@y{\@s{0}%
+    Assume that every node that *needs* to vote will have the time to do so
+}%
+\@xx{}%
+\@x{\@s{59.77} \.{\land}\@s{4.1} \A\, nonVoter \.{\in} Nodes
+\.{\,\backslash\,} SecretJudges ( j ) \.{:}}%
+\@x{\@s{86.30} \.{\lor}\@s{4.1} IsFinanciallyIncentivizedToVote ( nonVoter )}%
+\@x{\@s{86.30} \.{\lor}\@s{4.09} n \.{\in} MaliciousNodes}%
+\@x{\@s{59.77} \.{\land}\@s{4.09} EndSecretSubmissions ( j . id ,\, n )}%
+\@x{\@s{59.77} \.{\land} {\UNCHANGED} {\langle} private ,\, nextPackageId
+    {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    Add an open vote
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
+\@x{\@s{59.77} \.{\LET} openVote \.{\defeq} {\IF} n \.{\in} MaliciousNodes}%
+\@x{\@s{155.70} \.{\THEN} {\lnot} IsReproducible ( j . package )}%
+\@x{\@s{155.70} \.{\ELSE} IsReproducible ( j . package )}%
+\@x{\@s{59.77} \.{\IN}}%
+\@x{\@s{76.17} \.{\land} RunSimulation}%
+\@x{\@s{76.17} \.{\land}\@s{4.1} \.{\lor}\@s{4.1} FutureCost ( n ) \.{>}
+public . nodes [ n ] . wallet \.{-} 1}%
+\@x{\@s{91.38} \.{\lor}\@s{4.09} j . owner \.{=} n}%
+\@x{\@s{91.38} \.{\lor}\@s{4.09} j . package \.{\in} PreferredPackages ( n )}%
+\@x{\@s{76.17} \.{\land} ShowJudgment ( j . id ,\, n ,\, ToString ( openVote
+) )}%
+\@x{\@s{76.17} \.{\land} {\UNCHANGED} {\langle} private ,\, nextPackageId
+    {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    Close judgment
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
+\@x{\@s{59.77} \.{\land} RunSimulation}%
+\@x{\@s{59.77}}%
+\@y{\@s{0}%
+    Assume that every node that *needs* to vote will have the time to do so
+}%
+\@xx{}%
+\@x{\@s{59.77} \.{\land}\@s{4.1} \A\, nonVoter \.{\in} Nodes
+\.{\,\backslash\,} OpenJudges ( j ) \.{:}}%
+\@x{\@s{86.30} \.{\lor} IsFinanciallyIncentivizedToVote ( nonVoter )}%
+\@x{\@s{86.30} \.{\lor} n \.{\in} MaliciousNodes}%
+\@x{\@s{59.77} \.{\land}\@s{4.09} CloseJudgment ( j . id ,\, n )}%
+\@x{\@s{59.77}}%
+\@y{\@s{0}%
+    Update the nodes preferences
+}%
+\@xx{}%
+\@x{\@s{59.77} \.{\land}\@s{4.1} \E\, preferenceIndex \.{\in} {\DOMAIN}
+private [ n ] . preferences \.{:}}%
+\@x{\@s{86.30} \.{\land} private [ n ] . preferences [ preferenceIndex ] .
+package}%
+\@x{\@s{117.92} \.{=} j . package}%
+\@x{\@s{86.30} \.{\land} private \.{'} \.{=}}%
+\@x{\@s{97.42} [ private {\EXCEPT} {\bang} [ n ] . preferences [
+        preferenceIndex ] . status}%
+\@x{\@s{116.59} \.{=}\@w{processed} ]}%
+\@x{\@s{59.77} \.{\land} {\UNCHANGED}\@s{4.1} {\langle} nextPackageId
+    {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    Add additional package to node
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \.{\land} RunSimulation}%
+\@x{\@s{48.45} \.{\land} AddPreferencedPackage ( n )}%
+\@x{\@s{48.45} \.{\land} {\UNCHANGED} {\langle} public {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    End simulation
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \.{\land} {\lnot} RunSimulation}%
+\@x{\@s{48.45} \.{\land} {\UNCHANGED} {\langle} private ,\, public ,\,
+nextPackageId {\rangle}}%
+\@pvspace{16.0pt}%
+\@x{ Spec\@s{1.46} \.{\defeq} Init \.{\land} {\Box} [ Next ]_{ {\langle}
+public ,\, private ,\, nextPackageId {\rangle}}}%
+\end{document}
