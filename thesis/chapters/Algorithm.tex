@@ -1,0 +1,58 @@
+\chapter{Judgment algorithm}
+
+
+\section{Algorithm: reward scheme}
+Each builder holds a wallet of build tokens (BT), and a set of packages they prefer to be judged.
+
+Each prefered package has a trust level connected to it, that directly corresponds to how many build tokens the builder is willing to pay for the package to be judged. A package with a trust level of 1, requires one additional builder to judge the package for the initiator to be satisfied with the judgment. The initiator then pays 1 BT to the other builder. For each added trust level, one more builder is required to judge the package. The cost per added builder goes up by one, such that with $n$ builders, the $k^{th}$ one to judge a package recieves $n - k + 1$ BT from the initiator. The minimum cost for a judgment at trust level $l$ is then $1 + 2 + \dotsc + l = \frac{l(l+1)}{2}$.
+
+A package judgment can be initiated if the initiator has enough build tokens to pay for its cost.
+
+If a decision can be made on the reproducibility of a package, the initiator pays out the respective number of build tokens to each builder of the winning side. Everyone of those builders except the initiator also recieve one (1) additional build token from the system.
+
+In order to bootstrap the system each node recieves an initial 1 BT, except for one node which recieves 3 BT. This last node has the responsibility of being the first initiator
+
+\section{Algorithm: hidden vote judgment}
+
+A description of the voting scheme follows and is split into a single-package and a multi-package case. The single-package algorithm denote how a judgment is made on the reproducibility of a single package, while the multi-package variant generalizes this algorithm to scenarios with multiple packages through a reward scheme to motivate builders.
+
+\subsection{Single-package algorithm}
+
+A definition of \textit{what} the single-package judgment algorithm does can be stated as:
+
+\begin{quote}
+	Given the name of a \texttt{.buildinfo} file $n_p$ corresponding to the binary package $p$, a set of builders $b_1, b_2, \dotsc, b_k$, a cryptographic hash function $H$, a function for generating message authentication codes $M$, judge the validity and reproducibility of $p$.
+\end{quote}
+
+\begin{lstlisting}[tabsize=4]
+	
+Given 	
+	name and checksum of .buildinfo file f_name and f_hash, 
+	builders b1,b2, ..., bk,
+	rebuilding function B,
+	cryptographic hash function H,
+	HMAC function HMAC, and
+	world state W1 = W2 = W3 = W4 = {},
+judge the validity and reproducibility of f_name.
+
+1. For each builder bi:
+	a) Pick key ki
+	b) Build the package p = B(f_name)
+	c) Calculate p:s checksum h = H(p)
+	c) Verify that f_name should create p (f_name=>p)
+	d) ei = if f_name=>p then HMAC(ki, h) else HMAC(ki, "invalid")
+	e) Store ki, h privately
+	f) W1[bi] = ei
+2. When appropriate (timeout or |W1|): lock W1 from changing
+3. For each builder bi: W2[bi] = ei
+4. When appropriate (timeout or |W2|): lock W2 from changing
+5. For each builder bi: calculate the validity of builder bi:s work:
+		W3[bi] = W1[bi] == HMAC(W2[bi], h) || W1[bi] == HMAC(W2[bi], "invalid")
+		6. For each builder bi: judge f_name
+		if W3[bi]
+		then W4 = if W1[bi] == HMAC(W2[bi], h)
+					then True  // valid .buildinfo
+					else False // invalid .buildinfo
+					7. For each builder bi where W3[bi] = True: BT[bi] += reward
+						
+\end{lstlisting}

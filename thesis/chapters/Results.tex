@@ -1,0 +1,70 @@
+\chapter{Results and Analysis}
+
+\section{Model evaluation}
+
+To evaluate the correctness of the TLA\textsuperscript+ model, a number of scenarios are tested with the TLC model checker. Because TLC is a bounded model checker, these scenarios do not prove the correctness of the model in general but gives an indication to under which assumptions it is correct. Particularly, they are selected to show that the system makes progress in non-trivial cases, rather than stopping in a deadlocked state, and that it yields valid results. In all scenarios, a limit as well as goal is set in terms of the number of packages the system should evaluate correctly before finishing. In other words, for each behaviour (or state sequence) that is tested in a scenario, either the goal is reached or the model has failed the scenario.
+
+\subsection{Scenario 1: No malicious builders}
+\label{subsec:scenario_non-malicious}
+
+This scenario is a positive test of the model where every builder is assumed to take egoistical but non-malicious actions, following the behaviour described under section \ref{sec:systemActors}. There are three total builders, each one with two preferred packages at a vote target of two. Two of the builders begin with 0BT in their respective wallets while the third one starts with 3BT. This allows the last builder to initialize the first package judgment, because 3BT is exactly the cost for a package with a vote target of two. The judgment goal of the scenario scales from one up to and including four, thus ensuring that the initially preferred packages of at least one builder have been judged.
+
+\subsection{Scenario 2: Single malicious builder}
+\label{subsec:scenario_single_malicious}
+
+To test the model under a more realistic scenario, this scenario extends the one in \ref{subsec:scenario_non-malicious} with a malicious builder. The malicious builder acts similarly to the builders from \ref{sec:systemActors}, but will always judge packages incorrectly. With the added malicious builder, this scenario has a total of four builders. To improve model checking time with the additional builder, the judgment goal is lessened to up to and including two packages. The main purpose of this scenario is to ensure that the model works as intended when not all judgments are the equal.
+
+
+
+% TODO: Move this to results
+
+\begin{table}[h!]
+    \begin{tabular}{c c r r r r r}
+        Max \#closed & Diameter & States        & Distinct states & Time (hh:mm::ss) & Collision Calculated & Collision observed \\
+        \hline                                                                                                                   \\
+        1            & 10       & 734           & 297             & 00:00:04         & 7E-15                &                    \\
+        2            & 19       & 53,438        & 21,609          & 00:00:06         & 3.7E-11              &                    \\
+        3            & 31       & 32,017,982    & 9,987,859       & 00:04:27         & 1.2E-5               & 5.6E-6             \\
+        4            & 40       & 2,432,997,950 & 625,847,049     & 04:53:55         & 0.061                & 0.024              \\
+    \end{tabular}
+    \caption[Three node model check]{The result from running the model checker on a three node scenario. 1 and 2 was ran on a laptop with 6 cores and 12GB memory.}
+\end{table}
+
+\begin{table}[h!]
+    \begin{tabular}{c c r r r r r}
+        Max \#closed & Diameter & States     & Distinct states & Time (hh:mm::ss) & Collision Calculated & Collision observed \\
+        \hline                                                                                                                \\
+        3            & 31       & 23,523,125 & 9,241,353       & 00:03:47         & 7.2E-6               & 3.4E-6             \\
+    \end{tabular}
+    \caption[Three node model check]{V2. The result from running the model checker on a three node scenario. 1 and 2 was ran on a laptop with 6 cores and 12GB memory.}
+\end{table}
+
+\section{Model relevance}
+
+While TLA\textsuperscript+ models are useful to test and describe complex systems, to show their relevance they need to correspond to a real implementation. While this work does not include a system implementation, this section describe how one could be made which behaves equivalently to the model with regards to the models correctness properties. The main difference between the system model and a possible implementation is that the later is constrained as well as enhanced by Hyperledger Fabric, on which foundation it would be built. Many of the key security assumptions of the system such as integrity, availability, authentication and authorization rely on Fabrics default behaviour. An implementation built on Hyperledger Fabric can be seen as a refinement of (parts of) the model. To, then, show that an implementation of the model exists, an informal argument is given to claim that the TLA\textsuperscript+ model is a refinement of an implementation built on Hyperledger Fabric.
+
+A second key difference between the model and a real implementation lies in the modelled behaviour of the system actors.
+
+A third one is the use of HMAC.
+
+\subsection{Hyperledger fabric highlights}
+\label{subsec:hyperledger-highlights}
+
+The Hyperledger Fabric blockchain is extensively described in section \ref{sec:hyperledger-fabric}, but to aid the reader this section highlights the parts most relevant to a model-implementation translation. In Hyperledger Fabric, systems are defined as a set of organizations, a network of nodes each owned by one of the organizations, a set of general policies for how the network is managed and a set of chaincode smart contracts which can read and update the blockchain and worldstate. Every node has some role on the system, such as peers that store the blockchain and run chaincode or orderers that ensures all nodes have the same blockchain history. To support high availability, participating organizations can have several nodes with the same role, thus distributing the load on any one node as well as mitigating risk in the case where some node is not functioning properly. Chaincodes are written in regular turing-complete programming languages such as Java or Go. For them to be accepted by the network, chaincodes should be deterministic with regards to the read-write sets they generate. If a chaincode contains non-deterministic behaviour, different peers would not be able to reach the same result when running the chaincode. This would lead the network to reject the execution. Whether they are accepted or not is highly dependent on the chaincodes' endorsement policies which describe what organizations has to accept the run. While chaincodes can read any parts of the world state, the request parameters of a chaincode call can include information private only to the organization that invoked the request in first hand.
+
+\subsection{Model to network design}
+The TLA\textsuperscript+ model uses a simplified network topology compared to what is expected in a production system. In the model, each organization is represented by a single \texttt{builder}. These builders are actors in the model and play the roles of clients and peers in the network. While not recommended, there is nothing in Hyperledger Fabric stopping a network to have such single node organizations. In fact, this is precisely how the Hyperledger test-network is set up. While the model can be said to represent clients and peers, it does not have anything similar to orderer nodes. Instead, the model abstracts the transaction flow (see \ref{subsec:transaction-flow}) as guaranteed and atomic state updates. This is consistent with the guarantees Hyperledger Fabric makes, where any chaincode invocation should lead to the same state updates on every peer.
+
+To represent the Hyperledger Fabric world state, the key-value map variable \texttt{public} contains all publicly known (throughout the network) information. Similarly to how the world state on the blockchain can only be updated by chaincode, there is a limited number of operators that reads or writes to the \texttt{public} variable.
+
+\subsection{Model to chaincode}
+
+Because Hyperledger Fabric chaincode are written in turing-complete languages it is fully possible to translate TLA\textsuperscript+ code to one of those languages. This greatly simplifies the argument for whether a corresponding implementation \textit{can} be found for the model. The resulting chaincode definitions should be functional as long as adherence is made to follow the Hyperledger Fabric chaincode API. Relevant to this translation are five TLA\textsuperscript+ operators, each containing the functionality of a corresponding chaincode. In general, these operators all have the form of taking some parameters from a caller, verifying whether the call is valid and updating the \texttt{public} state. This way of defining chaincode can be seen in many of the Hyperledger Fabric examples \textbf{cite}. As mentioned in \ref{subsec:hyperledger-highlights}, chaincodes should be deterministic and can rely on private data only available to nodes of the same organization as the invoking client. The five operators in the model corresponding to chaincodes are all deterministic.
+
+Model state is split into private and public (there should be a third one as well so private state is split from builder assumptions). Chaincode can only touch public data from the world state, and private data sent in a request (only if from same organization).
+
+The model assumes that all builders are weakly fair and won't stall forever. This is reasonable because each organization probably have multiple nodes so if one has crashed they can use another one.
+
+\subsection{Client behaviour}
+
+\subsection{Translation summary}

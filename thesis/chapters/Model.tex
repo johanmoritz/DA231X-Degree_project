@@ -1,0 +1,444 @@
+\chapter{TLA\textsuperscript+ model}
+
+To develop and study the judgment algorithm, a model was created as a TLA\textsuperscript+ specification. This chapter seeks to describe how this model is structured and to detail its core components. The specification has been split into three parts with some details removed to make the explanation more manageable for the reader. A full version of the specification can be found in appendix \ref{ch:TLAPlusFullModel}. This section has been divided into \ref{subsec:ModelData} on the data structures used in the model, chaincode definitions in \ref{subsec:ModelChaincode} and how system actors interact under \ref{subsec:ModelSpec}.
+
+\lstset{
+    escapechar=µ
+    , numbers=left
+    , firstnumber=auto}
+
+\section{Data structures}
+\label{subsec:ModelData}
+
+The models main data structures, variables and module setup are shown in listing \ref{lst:ModelData}. It begins by declaring the module name and then listing its module dependencies on line \ref{line:ExtendedModules}. These modules makes available operators for working with real numbers and list-like sequences, as well as ensuring that sets are finite in the model. The last point is mainly important for the model checker. Lines \ref{line:VariableDecl}-\ref{line:ConstantDecl} declares all the models mutable variables as well as the model checking goal as an immutable constant. While this constant is declared in the module, it is set by the configuration of the model checker and can be thought of as a parameter of the model. The three variables respectively represent: public information known to all system actors, private information only known by a single actor and a counter to generate unique package names.
+
+Lines \ref{line:AllNodes}-\ref{line:MaliciousNodes} define sets containing the all the system actors, called \textit{nodes} in the model, and which system actors that act maliciously. The last lines define the initial state of the \texttt{public} and \texttt{private} variables and the correct information on whether a package is reproducible or not. As can be noted, the \texttt{private} variable contains a mapping from system actor to their preferred packages. These preferred packages are disjunct between nodes to simplify the rest of the model. Each package preference stores how many has to judge the package for the node to be satisfied with the result and whether the package has been judged yet. While the level is set at a hard coded value initially, this is also only to simplify the model. The \texttt{public} variable has instead two different parts. One describes the number of tokens a node has and the other stores the package judgments created during the execution of model checking. Because only one node starts of with tokens, they are the only ones who can initialize a package judgment at the start.
+
+\begin{lstlisting}[	  caption=Variables and TLA\textsuperscript+ model dependencies
+					, label=lst:ModelData]
+	µ
+	\begin{tlatex}
+\@x{}\moduleLeftDash\@xx{ {\MODULE} Judgment}\moduleRightDash\@xx{}%
+\@x{ {\EXTENDS} TLC ,\, FiniteSets ,\, Reals ,\, Sequences}%
+\label{line:ExtendedModules}
+\@pvspace{8.0pt}%
+\@x{ {\VARIABLE} public ,\, private ,\, nextPackageId}%
+\label{line:VariableDecl}
+\@pvspace{8.0pt}%
+\@x{ {\CONSTANT} NumberOfClosedJudgmentsGoal}%
+\label{line:ConstantDecl}
+\@pvspace{16.0pt}%
+\@x{ Nodes \.{\defeq} \{\@w{node1} ,\,\@w{node2} ,\,\@w{node3} ,\,\@w{node4}
+\}}%
+\label{line:AllNodes}
+\@x{ MaliciousNodes \.{\defeq} \{\@w{node4} \}}%
+\label{line:MaliciousNodes}
+\@pvspace{8.0pt}%
+\@x{ InitialPrivate\@s{9.53} \.{\defeq} private \.{=} [}%
+\@x{\@s{16.4} node1 \.{\mapsto} [}%
+\@x{\@s{32.8} preferences \.{\mapsto} {\langle}}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package1} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package2} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ]}%
+\@x{\@s{32.8} {\rangle}}%
+\@x{\@s{16.4} ] ,\,}%
+\@x{\@s{16.4} node2 \.{\mapsto} [}%
+\@x{\@s{32.8} preferences \.{\mapsto} {\langle}}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package3} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package4} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ]}%
+\@x{\@s{32.8} {\rangle}}%
+\@x{\@s{16.4} ] ,\,}%
+\@x{\@s{16.4} node3 \.{\mapsto} [}%
+\@x{\@s{32.8} preferences \.{\mapsto} {\langle}}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package5} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package6} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ]}%
+\@pvspace{8.0pt}%
+\@x{\@s{32.8} {\rangle}}%
+\@x{\@s{16.4} ] ,\,}%
+\@x{\@s{16.4} node4 \.{\mapsto} [}%
+\@x{\@s{32.8} preferences \.{\mapsto} {\langle}}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package7} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ] ,\,}%
+\@x{\@s{49.19} [ package \.{\mapsto}\@w{package8} ,\, level \.{\mapsto} 2 ,\,
+status \.{\mapsto}\@w{not{-}processed} ]}%
+\@pvspace{8.0pt}%
+\@x{\@s{32.8} {\rangle}}%
+\@x{\@s{16.4} ]}%
+\@x{ ]}%
+\@pvspace{8.0pt}%
+\@x{ InitialPublic \.{\defeq} public \.{=} [}%
+\@x{\@s{16.4} nodes \.{\mapsto} [}%
+\@x{\@s{32.8} node1 \.{\mapsto} [ wallet \.{\mapsto} 3 ] ,\,}%
+\@x{\@s{32.8} node2 \.{\mapsto} [ wallet \.{\mapsto} 0 ] ,\,}%
+\@x{\@s{32.8} node3 \.{\mapsto} [ wallet \.{\mapsto} 0 ] ,\,}%
+\@x{\@s{32.8} node4 \.{\mapsto} [ wallet \.{\mapsto} 0 ]}%
+\@x{\@s{16.4} ] ,\,}%
+\@x{\@s{16.4} judgments \.{\mapsto} {\langle} {\rangle}}%
+\label{line:EmptyJudgments}
+\@x{ ]}%
+\@pvspace{8.0pt}%
+\@x{ IsReproducibleData \.{\defeq}\@s{8.2} [ package1 \.{\mapsto} {\TRUE}
+,\,}%
+\@x{\@s{114.37} package2 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package3 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package4 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package5 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package6 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package7 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package8 \.{\mapsto} {\TRUE} ,\,}%
+\@x{\@s{114.37} package9 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package10 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package11 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package12 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package13 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package14 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package15 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package16 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package17 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package18 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package19 \.{\mapsto} {\FALSE} ,\,}%
+\@x{\@s{114.37} package20 \.{\mapsto} {\FALSE} ]}%
+	\end{tlatex}
+	µ
+\end{lstlisting}
+
+\section{Chaincode}
+\label{subsec:ModelChaincode}
+
+Listing \ref{lst:ChaincodeModel}
+
+\begin{lstlisting}[caption=TLA\textsuperscript+ model of chaincode, label=lst:ChaincodeModel]
+	µ
+	\begin{tlatex}
+		\@x{ InitializeJudgment ( package ,\, owner ,\, targetVotes ) \.{\defeq}}%
+\@x{\@s{16.4}}%
+\@y{\@s{0}%
+    Guards
+}%
+\@xx{}%
+\@x{\@s{16.4} \.{\land} Cost ( targetVotes ) \.{\leq} public . nodes [ owner
+    ] . wallet}%
+\@x{\@s{16.4} \.{\land} \A\, j \.{\in} ActiveJudgments \.{:} j . owner
+\.{\neq} owner}%
+\@x{\@s{16.4}}%
+\@y{\@s{0}%
+    Update
+}%
+\@xx{}%
+\@x{\@s{16.4}}%
+\@y{\@s{0}%
+    \ensuremath{TODO}: Better ids. Currently there can only be one judgment per
+    package.
+}%
+\@xx{}%
+\@x{\@s{16.4} \.{\land} \.{\LET} judgmentId \.{\defeq} package}%
+\@x{\@s{47.91} judgment \.{\defeq} [ id \.{\mapsto} judgmentId ,\,}%
+\@x{\@s{110.39} tally \.{\mapsto} [ for \.{\mapsto} 0 ,\, against \.{\mapsto}
+0 ] ,\,}%
+\@x{\@s{110.39} finalResult \.{\mapsto}\@w{undecided} ,\,}%
+\@x{\@s{110.39} package \.{\mapsto} package ,\,}%
+\@x{\@s{110.39} owner \.{\mapsto} owner ,\,}%
+\@x{\@s{110.39} targetVotes \.{\mapsto} targetVotes ,\,}%
+\@x{\@s{110.39} status \.{\mapsto}\@w{active} ,\,}%
+\@x{\@s{110.39} phase \.{\mapsto}\@w{secretVotes} ,\,}%
+\@x{\@s{110.39} secretJudgments \.{\mapsto} {\langle} {\rangle} ,\,}%
+\@x{\@s{110.39} openJudgments \.{\mapsto} {\langle} {\rangle} ] \.{\IN}}%
+\@x{\@s{31.61} public \.{'} \.{=} [ public {\EXCEPT} {\bang} . judgments
+\.{=} Append ( @ ,\, judgment ) ]}%
+\@pvspace{8.0pt}%
+\@x{ AddSecretJudgment ( judgmentId ,\, judge ,\, secretVote ) \.{\defeq}}%
+\@x{\@s{16.4} \.{\lor}\@s{4.1} Len ( public . judgments ) \.{=} 0}%
+\@x{\@s{16.4} \.{\lor}\@s{4.09} \E\, index \.{\in} {\DOMAIN} public .
+judgments \.{:}}%
+\@x{\@s{42.93} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
+\@x{\@s{63.33} \.{\land} j . id \.{=} judgmentId}%
+\@x{\@s{63.33} \.{\land} j . status \.{=}\@w{active}}%
+\@x{\@s{63.33} \.{\land} j . phase \.{=}\@w{secretVotes}}%
+\@x{\@s{63.33}}%
+\@y{\@s{0}%
+Has \mbox{'}judge\mbox{'} added their vote before\.{?}
+}%
+\@xx{}%
+\@x{\@s{63.33} \.{\land} \{ sj \.{\in} Range ( j . secretJudgments ) \.{:} sj
+. judge \.{=} judge \} \.{=} \{ \}}%
+\@x{\@s{63.33}}%
+\@y{\@s{0}%
+    Update
+}%
+\@xx{}%
+\@x{\@s{63.33} \.{\land}\@s{4.1} public \.{'} \.{=}}%
+\@x{\@s{94.94} [ public {\EXCEPT} {\bang} . judgments [ index ] .
+secretJudgments \.{=}}%
+\@x{\@s{110.02} Append ( @ ,\, [ judge \.{\mapsto} judge ,\,}%
+\@x{\@s{164.08} vote \.{\mapsto} secretVote ] ) ]}%
+\@pvspace{8.0pt}%
+\@x{ EndSecretSubmissions ( judgmentId ,\, owner ) \.{\defeq}}%
+\@x{\@s{16.4} \.{\lor} Len ( public . judgments ) \.{=} 0}%
+\@x{\@s{16.4} \.{\lor} \E\, index \.{\in} {\DOMAIN} public . judgments \.{:}}%
+\@x{\@s{31.61} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
+\@x{\@s{52.01} \.{\land} j . id \.{=} judgmentId}%
+\@x{\@s{52.01} \.{\land} j . status \.{=}\@w{active}}%
+\@x{\@s{52.01} \.{\land} j . phase\@s{2.49} \.{=}\@w{secretVotes}}%
+\@x{\@s{52.01} \.{\land} j . owner \.{=} owner}%
+\@x{\@s{52.01} \.{\land} 2 \.{*} j . targetVotes \.{-} 1 \.{\leq} Len ( j .
+secretJudgments )}%
+\@x{\@s{52.01} \.{\land} public \.{'} \.{=} [ public {\EXCEPT} {\bang} .
+judgments [ index ] . phase}%
+\@x{\@s{116.10} \.{=}\@w{openVotes} ]}%
+\@pvspace{8.0pt}%
+\@x{ ShowJudgment ( judgmentId ,\, judge ,\, openVote ) \.{\defeq}}%
+\@x{\@s{16.4} \.{\lor} Len ( public . judgments ) \.{=} 0}%
+\@x{\@s{16.4} \.{\lor} \E\, index \.{\in} {\DOMAIN} public . judgments \.{:}}%
+\@x{\@s{31.61} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
+\@x{\@s{52.01} \.{\land} j . id \.{=} judgmentId}%
+\@x{\@s{52.01} \.{\land} j . status \.{=}\@w{active}}%
+\@x{\@s{52.01} \.{\land} j . phase \.{=}\@w{openVotes}}%
+\@x{\@s{52.01}}%
+\@y{\@s{0}%
+Has \mbox{'}judge\mbox{'} added their vote before\.{?}
+}%
+\@xx{}%
+\@x{\@s{52.01} \.{\land} \{ sj \.{\in} Range ( j . secretJudgments ) \.{:} sj
+. judge \.{=} judge \} \.{\neq} \{ \}}%
+\@x{\@s{52.01}}%
+\@y{\@s{0}%
+Has \mbox{'}judge\mbox{'} showed their vote before\.{?}
+}%
+\@xx{}%
+\@x{\@s{52.01} \.{\land} \{ oj \.{\in} Range ( j . openJudgments ) \.{:} oj .
+judge \.{=} judge \} \.{=} \{ \}}%
+\@x{\@s{52.01}}%
+\@y{\@s{0}%
+    Secret and open votes should be the same
+}%
+\@xx{}%
+\@x{\@s{52.01}}%
+\@y{\@s{0}%
+    This validation is done with \ensuremath{HMAC} in practice
+}%
+\@xx{}%
+\@x{\@s{52.01} \.{\land} \E\, sj \.{\in} Range ( j . secretJudgments ) \.{:}}%
+\@x{\@s{67.22} \.{\land}\@s{4.1} sj . judge\@s{5.50} \.{=} judge}%
+\@x{\@s{67.22} \.{\land}\@s{4.09} openVote \.{=} sj . vote}%
+\@x{\@s{52.01}}%
+\@y{\@s{0}%
+    Update
+}%
+\@xx{}%
+\@x{\@s{52.01} \.{\land}\@s{4.1} public \.{'} \.{=} [ public {\EXCEPT}
+    {\bang} . judgments [ index ] \.{=} [ @ {\EXCEPT}}%
+\@x{\@s{116.10} {\bang} . openJudgments \.{=} Append ( @ ,\,}%
+\@x{\@s{131.65} [\@s{8.2} judge \.{\mapsto} judge ,\,}%
+\@x{\@s{142.62} vote \.{\mapsto} openVote ] ) ,\,}%
+\@x{\@s{116.10} {\bang} . tally . for \.{=} {\IF} openVote \.{=}\@w{TRUE}}%
+\@x{\@s{181.02} \.{\THEN} @ \.{+} 1}%
+\@x{\@s{181.02} \.{\ELSE} @ ,\,}%
+\@x{\@s{116.10} {\bang} . tally . against \.{=} {\IF} openVote
+\.{=}\@w{FALSE}}%
+\@x{\@s{177.89} \.{\THEN} @ \.{+} 1}%
+\@x{\@s{177.89} \.{\ELSE} @ ] ]}%
+\@pvspace{16.0pt}%
+\@x{ CloseJudgment ( judgmentId ,\, owner ) \.{\defeq}}%
+\@x{\@s{16.4} \.{\lor}\@s{4.1} Len ( public . judgments ) \.{=} 0}%
+\@x{\@s{16.4} \.{\lor}\@s{4.09} \E\, index \.{\in} {\DOMAIN} public .
+judgments \.{:}}%
+\@x{\@s{42.93} \.{\LET} j \.{\defeq} public . judgments [ index ]}%
+\@x{\@s{63.33} finalResult \.{\defeq} ToString ( j . tally . for \.{>} j .
+tally . against ) \.{\IN}}%
+\@x{\@s{63.33} \.{\land}\@s{4.1} j . id \.{=} judgmentId}%
+\@x{\@s{63.33} \.{\land}\@s{4.09} j . status \.{=}\@w{active}}%
+\@x{\@s{63.33} \.{\land}\@s{4.09} j . phase\@s{2.49} \.{=}\@w{openVotes}}%
+\@x{\@s{63.33} \.{\land}\@s{4.09} j . owner \.{=} owner}%
+\@x{\@s{63.33} \.{\land} 2 \.{*} j . targetVotes \.{-} 1 \.{\leq} Len ( j .
+openJudgments )}%
+\@x{\@s{78.54}}%
+\@y{\@s{0}%
+    We have a majority!
+}%
+\@xx{}%
+\@x{\@s{63.33} \.{\land}\@s{4.09} \.{\lor}\@s{4.1} \.{\land}\@s{4.1} j .
+tally . for \.{\neq} j . tally . against}%
+\@x{\@s{93.75} \.{\land}\@s{4.09} public \.{'} \.{=} [ public {\EXCEPT}}%
+\@x{\@s{125.36} {\bang} . judgments [ index ] \.{=}}%
+\@x{\@s{140.91} [ @ {\EXCEPT}}%
+\@x{\@s{155.56} {\bang} . status \.{=}\@w{closed} ,\,}%
+\@x{\@s{155.56} {\bang} . phase \.{=}\@w{judgment} ,\,}%
+\@x{\@s{155.56} {\bang} . finalResult \.{=} finalResult ] ,\,}%
+\@x{\@s{125.36} {\bang} . nodes \.{=} Rewards ( j ) ]}%
+\@x{\@s{78.54}}%
+\@y{\@s{0}%
+    Everyone has voted, and we don\mbox{'}t have a majority
+}%
+\@xx{}%
+\@x{\@s{78.54} \.{\lor}\@s{4.1} \.{\land}\@s{4.1} j . tally . for \.{=} j .
+tally . against}%
+\@x{\@s{93.75} \.{\land}\@s{4.09} public \.{'} \.{=} [ public {\EXCEPT}
+    {\bang} . judgments [ index ] \.{=} [ @ {\EXCEPT}}%
+\@x{\@s{157.84} {\bang} . status \.{=}\@w{closed} ,\,}%
+\@x{\@s{157.84} {\bang} . finalResult \.{=}\@w{undecided} ] ]}%
+	\end{tlatex}
+	µ
+\end{lstlisting}
+
+\section{Specification}
+\label{subsec:ModelSpec}
+
+\begin{lstlisting}[caption=System actor behaviour in TLA\textsuperscript+ specification]
+    µ
+    \@x{ Init \.{\defeq}}%
+\@x{\@s{16.4} \.{\land} InitialPublic}%
+\@x{\@s{16.4} \.{\land} InitialPrivate}%
+\@x{\@s{16.4} \.{\land} nextPackageId \.{=} 9}%
+\@pvspace{8.0pt}%
+\@x{ Next \.{\defeq}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    Initializing a package judgment
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, index \.{\in} {\DOMAIN} private [ n ] . preferences
+\.{:}}%
+\@x{\@s{59.77} \.{\LET} p \.{\defeq} private [ n ] . preferences [ index ]
+\.{\IN}}%
+\@x{\@s{80.17} \.{\land} RunSimulation}%
+\@x{\@s{80.17} \.{\land} p . status \.{=}\@w{not{-}processed}}%
+\@x{\@s{80.17} \.{\land} InitializeJudgment ( p . package ,\, n ,\, p . level
+)}%
+\@x{\@s{80.17} \.{\land} private \.{'} \.{=}}%
+\@x{\@s{95.38} [ private {\EXCEPT} {\bang} [ n ] . preferences [ index ] .
+status \.{=}\@w{started} ]}%
+\@x{\@s{80.17} \.{\land} {\UNCHANGED} {\langle} nextPackageId {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    Adding a secret vote
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
+\@x{\@s{59.77} \.{\LET} secretVote \.{\defeq} {\IF} n \.{\in} MaliciousNodes}%
+\@x{\@s{152.12} \.{\THEN} {\lnot} IsReproducible ( j . package )}%
+\@x{\@s{152.12} \.{\ELSE} IsReproducible ( j . package )}%
+\@x{\@s{59.77} \.{\IN}}%
+\@x{\@s{76.17} \.{\land} RunSimulation}%
+\@x{\@s{76.17}}%
+\@y{\@s{0}%
+    Nodes only build/judge if they have to
+}%
+\@xx{}%
+\@x{\@s{76.17} \.{\land}\@s{4.1} \.{\lor}\@s{4.1} FutureCost ( n ) \.{>}
+public . nodes [ n ] . wallet \.{-} 1}%
+\@x{\@s{91.38} \.{\lor}\@s{4.09} j . owner \.{=} n}%
+\@x{\@s{91.38} \.{\lor}\@s{4.09} j . package \.{\in} PreferredPackages ( n )}%
+\@x{\@s{76.17} \.{\land}\@s{4.09} AddSecretJudgment ( j . id ,\, n ,\,
+ToString ( secretVote ) )}%
+\@x{\@s{76.17} \.{\land}\@s{4.09} {\UNCHANGED} {\langle} private ,\,
+nextPackageId {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    End submission of secret votes
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
+\@x{\@s{59.77} \.{\land} RunSimulation}%
+\@x{\@s{59.77}}%
+\@y{\@s{0}%
+    Assume that every node that *needs* to vote will have the time to do so
+}%
+\@xx{}%
+\@x{\@s{59.77} \.{\land}\@s{4.1} \A\, nonVoter \.{\in} Nodes
+\.{\,\backslash\,} SecretJudges ( j ) \.{:}}%
+\@x{\@s{86.30} \.{\lor}\@s{4.1} IsFinanciallyIncentivizedToVote ( nonVoter )}%
+\@x{\@s{86.30} \.{\lor}\@s{4.09} n \.{\in} MaliciousNodes}%
+\@x{\@s{59.77} \.{\land}\@s{4.09} EndSecretSubmissions ( j . id ,\, n )}%
+\@x{\@s{59.77} \.{\land} {\UNCHANGED} {\langle} private ,\, nextPackageId
+    {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    Add an open vote
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
+\@x{\@s{59.77} \.{\LET} openVote \.{\defeq} {\IF} n \.{\in} MaliciousNodes}%
+\@x{\@s{155.70} \.{\THEN} {\lnot} IsReproducible ( j . package )}%
+\@x{\@s{155.70} \.{\ELSE} IsReproducible ( j . package )}%
+\@x{\@s{59.77} \.{\IN}}%
+\@x{\@s{76.17} \.{\land} RunSimulation}%
+\@x{\@s{76.17} \.{\land}\@s{4.1} \.{\lor}\@s{4.1} FutureCost ( n ) \.{>}
+public . nodes [ n ] . wallet \.{-} 1}%
+\@x{\@s{91.38} \.{\lor}\@s{4.09} j . owner \.{=} n}%
+\@x{\@s{91.38} \.{\lor}\@s{4.09} j . package \.{\in} PreferredPackages ( n )}%
+\@x{\@s{76.17} \.{\land} ShowJudgment ( j . id ,\, n ,\, ToString ( openVote
+) )}%
+\@x{\@s{76.17} \.{\land} {\UNCHANGED} {\langle} private ,\, nextPackageId
+    {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    Close judgment
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
+\@x{\@s{59.77} \.{\land} RunSimulation}%
+\@x{\@s{59.77}}%
+\@y{\@s{0}%
+    Assume that every node that *needs* to vote will have the time to do so
+}%
+\@xx{}%
+\@x{\@s{59.77} \.{\land}\@s{4.1} \A\, nonVoter \.{\in} Nodes
+\.{\,\backslash\,} OpenJudges ( j ) \.{:}}%
+\@x{\@s{86.30} \.{\lor} IsFinanciallyIncentivizedToVote ( nonVoter )}%
+\@x{\@s{86.30} \.{\lor} n \.{\in} MaliciousNodes}%
+\@x{\@s{59.77} \.{\land}\@s{4.09} CloseJudgment ( j . id ,\, n )}%
+\@x{\@s{59.77}}%
+\@y{\@s{0}%
+    Update the nodes preferences
+}%
+\@xx{}%
+\@x{\@s{59.77} \.{\land}\@s{4.1} \E\, preferenceIndex \.{\in} {\DOMAIN}
+private [ n ] . preferences \.{:}}%
+\@x{\@s{86.30} \.{\land} private [ n ] . preferences [ preferenceIndex ] .
+package}%
+\@x{\@s{117.92} \.{=} j . package}%
+\@x{\@s{86.30} \.{\land} private \.{'} \.{=}}%
+\@x{\@s{97.42} [ private {\EXCEPT} {\bang} [ n ] . preferences [
+        preferenceIndex ] . status}%
+\@x{\@s{116.59} \.{=}\@w{processed} ]}%
+\@x{\@s{59.77} \.{\land} {\UNCHANGED}\@s{4.1} {\langle} nextPackageId
+    {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    Add additional package to node
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
+\@x{\@s{48.45} \.{\land} RunSimulation}%
+\@x{\@s{48.45} \.{\land} AddPreferencedPackage ( n )}%
+\@x{\@s{48.45} \.{\land} {\UNCHANGED} {\langle} public {\rangle}}%
+\@pvspace{8.0pt}%
+\@x{\@s{33.24}}%
+\@y{\@s{0}%
+    End simulation
+}%
+\@xx{}%
+\@x{\@s{33.24} \.{\lor}\@s{4.1} \.{\land} {\lnot} RunSimulation}%
+\@x{\@s{48.45} \.{\land} {\UNCHANGED} {\langle} private ,\, public ,\,
+nextPackageId {\rangle}}%
+\@pvspace{16.0pt}%
+\@x{ Spec\@s{1.46} \.{\defeq} Init \.{\land} {\Box} [ Next ]_{ {\langle}
+public ,\, private ,\, nextPackageId {\rangle}}}%
+    µ
+\end{lstlisting}
