@@ -110,12 +110,15 @@ status \.{\mapsto}\@w{not{-}processed} ]}%
 \section{Chaincode}
 \label{subsec:ModelChaincode}
 
-Listing \ref{lst:ChaincodeModel}
+Listings \ref{lst:ModelInitializeChaincode}, \ref{lst:ModelSubmitHiddenChaincode}, \ref{lst:ModelEndHiddenChaincode}, \ref{lst:ModelRevealVoteChaincode} and \ref{lst:ModelEndJudgmentChaincode} contains the TLA\textsuperscript+ specifications of what would be written as chaincode in a system implementation. They are defined as a number of operators, each one representing a distinct chaincode. Each operator take some parameters such as who is invoking the chaincode, which judgment or package it relates to and other relevant information. They then verify whether the particular transaction is allowed or not and, if it was, updates the \texttt{public} variable. This is exemplified in the operator for initializing a new package judgment \texttt{InitializeJudgment} on lines \ref{line:InitializeJudgmentBegin}-\ref{line:InitializeJudgmentEnd}. Firstly, checks are made to ensure that the invoker \texttt{owner} has enough funds to initialize a package judgment and that there are no other judgments initialized by them currently active. If these predicates are fulfilled, a corresponding judgment is appended to the state. Note that all of these operators are in practice written as logical conjunctions, where every sub-expression must be true for the entire operator to be true. While intuitive for predicates, this is not quite obvious with an action such as on line \ref{line:InitializeJudgmentEnd}. For model checking and software development purposes, this can be thought of as an assignment where the \texttt{public} variable is updated. From a logical point of view, though, this is an equivalence check which is true only for those behaviors where the \texttt{public} variable in the next state is exactly the one as the current with the exception of an appended judgment to the \texttt{public.judgments} sequence. In practice these become equivalent statements because any behavior where the relationship between \texttt{public'} and \texttt{public} is different (and the equivalence on line \ref{line:InitializeJudgmentEnd} therefore is false) are irrelevant as they do not follow the specification.
 
-\begin{lstlisting}[caption=TLA\textsuperscript+ model of chaincode, label=lst:ChaincodeModel]
+To clarify the notation, \begin{tlatex}{\LET \IN}\end{tlatex} allows locally scoped definitions and in the \begin{tlatex}{\EXCEPT}\end{tlatex} at line \ref{line:InitializeJudgmentEnd}, \begin{tlatex}{\bang}\end{tlatex} is short for \texttt{public} and @ is short for \texttt{public.judgments}. Definitions for operators \texttt{Cost} and \texttt{ActiveJudgments} can be found in appendix \ref{ch:TLAPlusFullModel}.
+
+\begin{lstlisting}[caption=Chaincode for initializing a package judgment, label=lst:ModelInitializeChaincode]
 	µ
 	\begin{tlatex}
-		\@x{ InitializeJudgment ( package ,\, owner ,\, targetVotes ) \.{\defeq}}%
+\@x{ InitializeJudgment ( package ,\, owner ,\, targetVotes ) \.{\defeq}}%
+\label{line:InitializeJudgmentBegin}
 \@x{\@s{16.4}}%
 \@y{\@s{0}%
     Guards
@@ -150,139 +153,175 @@ Listing \ref{lst:ChaincodeModel}
 \@x{\@s{110.39} openJudgments \.{\mapsto} {\langle} {\rangle} ] \.{\IN}}%
 \@x{\@s{31.61} public \.{'} \.{=} [ public {\EXCEPT} {\bang} . judgments
 \.{=} Append ( @ ,\, judgment ) ]}%
-\@pvspace{8.0pt}%
-\@x{ AddSecretJudgment ( judgmentId ,\, judge ,\, secretVote ) \.{\defeq}}%
-\@x{\@s{16.4} \.{\lor}\@s{4.1} Len ( public . judgments ) \.{=} 0}%
-\@x{\@s{16.4} \.{\lor}\@s{4.09} \E\, index \.{\in} {\DOMAIN} public .
-judgments \.{:}}%
-\@x{\@s{42.93} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
-\@x{\@s{63.33} \.{\land} j . id \.{=} judgmentId}%
-\@x{\@s{63.33} \.{\land} j . status \.{=}\@w{active}}%
-\@x{\@s{63.33} \.{\land} j . phase \.{=}\@w{secretVotes}}%
-\@x{\@s{63.33}}%
-\@y{\@s{0}%
-Has \mbox{'}judge\mbox{'} added their vote before\.{?}
-}%
-\@xx{}%
-\@x{\@s{63.33} \.{\land} \{ sj \.{\in} Range ( j . secretJudgments ) \.{:} sj
-. judge \.{=} judge \} \.{=} \{ \}}%
-\@x{\@s{63.33}}%
-\@y{\@s{0}%
-    Update
-}%
-\@xx{}%
-\@x{\@s{63.33} \.{\land}\@s{4.1} public \.{'} \.{=}}%
-\@x{\@s{94.94} [ public {\EXCEPT} {\bang} . judgments [ index ] .
-secretJudgments \.{=}}%
-\@x{\@s{110.02} Append ( @ ,\, [ judge \.{\mapsto} judge ,\,}%
-\@x{\@s{164.08} vote \.{\mapsto} secretVote ] ) ]}%
-\@pvspace{8.0pt}%
-\@x{ EndSecretSubmissions ( judgmentId ,\, owner ) \.{\defeq}}%
-\@x{\@s{16.4} \.{\lor} Len ( public . judgments ) \.{=} 0}%
-\@x{\@s{16.4} \.{\lor} \E\, index \.{\in} {\DOMAIN} public . judgments \.{:}}%
-\@x{\@s{31.61} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
-\@x{\@s{52.01} \.{\land} j . id \.{=} judgmentId}%
-\@x{\@s{52.01} \.{\land} j . status \.{=}\@w{active}}%
-\@x{\@s{52.01} \.{\land} j . phase\@s{2.49} \.{=}\@w{secretVotes}}%
-\@x{\@s{52.01} \.{\land} j . owner \.{=} owner}%
-\@x{\@s{52.01} \.{\land} 2 \.{*} j . targetVotes \.{-} 1 \.{\leq} Len ( j .
-secretJudgments )}%
-\@x{\@s{52.01} \.{\land} public \.{'} \.{=} [ public {\EXCEPT} {\bang} .
-judgments [ index ] . phase}%
-\@x{\@s{116.10} \.{=}\@w{openVotes} ]}%
-\@pvspace{8.0pt}%
-\@x{ ShowJudgment ( judgmentId ,\, judge ,\, openVote ) \.{\defeq}}%
-\@x{\@s{16.4} \.{\lor} Len ( public . judgments ) \.{=} 0}%
-\@x{\@s{16.4} \.{\lor} \E\, index \.{\in} {\DOMAIN} public . judgments \.{:}}%
-\@x{\@s{31.61} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
-\@x{\@s{52.01} \.{\land} j . id \.{=} judgmentId}%
-\@x{\@s{52.01} \.{\land} j . status \.{=}\@w{active}}%
-\@x{\@s{52.01} \.{\land} j . phase \.{=}\@w{openVotes}}%
-\@x{\@s{52.01}}%
-\@y{\@s{0}%
-Has \mbox{'}judge\mbox{'} added their vote before\.{?}
-}%
-\@xx{}%
-\@x{\@s{52.01} \.{\land} \{ sj \.{\in} Range ( j . secretJudgments ) \.{:} sj
-. judge \.{=} judge \} \.{\neq} \{ \}}%
-\@x{\@s{52.01}}%
-\@y{\@s{0}%
-Has \mbox{'}judge\mbox{'} showed their vote before\.{?}
-}%
-\@xx{}%
-\@x{\@s{52.01} \.{\land} \{ oj \.{\in} Range ( j . openJudgments ) \.{:} oj .
-judge \.{=} judge \} \.{=} \{ \}}%
-\@x{\@s{52.01}}%
-\@y{\@s{0}%
-    Secret and open votes should be the same
-}%
-\@xx{}%
-\@x{\@s{52.01}}%
-\@y{\@s{0}%
-    This validation is done with \ensuremath{HMAC} in practice
-}%
-\@xx{}%
-\@x{\@s{52.01} \.{\land} \E\, sj \.{\in} Range ( j . secretJudgments ) \.{:}}%
-\@x{\@s{67.22} \.{\land}\@s{4.1} sj . judge\@s{5.50} \.{=} judge}%
-\@x{\@s{67.22} \.{\land}\@s{4.09} openVote \.{=} sj . vote}%
-\@x{\@s{52.01}}%
-\@y{\@s{0}%
-    Update
-}%
-\@xx{}%
-\@x{\@s{52.01} \.{\land}\@s{4.1} public \.{'} \.{=} [ public {\EXCEPT}
-    {\bang} . judgments [ index ] \.{=} [ @ {\EXCEPT}}%
-\@x{\@s{116.10} {\bang} . openJudgments \.{=} Append ( @ ,\,}%
-\@x{\@s{131.65} [\@s{8.2} judge \.{\mapsto} judge ,\,}%
-\@x{\@s{142.62} vote \.{\mapsto} openVote ] ) ,\,}%
-\@x{\@s{116.10} {\bang} . tally . for \.{=} {\IF} openVote \.{=}\@w{TRUE}}%
-\@x{\@s{181.02} \.{\THEN} @ \.{+} 1}%
-\@x{\@s{181.02} \.{\ELSE} @ ,\,}%
-\@x{\@s{116.10} {\bang} . tally . against \.{=} {\IF} openVote
-\.{=}\@w{FALSE}}%
-\@x{\@s{177.89} \.{\THEN} @ \.{+} 1}%
-\@x{\@s{177.89} \.{\ELSE} @ ] ]}%
-\@pvspace{16.0pt}%
-\@x{ CloseJudgment ( judgmentId ,\, owner ) \.{\defeq}}%
-\@x{\@s{16.4} \.{\lor}\@s{4.1} Len ( public . judgments ) \.{=} 0}%
-\@x{\@s{16.4} \.{\lor}\@s{4.09} \E\, index \.{\in} {\DOMAIN} public .
-judgments \.{:}}%
-\@x{\@s{42.93} \.{\LET} j \.{\defeq} public . judgments [ index ]}%
-\@x{\@s{63.33} finalResult \.{\defeq} ToString ( j . tally . for \.{>} j .
-tally . against ) \.{\IN}}%
-\@x{\@s{63.33} \.{\land}\@s{4.1} j . id \.{=} judgmentId}%
-\@x{\@s{63.33} \.{\land}\@s{4.09} j . status \.{=}\@w{active}}%
-\@x{\@s{63.33} \.{\land}\@s{4.09} j . phase\@s{2.49} \.{=}\@w{openVotes}}%
-\@x{\@s{63.33} \.{\land}\@s{4.09} j . owner \.{=} owner}%
-\@x{\@s{63.33} \.{\land} 2 \.{*} j . targetVotes \.{-} 1 \.{\leq} Len ( j .
-openJudgments )}%
-\@x{\@s{78.54}}%
-\@y{\@s{0}%
-    We have a majority!
-}%
-\@xx{}%
-\@x{\@s{63.33} \.{\land}\@s{4.09} \.{\lor}\@s{4.1} \.{\land}\@s{4.1} j .
-tally . for \.{\neq} j . tally . against}%
-\@x{\@s{93.75} \.{\land}\@s{4.09} public \.{'} \.{=} [ public {\EXCEPT}}%
-\@x{\@s{125.36} {\bang} . judgments [ index ] \.{=}}%
-\@x{\@s{140.91} [ @ {\EXCEPT}}%
-\@x{\@s{155.56} {\bang} . status \.{=}\@w{closed} ,\,}%
-\@x{\@s{155.56} {\bang} . phase \.{=}\@w{judgment} ,\,}%
-\@x{\@s{155.56} {\bang} . finalResult \.{=} finalResult ] ,\,}%
-\@x{\@s{125.36} {\bang} . nodes \.{=} Rewards ( j ) ]}%
-\@x{\@s{78.54}}%
-\@y{\@s{0}%
-    Everyone has voted, and we don\mbox{'}t have a majority
-}%
-\@xx{}%
-\@x{\@s{78.54} \.{\lor}\@s{4.1} \.{\land}\@s{4.1} j . tally . for \.{=} j .
-tally . against}%
-\@x{\@s{93.75} \.{\land}\@s{4.09} public \.{'} \.{=} [ public {\EXCEPT}
-    {\bang} . judgments [ index ] \.{=} [ @ {\EXCEPT}}%
-\@x{\@s{157.84} {\bang} . status \.{=}\@w{closed} ,\,}%
-\@x{\@s{157.84} {\bang} . finalResult \.{=}\@w{undecided} ] ]}%
+\label{line:InitializeJudgmentEnd}
 	\end{tlatex}
 	µ
+\end{lstlisting}
+
+\subsection{Submitting a hidden vote}
+\label{subsec:ModelSubmitHiddenChaincode}
+
+\begin{lstlisting}[caption=Chaincode for adding a hidden vote, label=lst:ModelSubmitHiddenChaincode]
+	µ
+	\begin{tlatex}
+        \@x{ AddSecretJudgment ( judgmentId ,\, judge ,\, secretVote ) \.{\defeq}}%
+        \@x{\@s{16.4} \.{\lor}\@s{4.1} Len ( public . judgments ) \.{=} 0}%
+        \@x{\@s{16.4} \.{\lor}\@s{4.09} \E\, index \.{\in} {\DOMAIN} public .
+        judgments \.{:}}%
+        \@x{\@s{42.93} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
+        \@x{\@s{63.33} \.{\land} j . id \.{=} judgmentId}%
+        \@x{\@s{63.33} \.{\land} j . status \.{=}\@w{active}}%
+        \@x{\@s{63.33} \.{\land} j . phase \.{=}\@w{secretVotes}}%
+        \@x{\@s{63.33}}%
+        \@y{\@s{0}%
+        Has \mbox{'}judge\mbox{'} added their vote before\.{?}
+        }%
+        \@xx{}%
+        \@x{\@s{63.33} \.{\land} \{ sj \.{\in} Range ( j . secretJudgments ) \.{:} sj
+        . judge \.{=} judge \} \.{=} \{ \}}%
+        \@x{\@s{63.33}}%
+        \@y{\@s{0}%
+            Update
+        }%
+        \@xx{}%
+        \@x{\@s{63.33} \.{\land}\@s{4.1} public \.{'} \.{=}}%
+        \@x{\@s{94.94} [ public {\EXCEPT} {\bang} . judgments [ index ] .
+        secretJudgments \.{=}}%
+        \@x{\@s{110.02} Append ( @ ,\, [ judge \.{\mapsto} judge ,\,}%
+        \@x{\@s{164.08} vote \.{\mapsto} secretVote ] ) ]}%
+    \end{tlatex}
+    µ
+\end{lstlisting}
+
+\subsection{End hidden vote submissions}
+\label{subsec:ModelEndHiddenChaincode}
+
+\begin{lstlisting}[caption=Chaincode stopping submissions of hidden votes, label=lst:ModelEndHiddenChaincode]
+	µ
+	\begin{tlatex}
+        \@x{ EndSecretSubmissions ( judgmentId ,\, owner ) \.{\defeq}}%
+        \@x{\@s{16.4} \.{\lor} Len ( public . judgments ) \.{=} 0}%
+        \@x{\@s{16.4} \.{\lor} \E\, index \.{\in} {\DOMAIN} public . judgments \.{:}}%\@x{\@s{31.61} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
+        \@x{\@s{52.01} \.{\land} j . id \.{=} judgmentId}%
+        \@x{\@s{52.01} \.{\land} j . status \.{=}\@w{active}}%
+        \@x{\@s{52.01} \.{\land} j . phase\@s{2.49} \.{=}\@w{secretVotes}}%
+        \@x{\@s{52.01} \.{\land} j . owner \.{=} owner}%
+        \@x{\@s{52.01} \.{\land} 2 \.{*} j . targetVotes \.{-} 1 \.{\leq} Len ( j .
+        secretJudgments )}%
+        \@x{\@s{52.01} \.{\land} public \.{'} \.{=} [ public {\EXCEPT} {\bang} .
+        judgments [ index ] . phase}%
+        \@x{\@s{116.10} \.{=}\@w{openVotes} ]}%
+    \end{tlatex}
+    µ
+\end{lstlisting}
+
+\subsection{Revealing a vote}
+\label{subsec:ModelRevealVoteChaincode}
+
+\begin{lstlisting}[caption=Chaincode for revealing a vote, label=lst:ModelRevealVoteChaincode]
+	µ
+	\begin{tlatex}
+        \@x{ ShowJudgment ( judgmentId ,\, judge ,\, openVote ) \.{\defeq}}%
+        \@x{\@s{16.4} \.{\lor} Len ( public . judgments ) \.{=} 0}%
+        \@x{\@s{16.4} \.{\lor} \E\, index \.{\in} {\DOMAIN} public . judgments \.{:}}%
+        \@x{\@s{31.61} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
+        \@x{\@s{52.01} \.{\land} j . id \.{=} judgmentId}%
+        \@x{\@s{52.01} \.{\land} j . status \.{=}\@w{active}}%
+        \@x{\@s{52.01} \.{\land} j . phase \.{=}\@w{openVotes}}%
+        \@x{\@s{52.01}}%
+        \@y{\@s{0}%
+        Has \mbox{'}judge\mbox{'} added their vote before\.{?}
+        }%
+        \@xx{}%
+        \@x{\@s{52.01} \.{\land} \{ sj \.{\in} Range ( j . secretJudgments ) \.{:} sj
+        . judge \.{=} judge \} \.{\neq} \{ \}}%
+        \@x{\@s{52.01}}%
+        \@y{\@s{0}%
+        Has \mbox{'}judge\mbox{'} showed their vote before\.{?}
+        }%
+        \@xx{}%
+        \@x{\@s{52.01} \.{\land} \{ oj \.{\in} Range ( j . openJudgments ) \.{:} oj .
+        judge \.{=} judge \} \.{=} \{ \}}%
+        \@x{\@s{52.01}}%
+        \@y{\@s{0}%
+            Secret and open votes should be the same
+        }%
+        \@xx{}%
+        \@x{\@s{52.01}}%
+        \@y{\@s{0}%
+            This validation is done with \ensuremath{HMAC} in practice
+        }%
+        \@xx{}%
+        \@x{\@s{52.01} \.{\land} \E\, sj \.{\in} Range ( j . secretJudgments ) \.{:}}%
+        \@x{\@s{67.22} \.{\land}\@s{4.1} sj . judge\@s{5.50} \.{=} judge}%
+        \@x{\@s{67.22} \.{\land}\@s{4.09} openVote \.{=} sj . vote}%
+        \@x{\@s{52.01}}%
+        \@y{\@s{0}%
+            Update
+        }%
+        \@xx{}%
+        \@x{\@s{52.01} \.{\land}\@s{4.1} public \.{'} \.{=} [ public {\EXCEPT}
+            {\bang} . judgments [ index ] \.{=} [ @ {\EXCEPT}}%
+        \@x{\@s{116.10} {\bang} . openJudgments \.{=} Append ( @ ,\,}%
+        \@x{\@s{131.65} [\@s{8.2} judge \.{\mapsto} judge ,\,}%
+        \@x{\@s{142.62} vote \.{\mapsto} openVote ] ) ,\,}%
+        \@x{\@s{116.10} {\bang} . tally . for \.{=} {\IF} openVote \.{=}\@w{TRUE}}%
+        \@x{\@s{181.02} \.{\THEN} @ \.{+} 1}%
+        \@x{\@s{181.02} \.{\ELSE} @ ,\,}%
+        \@x{\@s{116.10} {\bang} . tally . against \.{=} {\IF} openVote
+        \.{=}\@w{FALSE}}%
+        \@x{\@s{177.89} \.{\THEN} @ \.{+} 1}%
+        \@x{\@s{177.89} \.{\ELSE} @ ] ]}%
+    \end{tlatex}
+    µ
+\end{lstlisting}
+
+\subsection{End package judgment}
+\label{subsec:ModelEndJudgmentChaincode}
+
+\begin{lstlisting}[caption=Chaincode to end a package judgment, label=lst:ModelEndJudgmentChaincode]
+	µ
+	\begin{tlatex}
+        \@x{ CloseJudgment ( judgmentId ,\, owner ) \.{\defeq}}%
+        \@x{\@s{16.4} \.{\lor}\@s{4.1} Len ( public . judgments ) \.{=} 0}%
+        \@x{\@s{16.4} \.{\lor}\@s{4.09} \E\, index \.{\in} {\DOMAIN} public .
+        judgments \.{:}}%
+        \@x{\@s{42.93} \.{\LET} j \.{\defeq} public . judgments [ index ]}%
+        \@x{\@s{63.33} finalResult \.{\defeq} ToString ( j . tally . for \.{>} j .
+        tally . against ) \.{\IN}}%
+        \@x{\@s{63.33} \.{\land}\@s{4.1} j . id \.{=} judgmentId}%
+        \@x{\@s{63.33} \.{\land}\@s{4.09} j . status \.{=}\@w{active}}%
+        \@x{\@s{63.33} \.{\land}\@s{4.09} j . phase\@s{2.49} \.{=}\@w{openVotes}}%
+        \@x{\@s{63.33} \.{\land}\@s{4.09} j . owner \.{=} owner}%
+        \@x{\@s{63.33} \.{\land} 2 \.{*} j . targetVotes \.{-} 1 \.{\leq} Len ( j .
+        openJudgments )}%
+        \@x{\@s{78.54}}%
+        \@y{\@s{0}%
+            We have a majority!
+        }%
+        \@xx{}%
+        \@x{\@s{63.33} \.{\land}\@s{4.09} \.{\lor}\@s{4.1} \.{\land}\@s{4.1} j .
+        tally . for \.{\neq} j . tally . against}%
+        \@x{\@s{93.75} \.{\land}\@s{4.09} public \.{'} \.{=} [ public {\EXCEPT}}%
+        \@x{\@s{125.36} {\bang} . judgments [ index ] \.{=}}%
+        \@x{\@s{140.91} [ @ {\EXCEPT}}%
+        \@x{\@s{155.56} {\bang} . status \.{=}\@w{closed} ,\,}%
+        \@x{\@s{155.56} {\bang} . phase \.{=}\@w{judgment} ,\,}%
+        \@x{\@s{155.56} {\bang} . finalResult \.{=} finalResult ] ,\,}%
+        \@x{\@s{125.36} {\bang} . nodes \.{=} Rewards ( j ) ]}%
+        \@x{\@s{78.54}}%
+        \@y{\@s{0}%
+            Everyone has voted, and we don\mbox{'}t have a majority
+        }%
+        \@xx{}%
+        \@x{\@s{78.54} \.{\lor}\@s{4.1} \.{\land}\@s{4.1} j . tally . for \.{=} j .
+        tally . against}%
+        \@x{\@s{93.75} \.{\land}\@s{4.09} public \.{'} \.{=} [ public {\EXCEPT}
+            {\bang} . judgments [ index ] \.{=} [ @ {\EXCEPT}}%
+        \@x{\@s{157.84} {\bang} . status \.{=}\@w{closed} ,\,}%
+        \@x{\@s{157.84} {\bang} . finalResult \.{=}\@w{undecided} ] ]}%
+    \end{tlatex}
+    µ
 \end{lstlisting}
 
 \section{Specification}
