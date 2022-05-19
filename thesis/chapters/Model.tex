@@ -161,13 +161,19 @@ To clarify the notation, \begin{tlatex}{\LET \IN}\end{tlatex} allows locally sco
 \subsection{Submitting a hidden vote}
 \label{subsec:ModelSubmitHiddenChaincode}
 
+To add a hidden vote to a package judgment, the operator in listing \ref{lst:ModelSubmitHiddenChaincode} is used. It takes the id of the judgment, the name of node adding the vote, and the vote in question as parameters. The disjunctions on lines \ref{line:IfEmptyExampleBegin}-\ref{line:IfEmptyExampleEnd} is a pattern common for the rest of the chaincode specifications. If there are no judgments then this operator does nothing, otherwise some \texttt{index} is picked corresponding to the position of a particular judgment in the \texttt{public.judgments} sequence. This works because sequences in TLA\textsuperscript+ are essentially functions from positions to values and so the domain of a sequence is the set of all those positions.
+
+The rest of this operator is fairly straightforward, but line \ref{line:RangeExample} could need an explanation. Symmetric to the domain of the sequence, its range is a set of its values. Line \ref{line:RangeExample} can then be understood as testing if the set of secret votes submitted by node \texttt{judge} is empty.
+
 \begin{lstlisting}[caption=Chaincode for adding a hidden vote, label=lst:ModelSubmitHiddenChaincode]
 	µ
 	\begin{tlatex}
         \@x{ AddSecretJudgment ( judgmentId ,\, judge ,\, secretVote ) \.{\defeq}}%
         \@x{\@s{16.4} \.{\lor}\@s{4.1} Len ( public . judgments ) \.{=} 0}%
+        \label{line:IfEmptyExampleBegin}
         \@x{\@s{16.4} \.{\lor}\@s{4.09} \E\, index \.{\in} {\DOMAIN} public .
         judgments \.{:}}%
+        \label{line:IfEmptyExampleEnd}
         \@x{\@s{42.93} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
         \@x{\@s{63.33} \.{\land} j . id \.{=} judgmentId}%
         \@x{\@s{63.33} \.{\land} j . status \.{=}\@w{active}}%
@@ -179,6 +185,7 @@ To clarify the notation, \begin{tlatex}{\LET \IN}\end{tlatex} allows locally sco
         \@xx{}%
         \@x{\@s{63.33} \.{\land} \{ sj \.{\in} Range ( j . secretJudgments ) \.{:} sj
         . judge \.{=} judge \} \.{=} \{ \}}%
+        \label{line:RangeExample}
         \@x{\@s{63.33}}%
         \@y{\@s{0}%
             Update
