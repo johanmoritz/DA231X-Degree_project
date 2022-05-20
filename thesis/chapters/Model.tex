@@ -12,7 +12,7 @@ To develop and study the judgment algorithm, a model was created as a TLA\textsu
 
 The models main data structures, variables and module setup are shown in listing \ref{lst:ModelData}. It begins by declaring the module name and then listing its module dependencies on line \ref{line:ExtendedModules}. These modules makes available operators for working with real numbers and list-like sequences, as well as ensuring that sets are finite in the model. The last point is mainly important for the model checker. Lines \ref{line:VariableDecl}-\ref{line:ConstantDecl} declares all the models mutable variables as well as the model checking goal as an immutable constant. While this constant is declared in the module, it is set by the configuration of the model checker and can be thought of as a parameter of the model. The three variables respectively represent: public information known to all system actors, private information only known by a single actor and a counter to generate unique package names.
 
-Lines \ref{line:AllNodes}-\ref{line:MaliciousNodes} define sets containing the all the system actors, called \textit{nodes} in the model, and which system actors that act maliciously. The last lines define the initial state of the \texttt{public} and \texttt{private} variables and the correct information on whether a package is reproducible or not. As can be noted, the \texttt{private} variable contains a mapping from system actor to their preferred packages. These preferred packages are disjunct between nodes to simplify the rest of the model. Each package preference stores how many has to judge the package for the node to be satisfied with the result and whether the package has been judged yet. While the level is set at a hard coded value initially, this is also only to simplify the model. The \texttt{public} variable has instead two different parts. One describes the number of tokens a node has and the other stores the package judgments created during the execution of model checking. Because only one node starts of with tokens, they are the only ones who can initialize a package judgment at the start.
+Lines \ref{line:AllNodes}-\ref{line:MaliciousNodes} define sets containing all the system actors, called \textit{nodes} in the model, and which system actors that act maliciously. The last lines define the initial state of the \texttt{public} and \texttt{private} variables and the correct information on whether a package is reproducible or not. As can be noted, the \texttt{private} variable contains a mapping from system actor to their preferred packages. These preferred packages are disjunct between nodes to simplify the rest of the model. Each package preference stores how many nodes that has to judge the package for the node to be satisfied with the result and whether the package has been judged yet. While the level is set at a hard coded value initially, this is also only to simplify the model. The \texttt{public} variable has instead two different parts. One describes the number of tokens a node has and the other stores the package judgments created during the execution of model checking. Because only one node starts of with tokens, they are the only ones who can initialize a package judgment at the start.
 
 \begin{lstlisting}[	  caption=Variables and TLA\textsuperscript+ model dependencies
 					, label=lst:ModelData]
@@ -161,7 +161,7 @@ To clarify the notation, \begin{tlatex}{\LET \IN}\end{tlatex} allows locally sco
 \subsection{Submitting a hidden vote}
 \label{subsec:ModelSubmitHiddenChaincode}
 
-To add a hidden vote to a package judgment, the operator in listing \ref{lst:ModelSubmitHiddenChaincode} is used. It takes the id of the judgment, the name of node adding the vote, and the vote in question as parameters. The disjunctions on lines \ref{line:IfEmptyExampleBegin}-\ref{line:IfEmptyExampleEnd} is a pattern common for the rest of the chaincode specifications. If there are no judgments then this operator does nothing, otherwise some \texttt{index} is picked corresponding to the position of a particular judgment in the \texttt{public.judgments} sequence. This works because sequences in TLA\textsuperscript+ are essentially functions from positions to values and so the domain of a sequence is the set of all those positions.
+To add a hidden vote to a package judgment, the operator in listing \ref{lst:ModelSubmitHiddenChaincode} is used. It takes the id of the judgment, the name of the node adding the vote, and the vote in question as parameters. The disjunctions on lines \ref{line:IfEmptyExampleBegin}-\ref{line:IfEmptyExampleEnd} is a pattern common for the rest of the chaincode specifications. If there are no judgments then line \ref{line:IfEmptyExampleBegin} ensures that this operator does nothing, otherwise some \texttt{index} is picked corresponding to the position of a particular judgment in the \texttt{public.judgments} sequence. This works because sequences in TLA\textsuperscript+ are essentially functions from positions to values and so the domain of a sequence is the set of all those positions.
 
 The rest of this operator is fairly straightforward, but line \ref{line:RangeExample} could need an explanation. Symmetric to the domain of the sequence, its range is a set of its values. Line \ref{line:RangeExample} can then be understood as testing if the set of secret votes submitted by node \texttt{judge} is empty.
 
@@ -203,6 +203,8 @@ The rest of this operator is fairly straightforward, but line \ref{line:RangeExa
 \subsection{End hidden vote submissions}
 \label{subsec:ModelEndHiddenChaincode}
 
+After enough hidden votes have been added to a package judgment, this phase of the process can be ended by the node that initialized it. The requirements for this are listed on lines \ref{line:EndHiddenGuardBegin}-\ref{line:EndHiddenGuardEnd} in listing \ref{lst:ModelEndHiddenChaincode}. Most notably, \emph{enough} hidden votes is defined to guarantee that there are at least \texttt{targetVotes} number of votes on one side for or against the package being reproducible. In other words, it is guaranteed that at least one side has at least \texttt{targetVotes} number of votes.
+
 \begin{lstlisting}[caption=Chaincode stopping submissions of hidden votes, label=lst:ModelEndHiddenChaincode]
 	µ
 	\begin{tlatex}
@@ -210,11 +212,13 @@ The rest of this operator is fairly straightforward, but line \ref{line:RangeExa
         \@x{\@s{16.4} \.{\lor} Len ( public . judgments ) \.{=} 0}%
         \@x{\@s{16.4} \.{\lor} \E\, index \.{\in} {\DOMAIN} public . judgments \.{:}}%\@x{\@s{31.61} \.{\LET} j \.{\defeq} public . judgments [ index ] \.{\IN}}%
         \@x{\@s{52.01} \.{\land} j . id \.{=} judgmentId}%
+        \label{line:EndHiddenGuardBegin}
         \@x{\@s{52.01} \.{\land} j . status \.{=}\@w{active}}%
         \@x{\@s{52.01} \.{\land} j . phase\@s{2.49} \.{=}\@w{secretVotes}}%
         \@x{\@s{52.01} \.{\land} j . owner \.{=} owner}%
         \@x{\@s{52.01} \.{\land} 2 \.{*} j . targetVotes \.{-} 1 \.{\leq} Len ( j .
         secretJudgments )}%
+        \label{line:EndHiddenGuardEnd}
         \@x{\@s{52.01} \.{\land} public \.{'} \.{=} [ public {\EXCEPT} {\bang} .
         judgments [ index ] . phase}%
         \@x{\@s{116.10} \.{=}\@w{openVotes} ]}%
@@ -224,6 +228,8 @@ The rest of this operator is fairly straightforward, but line \ref{line:RangeExa
 
 \subsection{Revealing a vote}
 \label{subsec:ModelRevealVoteChaincode}
+
+To reveal ones hidden vote, the operator \texttt{ShowJudgment} shown in listing \ref{lst:ModelRevealVoteChaincode} is invoked. If the invocation is valid, \ie there is a hidden vote by this node which has not been revealed, the vote count for or against the reproducibility of the package is updated. The vote itself is also appended to a sequence of all revealed votes.
 
 \begin{lstlisting}[caption=Chaincode for revealing a vote, label=lst:ModelRevealVoteChaincode]
 	µ
@@ -286,6 +292,8 @@ The rest of this operator is fairly straightforward, but line \ref{line:RangeExa
 \subsection{End package judgment}
 \label{subsec:ModelEndJudgmentChaincode}
 
+The final step of a package judgment is begun by the node who initialized it invoking the \texttt{CloseJudgment} operator shown in listing \ref{lst:ModelEndJudgmentChaincode}. Similar to section \ref{subsec:ModelEndHiddenChaincode}, a package judgment can only be ended when the number of revealed votes is enough to ensure that there are at least
+
 \begin{lstlisting}[caption=Chaincode to end a package judgment, label=lst:ModelEndJudgmentChaincode]
 	µ
 	\begin{tlatex}
@@ -327,6 +335,83 @@ The rest of this operator is fairly straightforward, but line \ref{line:RangeExa
             {\bang} . judgments [ index ] \.{=} [ @ {\EXCEPT}}%
         \@x{\@s{157.84} {\bang} . status \.{=}\@w{closed} ,\,}%
         \@x{\@s{157.84} {\bang} . finalResult \.{=}\@w{undecided} ] ]}%
+    \end{tlatex}
+    µ
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Operator updating wallets for judgment, label=lst:ModelRewardChaincode]
+	µ
+	\begin{tlatex}
+        \@x{ {\RECURSIVE} WalletUpdatesForVoters ( \_ ,\, \_ ,\, \_ ,\, \_ )}%
+        \@x{ WalletUpdatesForVoters ( judgment ,\, votes ,\, reward ,\, updates )
+        \.{\defeq}}%
+        \@x{\@s{16.4} \.{\LET} finalResult \.{\defeq} ToString ( judgment . tally .
+        for \.{>} judgment . tally . against )}%
+        \@x{\@s{36.79} judge \.{\defeq} Head ( votes ) . judge}%
+        \@x{\@s{36.79} vote \.{\defeq} Head ( votes ) . vote}%
+        \@x{\@s{16.4} \.{\IN}}%
+        \@x{\@s{32.8} {\IF} Len ( votes ) \.{=} 0}%
+        \@x{\@s{49.05} \.{\THEN} updates}%
+        \@x{\@s{32.8} \.{\ELSE} {\IF} judge \.{=} judgment . owner}%
+        \@x{\@s{49.19}}%
+        \@y{\@s{0}%
+        Skip the owner
+        }%
+        \@xx{}%
+        \@x{\@s{49.19} \.{\THEN} WalletUpdatesForVoters (}%
+        \@x{\@s{65.6} judgment ,\, Tail ( votes ) ,\, reward ,\, updates )}%
+        \@x{\@s{32.8} \.{\ELSE} {\IF} vote \.{\neq} finalResult \.{\THEN} \.{\LET}}%
+        \@x{\@s{49.19}}%
+        \@y{\@s{0}%
+        Minority voter
+        }%
+        \@xx{}%
+        \@x{\@s{65.6} newUpdates \.{\defeq} [ updates {\EXCEPT} {\bang} [ judge ] .
+        wallet \.{=} @ ]}%
+        \@x{\@s{49.19} \.{\IN} WalletUpdatesForVoters (}%
+        \@x{\@s{73.69} judgment ,\, Tail ( votes ) ,\, reward ,\, newUpdates )}%
+        \@x{\@s{32.8} \.{\ELSE} \.{\LET}}%
+        \@x{\@s{49.19}}%
+        \@y{\@s{0}%
+        Majority voter
+        }%
+        \@xx{}%
+        \@x{\@s{65.6} newUpdates \.{\defeq} [ updates {\EXCEPT} {\bang} [ judge ] .
+        wallet \.{=} @ \.{+} reward \.{+} 1 ]}%
+        \@x{\@s{73.69} newReward \.{\defeq} {\IF} reward \.{=} 0 \.{\THEN} 0
+        \.{\ELSE} reward \.{-} 1}%
+        \@x{\@s{53.29} \.{\IN} WalletUpdatesForVoters (}%
+        \@x{\@s{90.09} judgment ,\, Tail ( votes ) ,\, newReward ,\, newUpdates )}%
+        \@pvspace{8.0pt}%
+
+        \@x{ {\RECURSIVE} WalletUpdatesForNotVoting ( \_ ,\, \_ )}%
+        \@x{ WalletUpdatesForNotVoting ( nonVoters ,\, updates ) \.{\defeq}}%
+        \@x{\@s{16.4} {\IF} nonVoters \.{=} \{ \}}%
+        \@x{\@s{32.65} \.{\THEN} updates}%
+        \@x{\@s{32.65} \.{\ELSE}}%
+        \@x{\@s{49.05} \.{\LET} v \.{\defeq} {\CHOOSE} voter \.{\in} nonVoters \.{:}
+        {\TRUE}}%
+        \@x{\@s{73.55} newUpdates \.{\defeq} [ updates {\EXCEPT} {\bang} [ v ] .
+        wallet \.{=} @ \.{-} 1 ]}%
+        \@x{\@s{49.05} \.{\IN}\@s{4.09} WalletUpdatesForNotVoting ( nonVoters
+        \.{\,\backslash\,} \{ v \} ,\, newUpdates )}%
+
+        \@x{ Rewards ( judgment ) \.{\defeq}}%
+        \@x{\@s{16.4} \.{\LET} openVotes\@s{4.11} \.{\defeq} judgment .
+        openJudgments}%
+        \@x{\@s{36.79} topReward\@s{2.12} \.{\defeq} judgment . targetVotes}%
+        \@x{\@s{36.79} wallets \.{\defeq} public . nodes}%
+        \@x{\@s{36.79} openVoters \.{\defeq} OpenJudges ( judgment )}%
+        \@x{\@s{36.79} nonVoters\@s{1.63} \.{\defeq} Nodes \.{\,\backslash\,}
+        openVoters}%
+        \@x{\@s{36.79} ownerCost \.{\defeq} Cost ( judgment . targetVotes )}%
+        \@x{\@s{36.79} updatesForVoters \.{\defeq}}%
+        \@x{\@s{53.19} WalletUpdatesForVoters ( judgment ,\, openVotes ,\, topReward
+        ,\, wallets )}%
+        \@x{\@s{40.89} updatesForNonVoters \.{\defeq}}%
+        \@x{\@s{57.29} WalletUpdatesForNotVoting ( nonVoters ,\, updatesForVoters )}%
+        \@x{\@s{16.4} \.{\IN}\@s{4.09} [ updatesForNonVoters {\EXCEPT} {\bang} [
+        judgment . owner ] . wallet \.{=} @ \.{-} ownerCost ]}%
     \end{tlatex}
     µ
 \end{lstlisting}
