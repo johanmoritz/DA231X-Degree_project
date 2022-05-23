@@ -587,6 +587,7 @@ public ,\, private ,\, nextPackageId {\rangle}}}%
 \end{lstlisting}
 
 \subsection{Model checking goal}
+\label{subsec:ModelCheckingGoal}
 
 Deadlocks happen if the model checker finds a state at which no sub-expression in the \texttt{Next} operator evaluates to true. While this is convenient for finding bugs in the specification, it can also lead to false-negatives if the state space of the model is designed to be finite. In other words, it is problematic if the model checker ends up in a deadlock when it is done. To combat this situation, the predicate \texttt{RunSimulation} shown in listing \ref{lst:RunSimulation} is used in \texttt{Next} to ensure the existence of a valid next state even after the model checking goal has been reached. Lines \ref{line:ModelEndStateBegin}-\ref{line:ModelEndStateEnd} in listing \ref{lst:ModelSpec} are true exactly when the model checking goal has been reached. At that point, the other sub-expressions in \texttt{Next} are false because they are dependent on \texttt{RunSimulation} to be true. When the goal has been fulfilled, the TLC model checker finds the sub-expression at lines \ref{line:ModelEndStateBegin}-\ref{line:ModelEndStateEnd} to be the only one that is true. Because that sub-expression also does not change any variables value, TLC infers that no new states can be made and the behavior finishes successfully.
 
@@ -602,10 +603,10 @@ Deadlocks happen if the model checker finds a state at which no sub-expression i
 \end{lstlisting}
 
 \subsection{Adding packages}
+\label{subsec:ModelAddingPackages}
 
-In the initial state, each node has a number of preferred packages as a means of goals. As stated in section \ref{subsec:ModelData}, these packages are set statically to simplify the model. To introduce a bit of dynamic behavior into the model, the sub-expression at lines \ref{line:ModelAddPackageBegin}-\ref{line:ModelAddPackageEnd} in listing \ref{lst:ModelSpec} has the possibility of adding a package to one of the nodes. The target vote level of that package is based on the wallet and any other current preferred packages of a node. This simulates new packages and package versions being added to the eco-system and nodes being willing to pay more tokens to get a more certain result for packages if they can. 
-
-
+In the initial state, each node has a number of preferred packages as a means of goals. As stated in section \ref{subsec:ModelData}, these packages are set statically to simplify the model. To introduce a bit of dynamic behavior into the model, the sub-expression at lines \ref{line:ModelAddPackageBegin}-\ref{line:ModelAddPackageEnd} in listing \ref{lst:ModelSpec} has the possibility of adding a package to one of the nodes. The target vote level of that package is based on the wallet and any other current preferred packages of a node. This simulates new packages and package versions being added to the eco-system and nodes being willing to pay more tokens to get a more certain result for packages if they can.
 
 \subsection{System actor assumptions}
 
+Besides the sub-expressions described in sections \ref{subsec:ModelCheckingGoal} and \ref{subsec:ModelAddingPackages}, the rest of the sub-expressions of the \texttt{Next} operator all relate to the behavior of the nodes. For each chaincode defined in the model, there is a sub-expression in the main disjunction of the \texttt{Next} operator.
