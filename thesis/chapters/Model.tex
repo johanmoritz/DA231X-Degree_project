@@ -292,7 +292,7 @@ To reveal ones hidden vote, the operator \texttt{ShowJudgment} shown in listing 
 \subsection{End package judgment}
 \label{subsec:ModelEndJudgmentChaincode}
 
-The final step of a package judgment is begun by the node who initialized it invoking the \texttt{CloseJudgment} operator shown in listing \ref{lst:ModelEndJudgmentChaincode}. Similar to section \ref{subsec:ModelEndHiddenChaincode}, a package judgment can only be ended when the number of revealed votes is enough to ensure that there are at least
+The final step of a package judgment is begun by the node who initialized it invoking the \texttt{CloseJudgment} operator shown in listing \ref{lst:ModelEndJudgmentChaincode}. Similar to section \ref{subsec:ModelEndHiddenChaincode}, a package judgment can only be ended when the number of revealed votes is enough to ensure that there are at least \texttt{targetVotes} number of votes on one side for or against reproducibility. If their is a majority for one side, the \texttt{Rewards} operator seen in listing \ref{lst:ModelRewardChaincode} updates the nodes' wallets, otherwise the package judgment is closed and marked with \emph{undecided} as a final result.
 
 \begin{lstlisting}[caption=Chaincode to end a package judgment, label=lst:ModelEndJudgmentChaincode]
 	µ
@@ -338,6 +338,8 @@ The final step of a package judgment is begun by the node who initialized it inv
     \end{tlatex}
     µ
 \end{lstlisting}
+
+The \texttt{Rewards} operator and its two sub-operators \texttt{WalletUpdatesForVoters} and \texttt{WalletUpdatesForNotVoting} in listing \ref{lst:ModelRewardChaincode} work by updating the \texttt{public.nodes} wallets. Together, they partition the nodes in four different cases for how these updates are done based on their respective role in the judgment: the initializer of the package judgment pays out a cost related to \texttt{targetVotes}, minority voters' wallets neither increase nor decrease, majority voters receive a reward based on how quickly they added their vote and a bonus token for the correctness of their vote, and the rest loose one token for not voting.
 
 \begin{lstlisting}[caption=Operator updating wallets for judgment, label=lst:ModelRewardChaincode]
 	µ
@@ -416,12 +418,16 @@ The final step of a package judgment is begun by the node who initialized it inv
     µ
 \end{lstlisting}
 
-\section{Specification}
+\section{Behavior of system actors}
 \label{subsec:ModelSpec}
 
-\begin{lstlisting}[caption=System actor behaviour in TLA\textsuperscript+ specification]
-    µ
-    \@x{ Init \.{\defeq}}%
+The last main parts of the model are the assumptions for how the nodes behave, certain system properties and how a successful run of the model checker is defined. Line \ref{line:ModelSpec} of listing \ref{lst:ModelSpec} shows the main operator of the specification, defining the initial variable values according to \texttt{Init} and all their allowed changes by \texttt{Next}. This last operator is interesting in that it follows a slightly different pattern than the other ones. Rather than being mainly a large conjunction, \texttt{Next} is instead a set of disjunctions. For the TLC model checker, this implies that only one, and exactly one, of these sub-expressions will be executed for each state or else there will be a deadlock if all of the sub-expressions are false. The limit of at most one executed expression comes for the shortcut behavior of TLC which will only evaluate the first of all truthful expressions in a disjunction.
+
+\begin{lstlisting}[caption=System actor behavior in TLA\textsuperscript+ specification
+    , label=lst:ModelSpec]
+µ
+\begin{tlatex}
+\@x{ Init \.{\defeq}}%
 \@x{\@s{16.4} \.{\land} InitialPublic}%
 \@x{\@s{16.4} \.{\land} InitialPrivate}%
 \@x{\@s{16.4} \.{\land} nextPackageId \.{=} 9}%
@@ -430,7 +436,7 @@ The final step of a package judgment is begun by the node who initialized it inv
 \@pvspace{8.0pt}%
 \@x{\@s{33.24}}%
 \@y{\@s{0}%
-    Initializing a package judgment
+Initializing a package judgment
 }%
 \@xx{}%
 \@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
@@ -449,7 +455,7 @@ status \.{=}\@w{started} ]}%
 \@pvspace{8.0pt}%
 \@x{\@s{33.24}}%
 \@y{\@s{0}%
-    Adding a secret vote
+Adding a secret vote
 }%
 \@xx{}%
 \@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
@@ -461,7 +467,7 @@ status \.{=}\@w{started} ]}%
 \@x{\@s{76.17} \.{\land} RunSimulation}%
 \@x{\@s{76.17}}%
 \@y{\@s{0}%
-    Nodes only build/judge if they have to
+Nodes only build/judge if they have to
 }%
 \@xx{}%
 \@x{\@s{76.17} \.{\land}\@s{4.1} \.{\lor}\@s{4.1} FutureCost ( n ) \.{>}
@@ -475,7 +481,7 @@ nextPackageId {\rangle}}%
 \@pvspace{8.0pt}%
 \@x{\@s{33.24}}%
 \@y{\@s{0}%
-    End submission of secret votes
+End submission of secret votes
 }%
 \@xx{}%
 \@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
@@ -483,7 +489,7 @@ nextPackageId {\rangle}}%
 \@x{\@s{59.77} \.{\land} RunSimulation}%
 \@x{\@s{59.77}}%
 \@y{\@s{0}%
-    Assume that every node that *needs* to vote will have the time to do so
+Assume that every node that *needs* to vote will have the time to do so
 }%
 \@xx{}%
 \@x{\@s{59.77} \.{\land}\@s{4.1} \A\, nonVoter \.{\in} Nodes
@@ -492,11 +498,11 @@ nextPackageId {\rangle}}%
 \@x{\@s{86.30} \.{\lor}\@s{4.09} n \.{\in} MaliciousNodes}%
 \@x{\@s{59.77} \.{\land}\@s{4.09} EndSecretSubmissions ( j . id ,\, n )}%
 \@x{\@s{59.77} \.{\land} {\UNCHANGED} {\langle} private ,\, nextPackageId
-    {\rangle}}%
+{\rangle}}%
 \@pvspace{8.0pt}%
 \@x{\@s{33.24}}%
 \@y{\@s{0}%
-    Add an open vote
+Add an open vote
 }%
 \@xx{}%
 \@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
@@ -513,11 +519,11 @@ public . nodes [ n ] . wallet \.{-} 1}%
 \@x{\@s{76.17} \.{\land} ShowJudgment ( j . id ,\, n ,\, ToString ( openVote
 ) )}%
 \@x{\@s{76.17} \.{\land} {\UNCHANGED} {\langle} private ,\, nextPackageId
-    {\rangle}}%
+{\rangle}}%
 \@pvspace{8.0pt}%
 \@x{\@s{33.24}}%
 \@y{\@s{0}%
-    Close judgment
+Close judgment
 }%
 \@xx{}%
 \@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
@@ -525,7 +531,7 @@ public . nodes [ n ] . wallet \.{-} 1}%
 \@x{\@s{59.77} \.{\land} RunSimulation}%
 \@x{\@s{59.77}}%
 \@y{\@s{0}%
-    Assume that every node that *needs* to vote will have the time to do so
+Assume that every node that *needs* to vote will have the time to do so
 }%
 \@xx{}%
 \@x{\@s{59.77} \.{\land}\@s{4.1} \A\, nonVoter \.{\in} Nodes
@@ -535,7 +541,7 @@ public . nodes [ n ] . wallet \.{-} 1}%
 \@x{\@s{59.77} \.{\land}\@s{4.09} CloseJudgment ( j . id ,\, n )}%
 \@x{\@s{59.77}}%
 \@y{\@s{0}%
-    Update the nodes preferences
+Update the nodes preferences
 }%
 \@xx{}%
 \@x{\@s{59.77} \.{\land}\@s{4.1} \E\, preferenceIndex \.{\in} {\DOMAIN}
@@ -545,14 +551,14 @@ package}%
 \@x{\@s{117.92} \.{=} j . package}%
 \@x{\@s{86.30} \.{\land} private \.{'} \.{=}}%
 \@x{\@s{97.42} [ private {\EXCEPT} {\bang} [ n ] . preferences [
-        preferenceIndex ] . status}%
+preferenceIndex ] . status}%
 \@x{\@s{116.59} \.{=}\@w{processed} ]}%
 \@x{\@s{59.77} \.{\land} {\UNCHANGED}\@s{4.1} {\langle} nextPackageId
-    {\rangle}}%
+{\rangle}}%
 \@pvspace{8.0pt}%
 \@x{\@s{33.24}}%
 \@y{\@s{0}%
-    Add additional package to node
+Add additional package to node
 }%
 \@xx{}%
 \@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
@@ -562,14 +568,34 @@ package}%
 \@pvspace{8.0pt}%
 \@x{\@s{33.24}}%
 \@y{\@s{0}%
-    End simulation
+End simulation
 }%
 \@xx{}%
+\label{line:ModelEndStateBegin}
 \@x{\@s{33.24} \.{\lor}\@s{4.1} \.{\land} {\lnot} RunSimulation}%
 \@x{\@s{48.45} \.{\land} {\UNCHANGED} {\langle} private ,\, public ,\,
 nextPackageId {\rangle}}%
+\label{line:ModelEndStateEnd}
 \@pvspace{16.0pt}%
 \@x{ Spec\@s{1.46} \.{\defeq} Init \.{\land} {\Box} [ Next ]_{ {\langle}
 public ,\, private ,\, nextPackageId {\rangle}}}%
+\label{line:ModelSpec}
+\end{tlatex}
+µ
+\end{lstlisting}
+
+\subsection{Model checking goal}
+
+Deadlocks happen if the model checker finds a state at which no sub-expression in the \texttt{Next} operator evaluates to true. While this is convenient for finding bugs in the specification, it can also lead to false-negatives if the state space of the model is designed to be finite. In other words, it is problematic if the model checker ends up in a deadlock when it is done. To combat this situation, the predicate \texttt{RunSimulation} shown in listing \ref{lst:RunSimulation} is used in \texttt{Next} to ensure the existence of a valid next state even after the model checking goal has been reached. Lines \ref{line:ModelEndStateBegin}-\ref{line:ModelEndStateEnd} in listing \ref{lst:ModelSpec} are true exactly when the model checking goal has been reached. At that point, the other sub-expressions in \texttt{Next} are false because they are dependent on \texttt{RunSimulation} to be true. When the goal has been fulfilled, the TLC model checker finds the sub-expression at lines \ref{line:ModelEndStateBegin}-\ref{line:ModelEndStateEnd} to be the only one that is true. Because that sub-expression also does not change any variables value, TLC infers that no more progress can be made and the behavior finishes successfully.
+
+\begin{lstlisting}[caption=Test if goal is met or not
+                    , label=lst:RunSimulation]
+    µ
+    \begin{tlatex}
+        \@x{ RunSimulation \.{\defeq}}%
+        \@x{\@s{16.4} Cardinality ( ClosedJudgments ) \.{<}
+        NumberOfClosedJudgmentsGoal}%
+    \end{tlatex}
     µ
 \end{lstlisting}
+
