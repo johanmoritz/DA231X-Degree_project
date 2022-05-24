@@ -439,6 +439,7 @@ The last main parts of the model are the assumptions for how the nodes behave, c
 Initializing a package judgment
 }%
 \@xx{}%
+\label{line:ModelNextInitializeBegin}
 \@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
 \@x{\@s{48.45} \E\, index \.{\in} {\DOMAIN} private [ n ] . preferences
 \.{:}}%
@@ -452,12 +453,14 @@ Initializing a package judgment
 \@x{\@s{95.38} [ private {\EXCEPT} {\bang} [ n ] . preferences [ index ] .
 status \.{=}\@w{started} ]}%
 \@x{\@s{80.17} \.{\land} {\UNCHANGED} {\langle} nextPackageId {\rangle}}%
+\label{line:ModelNextInitializeEnd}
 \@pvspace{8.0pt}%
 \@x{\@s{33.24}}%
 \@y{\@s{0}%
 Adding a secret vote
 }%
 \@xx{}%
+\label{line:ModelNextAddSecretBegin}
 \@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
 \@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
 \@x{\@s{59.77} \.{\LET} secretVote \.{\defeq} {\IF} n \.{\in} MaliciousNodes}%
@@ -478,12 +481,14 @@ public . nodes [ n ] . wallet \.{-} 1}%
 ToString ( secretVote ) )}%
 \@x{\@s{76.17} \.{\land}\@s{4.09} {\UNCHANGED} {\langle} private ,\,
 nextPackageId {\rangle}}%
+\label{line:ModelNextAddSecretEnd}
 \@pvspace{8.0pt}%
 \@x{\@s{33.24}}%
 \@y{\@s{0}%
 End submission of secret votes
 }%
 \@xx{}%
+\label{line:ModelNextEndSecretBegin}
 \@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
 \@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
 \@x{\@s{59.77} \.{\land} RunSimulation}%
@@ -499,12 +504,14 @@ Assume that every node that *needs* to vote will have the time to do so
 \@x{\@s{59.77} \.{\land}\@s{4.09} EndSecretSubmissions ( j . id ,\, n )}%
 \@x{\@s{59.77} \.{\land} {\UNCHANGED} {\langle} private ,\, nextPackageId
 {\rangle}}%
+\label{line:ModelNextEndSecretEnd}
 \@pvspace{8.0pt}%
 \@x{\@s{33.24}}%
 \@y{\@s{0}%
 Add an open vote
 }%
 \@xx{}%
+\label{line:ModelNextShowSecretBegin}
 \@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
 \@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
 \@x{\@s{59.77} \.{\LET} openVote \.{\defeq} {\IF} n \.{\in} MaliciousNodes}%
@@ -520,12 +527,14 @@ public . nodes [ n ] . wallet \.{-} 1}%
 ) )}%
 \@x{\@s{76.17} \.{\land} {\UNCHANGED} {\langle} private ,\, nextPackageId
 {\rangle}}%
+\label{line:ModelNextShowSecretEnd}
 \@pvspace{8.0pt}%
 \@x{\@s{33.24}}%
 \@y{\@s{0}%
 Close judgment
 }%
 \@xx{}%
+\label{line:ModelNextCloseBegin}
 \@x{\@s{33.24} \.{\lor}\@s{4.1} \E\, n \.{\in} Nodes \.{:}}%
 \@x{\@s{48.45} \E\, j\@s{1.87} \.{\in} Range ( public . judgments ) \.{:}}%
 \@x{\@s{59.77} \.{\land} RunSimulation}%
@@ -555,6 +564,7 @@ preferenceIndex ] . status}%
 \@x{\@s{116.59} \.{=}\@w{processed} ]}%
 \@x{\@s{59.77} \.{\land} {\UNCHANGED}\@s{4.1} {\langle} nextPackageId
 {\rangle}}%
+\label{line:ModelNextCloseEnd}
 \@pvspace{8.0pt}%
 \@x{\@s{33.24}}%
 \@y{\@s{0}%
@@ -609,4 +619,6 @@ In the initial state, each node has a number of preferred packages as a means of
 
 \subsection{System actor assumptions}
 
-Besides the sub-expressions described in sections \ref{subsec:ModelCheckingGoal} and \ref{subsec:ModelAddingPackages}, the rest of the sub-expressions of the \texttt{Next} operator all relate to the behavior of the nodes. For each chaincode defined in the model, there is a sub-expression in the main disjunction of the \texttt{Next} operator.
+Besides the sub-expressions described in sections \ref{subsec:ModelCheckingGoal} and \ref{subsec:ModelAddingPackages}, the rest of the sub-expressions of the \texttt{Next} operator all relate to the behavior of the nodes. For each chaincode defined in the model, there is a sub-expression in the main disjunction of the \texttt{Next} operator as seen in listing \ref{lst:ModelSpec}. Overall, they follow a pattern of picking some node \texttt{n} and, possibly, a package judgment \texttt{j}, testing the appropriateness of calling a particular chaincode in that state and, if it is appropriate, finally executing the chaincode. This is also where the \texttt{private} variable might change, representing information only available to that particular node.
+
+Beginning with lines \ref{line:ModelNextInitializeBegin}-\ref{line:ModelNextInitializeEnd} is the setup for initializing a new package judgment. While straightforward, this is an example of how the \texttt{private} variable is used and changed to represent that a node has information on which and to what extent packages they wish to judge. Following along from line \ref{line:ModelNextAddSecretBegin} shows the assumptions under which hidden votes are added to a package judgment. A vote is added only under the conditions that the node would be \emph{either} lacking tokens for initializing judgments for their own preferred packages by not participating in the judgment, \emph{or}preferring the package in question. These lines also show that the behavior of a malicious node is exactly the same that of the non-malicious one with the exception of voting the opposite way.
