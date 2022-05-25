@@ -497,10 +497,12 @@ End submission of secret votes
 Assume that every node that *needs* to vote will have the time to do so
 }%
 \@xx{}%
+\label{line:ModelSpecTimingExampleBegin}
 \@x{\@s{59.77} \.{\land}\@s{4.1} \A\, nonVoter \.{\in} Nodes
 \.{\,\backslash\,} SecretJudges ( j ) \.{:}}%
 \@x{\@s{86.30} \.{\lor}\@s{4.1} IsFinanciallyIncentivizedToVote ( nonVoter )}%
 \@x{\@s{86.30} \.{\lor}\@s{4.09} n \.{\in} MaliciousNodes}%
+\label{line:ModelSpecTimingExampleEnd}
 \@x{\@s{59.77} \.{\land}\@s{4.09} EndSecretSubmissions ( j . id ,\, n )}%
 \@x{\@s{59.77} \.{\land} {\UNCHANGED} {\langle} private ,\, nextPackageId
 {\rangle}}%
@@ -621,4 +623,6 @@ In the initial state, each node has a number of preferred packages as a means of
 
 Besides the sub-expressions described in sections \ref{subsec:ModelCheckingGoal} and \ref{subsec:ModelAddingPackages}, the rest of the sub-expressions of the \texttt{Next} operator all relate to the behavior of the nodes. For each chaincode defined in the model, there is a sub-expression in the main disjunction of the \texttt{Next} operator as seen in listing \ref{lst:ModelSpec}. Overall, they follow a pattern of picking some node \texttt{n} and, possibly, a package judgment \texttt{j}, testing the appropriateness of calling a particular chaincode in that state and, if it is appropriate, finally executing the chaincode. This is also where the \texttt{private} variable might change, representing information only available to that particular node.
 
-Beginning with lines \ref{line:ModelNextInitializeBegin}-\ref{line:ModelNextInitializeEnd} is the setup for initializing a new package judgment. While straightforward, this is an example of how the \texttt{private} variable is used and changed to represent that a node has information on which and to what extent packages they wish to judge. Following along from line \ref{line:ModelNextAddSecretBegin} shows the assumptions under which hidden votes are added to a package judgment. A vote is added only under the conditions that the node would be \emph{either} lacking tokens for initializing judgments for their own preferred packages by not participating in the judgment, \emph{or}preferring the package in question. These lines also show that the behavior of a malicious node is exactly the same that of the non-malicious one with the exception of voting the opposite way.
+Beginning with lines \ref{line:ModelNextInitializeBegin}-\ref{line:ModelNextInitializeEnd} is the setup for initializing a new package judgment. While straightforward, this is an example of how the \texttt{private} variable is used and changed to represent that a node has information on which and to what extent packages they wish to judge. Following along from line \ref{line:ModelNextAddSecretBegin} shows the assumptions under which hidden votes are added to a package judgment. A vote is added only under the conditions that the node would be \emph{either} lacking tokens for initializing judgments for their own preferred packages by not participating in the judgment, \emph{or}preferring the package in question. These lines also show that the behavior of a malicious node is exactly the same as that of a non-malicious one with the exception of voting the opposite way. Lines \ref{line:ModelNextShowSecretBegin}-\ref{line:ModelNextShowSecretEnd} contain a near identical pattern for under what circumstances hidden votes are revealed.
+
+Both the hidden vote submission phase and the vote revealing phase are assumed to take enough time that every node who is motivated to participate will have the time to do so. This is regulated by the predicates seen at lines \ref{line:ModelSpecTimingExampleBegin}-\ref{line:ModelSpecTimingExampleEnd}, relying on the nodes \texttt{private} information.
