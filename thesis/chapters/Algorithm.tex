@@ -1,22 +1,11 @@
 \chapter{Judgment algorithm}
 
-
-\section{Algorithm: reward scheme}
-Each builder holds a wallet of build tokens (BT), and a set of packages they prefer to be judged.
-
-Each prefered package has a trust level connected to it, that directly corresponds to how many build tokens the builder is willing to pay for the package to be judged. A package with a trust level of 1, requires one additional builder to judge the package for the initiator to be satisfied with the judgment. The initiator then pays 1 BT to the other builder. For each added trust level, one more builder is required to judge the package. The cost per added builder goes up by one, such that with $n$ builders, the $k^{th}$ one to judge a package recieves $n - k + 1$ BT from the initiator. The minimum cost for a judgment at trust level $l$ is then $1 + 2 + \dotsc + l = \frac{l(l+1)}{2}$.
-
-A package judgment can be initiated if the initiator has enough build tokens to pay for its cost.
-
-If a decision can be made on the reproducibility of a package, the initiator pays out the respective number of build tokens to each builder of the winning side. Everyone of those builders except the initiator also recieve one (1) additional build token from the system.
-
-In order to bootstrap the system each node recieves an initial 1 BT, except for one node which recieves 3 BT. This last node has the responsibility of being the first initiator
-
 \section{Algorithm: hidden vote judgment}
 
 A description of the voting scheme follows and is split into a single-package and a multi-package case. The single-package algorithm denote how a judgment is made on the reproducibility of a single package, while the multi-package variant generalizes this algorithm to scenarios with multiple packages through a reward scheme to motivate builders.
 
 \subsection{Single-package algorithm}
+\label{subsec:AlgorithmSingle}
 
 A definition of \textit{what} the single-package judgment algorithm does can be stated as:
 
@@ -25,3 +14,15 @@ A definition of \textit{what} the single-package judgment algorithm does can be 
 \end{quote}
 
 A package judgment is initiated by a builder selecting a default value $d$ and supplying it together with a \texttt{.buildinfo} file name $n_p$ to a Hyperledger Fabric network. The judgment process is then a two-phase commit with an initial round of hidden votes followed by a round of vote reveals. By separating the vote into two phases, no two participating builders votes can influence each other even though the final votes are not anonymized. Any builder on the network may then vote on the reproducibility of the package by (I) selecting a key $k$, (II) calculating the checksum of the reproduced package $c = H(p)$, (III) encrypting the checksum $e = MAC(k, c)$ and (IV) adding the encrypted result to the Hyperledger Fabric network. If a package is not reproducible, the builder instead uses the default value $d$ instead of the checksum $c$ in the third step. At a suitable moment, the initiator can then close the first phase of the judgment process and open it up for vote reveals. A builder reveals their vote by providing the $k$ and $c$ values to the Fabric network, which then verifies the consistency of the vote. The judgment process can then be ended by the initiator. At this point, the votes are counted and the final verdict as determined by a majority of the votes is stored on the network.
+
+\subsection{Multi-package algorithm and reward scheme}
+
+To lift the algorithm described in section \ref{subsec:AlgorithmSingle} from working on a single package to multiple packages, a reward scheme is added to incentive builder collaboration and the number of simultaneous active judgments a builder have initialized is limited to one. The reward scheme relies on every builder having a wallet of build tokens (BT) that is stored on the network. While initializing a package judgment, the initializing builder provides a target vote level corresponding to the number of build tokens they are willing to pay for the judgment. \textbf{(minimum cost???)}
+
+A package with a trust level of 1, requires one additional builder to judge the package for the initiator to be satisfied with the judgment. The initiator then pays 1 BT to the other builder. For each added trust level, one more builder is required to judge the package. The cost per added builder goes up by one, such that with $n$ builders, the $k^{th}$ one to judge a package recieves $n - k + 1$ BT from the initiator. The minimum cost for a judgment at trust level $l$ is then $1 + 2 + \dotsc + l = \frac{l(l+1)}{2}$.
+
+A package judgment can be initiated if the initiator has enough build tokens to pay for its cost.
+
+If a decision can be made on the reproducibility of a package, the initiator pays out the respective number of build tokens to each builder of the winning side. Everyone of those builders except the initiator also recieve one (1) additional build token from the system.
+
+In order to bootstrap the system each node recieves an initial 1 BT, except for one node which recieves 3 BT. This last node has the responsibility of being the first initiator
