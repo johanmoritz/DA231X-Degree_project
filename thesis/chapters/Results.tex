@@ -43,24 +43,39 @@ To test the model under a more realistic scenario, this scenario extends the one
 
 \section{Analysis of system properties}
 
+The following section argue the the general system properties that can be inferred by the results and system description.
+
 \subsection{Safety}
+\label{subsec:AnalysisSafety}
 
 The safety property of the system as stated in section \ref{sec:modelCorrectness} says that no packages should be wrongly judged. This is determined by the model checker as described in section \ref{subsec:ModelModelCorrectness}. Given the successfully finished model checking results noted in tables \ref{table:no_malicious_builders} and \ref{table:one_malicious_builder} and assuming the model represents a real implementation, this property hold for the system.
 
 \subsection{Progress}
+\label{subsec:AnalysisProgress}
 
 System progress has been shown by a combination of the model package judgment goal described in section \ref{subsec:ModelCheckingGoal} and the builtin deadlock testing the model checker performs. Because every goal was reached successfully without reaching a deadlocked state, a system based on the model should be able to progress as well.
 
 \subsection{Balanced ownership}
+\label{subsec:AnalysisBalanced}
 
-Intuitively from the multi-package algorithm description in section \ref{subsec:AlgorithmMulti}, it can be understood that no builder could singlehandedly decide what packages should be judged. If a builder would try such a thing, their wallets would be emptied out to pay for the judgments they initialize. At this point they would have to judge packages for others, thus proving they would not be able to control the system. 
+Intuitively from the multi-package algorithm description in section \ref{subsec:AlgorithmMulti}, it can be understood that no builder could singlehandedly decide what packages should be judged. If a builder would try such a thing, their wallets would be emptied out to pay for the judgments they initialize. At this point they would have to judge packages for others, thus proving they would not be able to control the system.
 
-\subsection{Centralized distribution}
+\subsection{Decentralized distribution}
+\label{subsec:AnalysisDecentralized}
 
-Because the system is designed on top of Hyperledger Fabric, 
+Because the system is designed on top of Hyperledger Fabric, the \glsentryshort{DLT}s properties benefit the system as well. One of these is the fact that the network and the data stored on the network is distributed and not centralized. This implies that the reproducibility of packages stored in the system has decentralized distribution as well.
 
 \subsection{Traceability}
+\label{subsec:AnalysisTraceability}
+
+Similarly to section \ref{subsec:AnalysisDecentralized}, any package judgment result can be traced back through the transaction history stored on the Hyperledger Fabric blockchain. The main events of a package judgment is also stored on the world-state itself, as shown in the model description under section \ref{subsec:ModelChaincode}, which acts to increase the traceability for how a particular result was decided.
 
 \subsection{Integrity of results}
+\label{subsec:AnalysisIntegrity}
+
+As an additional benefit to being built on top of Hyperledger Fabric, the results stored on the system can only be changed by a consensus of actors. The threat from single participating malicious actors is therefore slim.
 
 \subsection{Collusion-free}
+\label{subsec:AnalysisCollusionFree}
+
+Assuming that actors do not communicate outside of the network as stated in section \ref{sec:systemActors}, the single-package algorithm described in section \ref{subsec:AlgorithmSingle} stops collusion and improper knowledge sharing within the system due to the votes hidden nature.
