@@ -28,10 +28,12 @@ Because Hyperledger Fabric chaincode are written in turing-complete languages it
 \subsection{Two-phase commit}
 \label{subsec:DiscussionTwoPhaseCommit}
 
-\subsection{System-actor behaviour}
+While the model does not include the cryptographic elements of the judgment algorithm, it follows the idea of adding and revealing votes in two different steps and instead assumes the mechanism for validating the revealed votes to always work. \textbf{(Do I need a correctness argument in my results for the cryptographic stuff?)} Additionally, the model does not use per package judgment unique values for positive and negative votes as described in section \ref{subsec:AlgorithmSingle}. While such additions would be needed for the security properties of the system, they are not problematic to simplify in the model as they do not change the possible behavior of the system actors.
+
+\subsection{System-actor behavior}
 \label{subsec:DiscussionBehaviourAssumptions}
 
-The model assumptions of how system-actors behave are laid out in section \ref{subsec:ModelSpec}.
+The assumptions of how system-actors behave are laid out in section \ref{sec:systemActors} and further deliberated on for the model in section \ref{subsec:ModelSpec}. Although it is straightforward to see that the model follows the assumptions for system-actors, there are a some additional behaviors in the model not explained in section \ref{sec:systemActors}. Mainly this comes down to the representation of malicious actors which are used in the model mainly for testing purposes. Modelling a realistic malicious actor complicate the model significantly and is beyond the scope of this work.
 
 
 \subsection{Translation summary}
