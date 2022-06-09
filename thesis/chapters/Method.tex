@@ -259,6 +259,25 @@ The use of a system model written in TLA\textsuperscript+ instead of an actual i
 
 The ideal method for this project would be building the system and evaluating it with real world actors interessted in using it. That would give a clear indication of the systems' properties and the outcomes from utilizing it. It would, however, be quite out of scope for this project. To diminish the distance between this ideal method and the one used, the model is made in such a way that the number of assumptions on actors are as few as possible and clearly formulated. As every assumption is encoded in TLA\textsuperscript+, they are defined semantically and can be verified by the reader.
 
+\section{Model evaluation}
+\label{sec:model_evaluation}
+
+To evaluate the correctness of the TLA\textsuperscript+ model, a number of scenarios are tested with the TLC model checker. Because TLC is a bounded model checker, these scenarios do not prove the correctness of the model in general but gives an indication to under which assumptions it is correct. Particularly, they are selected to show that the system makes progress in non-trivial cases, rather than stopping in a deadlocked state, and that it yields valid results. In all scenarios, a limit as well as goal is set in terms of the number of packages the system should evaluate correctly before finishing. In other words, for each behaviour (or state sequence) that is tested in a scenario, either the goal is reached or the model has failed the scenario.
+
+\subsection{Scenario 1: No malicious builders}
+\label{subsec:scenario_non-malicious}
+
+This scenario is a positive test of the model where every builder is assumed to take egoistical but non-malicious actions, following the behaviour described under section \ref{sec:systemActors}. There are three total builders, each one with two preferred packages at a vote target of two. Two of the builders begin with 0BT in their respective wallets while the third one starts with 3BT. This allows the last builder to initialize the first package judgment, because 3BT is exactly the cost for a package with a vote target of two. The judgment goal of the scenario scales from one up to and including four, thus ensuring that the initially preferred packages of at least one builder have been judged.
+
+\subsection{Scenario 2: Single malicious builder}
+\label{subsec:scenario_single_malicious}
+
+To test the model under a more realistic scenario, this scenario extends the one in \ref{subsec:scenario_non-malicious} with a malicious builder. The malicious builder acts similarly to the builders from \ref{sec:systemActors}, but will always judge packages incorrectly. With the added malicious builder, this scenario has a total of four builders. To improve model checking time with the additional builder, the judgment goal is lessened to up to and including two packages. The main purpose of this scenario is to ensure that the model works as intended when not all judgments are the equal.
+
+\section{Test equipment}
+
+Model checking is run on two different types of hardware. The time-wize shortest tests are run on a laptop with 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz processor and 16.0GB memory. More time-consuming tests are performed on an AWS EC2 c3.8xlarge instance with 32 virtual CPUs and 60GiB of memory.
+
 \section{System overview}
 \label{sec:systemOverview}
 
