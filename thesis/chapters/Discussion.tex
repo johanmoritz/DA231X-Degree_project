@@ -7,11 +7,16 @@
 
 \section{Model bounds}
 
-While the model checking runs successfully in the scenarios laid out in section \ref{sec:model_evaluation}, these are all artificially limited in their size. As can be noted from the results, the time it takes to model check each scenario grows significantly with the bounds of the model. The upper limit of these scenarios are therefore in practice bounded by compute time. The consequence of this limit is that the model is not verified to work successfully with higher goals or in larger networks, although there is little to suggest that such an extension would significantly change the models behavior in practice.
+While the model checking runs successfully in the scenarios laid out in section \ref{sec:model_evaluation}, these are all artificially limited in their size. As can be noted from the results, the time it takes to model check each scenario grows significantly with the bounds of the model. The upper limit of these scenarios are therefore in practice bounded by compute time. The consequence of this limit is that the model is not verified to work successfully with higher goals or in larger networks. Although there is little to suggest that such an extension would significantly change the models behavior in practice, the results could very well be improved or strengthened by model checking on larger and more complex scenarios.
+
+\section{Model refinement}
+
+Another way to improve the results would be to refine the model itself. Currently, its focus is on the interactions between system actors and the reward system while it leaves the details for how to cryptographically handle the voting process completely. 
+
 
 \section{User behavior}
 
-
+The assumptions on user behavior in this report have overall been minor and as limited as possible. However, there could be important differences between how the system actors are modelled and how actual users of the system would behave. While it is outside of the scope of this work, it would be interesting to study how well the incentive mechanisms and behavior used represent the relevant users.
 
 \section{Fabric security properties}
 
