@@ -11,7 +11,7 @@ While the model checking runs successfully in the scenarios laid out in section 
 
 \section{Model refinement}
 
-Another way to improve the results would be to refine the model itself. Currently, its focus is on the interactions between system actors and the reward system while it leaves the details for how to cryptographically handle the voting process completely. 
+Another way to improve the results would be to refine the model itself. Currently, its focus is on the interactions between system actors and the reward system while it leaves the details for how to cryptographically handle the voting process completely. It also disregards the Fabric transactional process in favour of simpler model. By modelling the Fabric API and transactions, the refinement would be closer to an implementation. However, it would most likely also increase model checking duration. At that point, an argument could be made that testing an implementation could be more productive rather than making the model more complex.
 
 
 \section{User behavior}
