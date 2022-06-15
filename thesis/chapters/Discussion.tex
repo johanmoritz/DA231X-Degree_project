@@ -20,3 +20,9 @@ The assumptions on user behavior in this report have overall been minor and as l
 
 \section{Fabric security properties}
 
+
+\todoinline{The builders should only use a hash for YES or NO. This more general voting scheme (with multiple different votes) should be added as a discussion point.}
+
+\todoinline{Currently, the security evaluation of the single-judgment algorithm is very limited. We make no argument as to how long the votes and keys used for hmac should be.}
+
+\todoinline{Builders can choose what ever terrible key they want when using HMAC. This is fine because we assume they cannot communicate outside the network. In practice though, it is a problem. }

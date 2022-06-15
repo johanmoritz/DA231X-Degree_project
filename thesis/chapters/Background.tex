@@ -149,7 +149,7 @@ async createCar(ctx, carNumber, make, model, color, owner) {
 		owner,
 	};
 
-	await ctx.stub.putState(carNumber, 
+	await ctx.stub.putState(carNumber,
 	                        Buffer.from(JSON.stringify(car)));
 }
 
@@ -319,7 +319,11 @@ where
 
 % A commitment scheme is a cryptographic primitive for proving to a \textit{reciever} that a \textit{commiter} had some knowledge or stake at an earlier point in time without having to disclose it directly \cite{rak_automated_2017}. Given that the commiter has some public (known by both parties) value \textit{h} and stake \textit{m}, they calculate a commitment \textit{c} and an opening value \textit{d} by some method $\mathcal{C}$ \ie $\mathcal{C}(h, m) = (c, d)$. The commitment \textit{c} is sent to the reciever in this first phase of the protocol. The stake \textit{m} and the opening value \textit{d} is later sent in the second phase, from which the reciever can verify that \textit{m} was the initial value with some boolean function $\mathcal{V}(h, m, c, d)$.
 
+\section{\glsentryshort{HMAC}}
 
+\gls{HMAC} \cite{goos_keying_1996} is commonly used to ensure the integrity and authenticity of a message by generating what is essentially a hash of the message itself. The message sender and receiver share a common key, which is used by the reciever to recreate the hash from the message, thus verifying that the message has not been changed by anyone other than the sender.
+
+To generate a hash, or \glsentryshort{MAC} with \gls{HMAC}, a plaintext message $m$, a hash function $H$ and a key $k$ is needed. The hash function should work iteratively on fixed sized blocks of $b$ bits length. Additionally, $\bar{k}$ is the key $k$ but with enough 0's concatenated to reach the block length, $opad$ is a string of repeated 0x36 values and $ipad$ is a string of repeated 0x5c values. The length of both $opad$ and $ipad$ is $b$ bits. A MAC is then generated as $HMAC_k(m) = H(\bar{k} \oplus opad, H(\bar{k} \oplus ipad, m))$, where the exlusive-or operator is signified by $\oplus$.
 
 % \section{Major background area 1}
 % \todo[inline, backgroundcolor=kth-lightblue]{Viktigt bakgrundsområde 1}
