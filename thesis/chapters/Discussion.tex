@@ -1,9 +1,9 @@
 \chapter{Discussion}
-\todo[inline]{This can be a separate chapter or a section
-	in the previous chapter.}
+% \todo[inline]{This can be a separate chapter or a section
+% 	in the previous chapter.}
 \label{ch:discussion}
-\todo[inline, backgroundcolor=kth-lightblue]{Diskussion\\
-	Förbättringsförslag?}
+% \todo[inline, backgroundcolor=kth-lightblue]{Diskussion\\
+% 	Förbättringsförslag?}
 
 \section{Model bounds}
 
@@ -16,10 +16,17 @@ Another way to improve the results would be to refine the model itself. Currentl
 
 \section{User behavior}
 
-The assumptions on user behavior in this report have overall been minor and as limited as possible. However, there could be important differences between how the system actors are modelled and how actual users of the system would behave. While it is outside of the scope of this work, it would be interesting to study how well the incentive mechanisms and behavior used represent the relevant users.
+The assumptions on user behavior in this report have overall been minor and as limited as possible. However, there could be important differences between how the system actors are modelled and how actual users of the system would behave. While it is outside of the scope of this work, it would be interesting to study how well the incentive mechanisms and behavior used represent the relevant users. This is especially true for modelling malicious system actors, which the result mostly disregard. While a Hyperledger Fabric network has strong security properties and allows a certain fraction of malicious nodes, the result does not particularly address whether a system implementation as analyzed would open up other security vulnerabilities due to unforeseen user patterns.
 
 \section{Fabric security properties}
 
+\section{Improved voting}
+
+In the single-package algorithm described in section \ref{subsec:AlgorithmSingle}, the values to represent positive and negative votes respectively were all the same and selected at the start of a package judgment. This means that while the judgment decision can be traced on the Fabric blockchain, there would be no proof that all builders have built the exact same package. Depending on the situation, such a relaxed view could be preferable though, as it would simplify builder setup coordination and the reproducibility is tested in different environments. If the wish would be to strengthen the traceability, the builders could be asked to supply a proof for a positive vote by adding the checksum of the built package to their vote. With such a change, all positive votes should be equal after they have been revealed without needing any centralized coordination on the allowed votes.
+
+\section{Key selection}
+
+While a system user's number of choices has been minimized to simplify analysis, the matter of key selection for the \gls{HMAC} usage was up to the user to decide on their own. This could be a possible entry point for users to collude by using pre-determined or simple keys. If only considering non-malicious users, this can possibly be resolved by generating keys inside chaincode, thus ensuring that all keys are created in the same standard way. 
 
 \todoinline{The builders should only use a hash for YES or NO. This more general voting scheme (with multiple different votes) should be added as a discussion point.}
 
